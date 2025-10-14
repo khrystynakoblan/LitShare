@@ -59,7 +59,13 @@ class Program
             while (reader.Read())
             {
                 for (int i = 0; i < reader.FieldCount; i++)
-                    Console.Write($"{reader[i],-25}");
+                {
+                    var value = reader[i];
+                    if (reader.GetName(i).ToLower() == "password")
+                        value = value.ToString().Length > 10 ? value.ToString().Substring(0, 10) + "..." : value;
+
+                    Console.Write($"{value,-25}");
+                }
                 Console.WriteLine();
             }
             Console.WriteLine();
@@ -136,7 +142,7 @@ class Program
             string title = $"Книга_{i + 1}";
             string author = $"Автор_{rand.Next(1, 20)}";
             string dealType = (rand.Next(2) == 0) ? "exchange" : "donation";
-            string description = $"Опис книги {i + 1}. Стан хороший.";
+            string description = $"Опис книги {i + 1}.";
             string photo = $"https://photo{i + 1}";
 
             string insertPost = @"
@@ -180,7 +186,7 @@ class Program
         {
             int postId = rand.Next(1, POSTS_COUNT + 1);
             int userId = rand.Next(1, USERS_COUNT + 1);
-            string text = $"Скарга {i + 1} на пост {postId}. Порушення правил.";
+            string text = $"Скарга {i + 1} на пост {postId}.";
 
             string insertComplaint = @"
             INSERT INTO complaints (text, post_id, complainant_id)
