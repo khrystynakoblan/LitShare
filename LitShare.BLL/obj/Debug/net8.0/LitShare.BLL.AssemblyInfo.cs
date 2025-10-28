@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LitShare.BLL")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bd5155afb9d7b0da7a8161c29e68522b7a2c30cf")]
 [assembly: System.Reflection.AssemblyProductAttribute("LitShare.BLL")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LitShare.BLL")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
