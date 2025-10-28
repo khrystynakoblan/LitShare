@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LitShare.DAL")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fe85c25bd67dfaa1c942dfe26b032897ffeaa799")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
 [assembly: System.Reflection.AssemblyProductAttribute("LitShare.DAL")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LitShare.DAL")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
