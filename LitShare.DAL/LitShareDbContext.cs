@@ -1,28 +1,37 @@
-﻿using LitShare.DAL.Models; 
+﻿
+using LitShare.DAL.Models; 
 using Microsoft.EntityFrameworkCore;
+using Npgsql; 
+// ------------------------------
 
 namespace LitShare.DAL
 {
     public class LitShareDbContext : DbContext
     {
-        // "Набори" даних, які представляють ваші таблиці
+        private static bool _mapperConfigured = false;
+       
+
+
+
         public DbSet<Users> Users { get; set; }
-        public DbSet<Posts> Posts { get; set; }
-        public DbSet<Genres> Genres { get; set; }
-        public DbSet<Complaints> Complaints { get; set; }
-        public DbSet<BookGenres> BookGenres { get; set; }
+        public DbSet<Posts> posts { get; set; }
+        public DbSet<Genres> genres { get; set; }
+        public DbSet<Complaints> complaints { get; set; }
+        public DbSet<BookGenres> bookGenres { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            // РЯДОК ПІДКЛЮЧЕННЯ З SUPABASE
-            string connectionString = "User Id=postgres.arrxdcvkamsqxudjxvkm;Password=QioEm2I5SBGYHjs7;Server=aws-1-eu-west-3.pooler.supabase.com;Port=6543;Database=postgres";
+            
+
+            string connectionString = "User-----------------------------------------";
 
             optionsBuilder.UseNpgsql(connectionString);
         }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // вказуємо EF Core, що таблиця 'BookGenre' має складений первинний ключ (з двох колонок)
+            // Цей рядок у вас має залишитись
             modelBuilder.Entity<BookGenres>()
                 .HasKey(bg => new { bg.post_id, bg.genre_id });
         }

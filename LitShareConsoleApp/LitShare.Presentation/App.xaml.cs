@@ -2,7 +2,8 @@
 using System.Data;
 using System.Windows;
 
-namespace LitShare.Presentation { 
+namespace LitShare.Presentation
+{
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>

@@ -1,4 +1,5 @@
 C:\Users\Lenovo\Desktop\LitShare\LitShare.BLL\bin\Debug\net8.0\LitShare.BLL.deps.json
+C:\Users\Lenovo\Desktop\LitShare\LitShare.BLL\bin\Debug\net8.0\LitShare.BLL.runtimeconfig.json
 C:\Users\Lenovo\Desktop\LitShare\LitShare.BLL\bin\Debug\net8.0\LitShare.BLL.dll
 C:\Users\Lenovo\Desktop\LitShare\LitShare.BLL\bin\Debug\net8.0\LitShare.BLL.pdb
 C:\Users\Lenovo\Desktop\LitShare\LitShare.BLL\bin\Debug\net8.0\LitShare.DAL.dll
@@ -13,6 +14,5 @@ C:\Users\Lenovo\Desktop\LitShare\LitShare.BLL\obj\Debug\net8.0\LitShare.BLL.cspr
 C:\Users\Lenovo\Desktop\LitShare\LitShare.BLL\obj\Debug\net8.0\LitShare.BLL.dll
 C:\Users\Lenovo\Desktop\LitShare\LitShare.BLL\obj\Debug\net8.0\refint\LitShare.BLL.dll
 C:\Users\Lenovo\Desktop\LitShare\LitShare.BLL\obj\Debug\net8.0\LitShare.BLL.pdb
-C:\Users\Lenovo\Desktop\LitShare\LitShare.BLL\obj\Debug\net8.0\ref\LitShare.BLL.dll
-C:\Users\Lenovo\Desktop\LitShare\LitShare.BLL\bin\Debug\net8.0\LitShare.BLL.runtimeconfig.json
 C:\Users\Lenovo\Desktop\LitShare\LitShare.BLL\obj\Debug\net8.0\LitShare.BLL.genruntimeconfig.cache
+C:\Users\Lenovo\Desktop\LitShare\LitShare.BLL\obj\Debug\net8.0\ref\LitShare.BLL.dll

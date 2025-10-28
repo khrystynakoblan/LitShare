@@ -1,6 +1,6 @@
 ﻿
-using LitShare.DAL; // 1. Доступ до нашого DbContext
-using LitShare.DAL.Models; // 2. Доступ до наших моделей (User, Post і т.д.)
+using LitShare.DAL; // 1. Доступдо нашого DbContext
+using LitShare.DAL.Models;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -35,27 +35,24 @@ namespace LitShare.BLL.Services
         }
 
         // Метод для додавання нового користувача
-        public void AddUser(string name, string email, string password)
-        {
-            // Тут може буде логіка (BLL):
-            // - Перевірка, чи email вже не зайнятий
-            // - Хешування парол
+        // У файлі LitShare.BLL.Services/UserService.cs
 
+        public void AddUser(string name, string email, string password, string region, string district, string city)
+        {
             var newUser = new Users
             {
                 name = name,
                 email = email,
-                password = password, // (Тут має бути хешування!)
-                role = "user", // Значення за замовчуванням
-                region = "Default",
-                district = "Default",
-                city = "Default"
+                password = password,
+                region = region,
+                district = district,
+                city = city
             };
 
             using (LitShareDbContext context = new LitShareDbContext())
             {
-                context.Users.Add(newUser); // Повідомляємо EF, що хочемо додати об'єкт
-                context.SaveChanges();      // Виконуємо команду INSERT в базу даних
+                context.Users.Add(newUser);
+                context.SaveChanges();
             }
         }
     }
