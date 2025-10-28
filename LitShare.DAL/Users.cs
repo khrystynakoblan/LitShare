@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace LitShare.DAL.Models
 {
     [Table("users")] // Точно вказуємо назву таблиці
-    public class User
+    public class Users
     {
         [Key] // Позначаємо первинний ключ
         public int id { get; set; }

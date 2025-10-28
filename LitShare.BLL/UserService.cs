@@ -9,13 +9,13 @@ namespace LitShare.BLL.Services
     public class UserService
     {
         // Він не приймає нічого, а повертає список (List) об'єктів User
-        public List<User> GetAllUsers()
+        public List<Users> GetAllUsers()
         {
             //    'using' гарантує, що з'єднання з базою буде закрито 
             //    після виконання коду, навіть якщо станеться помилка.
             using (LitShareDbContext context = new LitShareDbContext())
             {
-                List<User> allUsers = context.Users.ToList();
+                List<Users> allUsers = context.Users.ToList();
 
                 return allUsers;
             }
@@ -26,11 +26,10 @@ namespace LitShare.BLL.Services
         // ---
 
         // Метод для отримання одного користувача за його ID
-        public User? GetUserById(int id)
+        public Users? GetUserById(int id)
         {
             using (LitShareDbContext context = new LitShareDbContext())
             {
-                // .Find() - це ефективний спосіб знайти щось за первинним ключем
                 return context.Users.Find(id);
             }
         }
@@ -42,7 +41,7 @@ namespace LitShare.BLL.Services
             // - Перевірка, чи email вже не зайнятий
             // - Хешування парол
 
-            var newUser = new User
+            var newUser = new Users
             {
                 name = name,
                 email = email,

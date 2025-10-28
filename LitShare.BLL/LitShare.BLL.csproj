@@ -17,10 +17,4 @@
     <ProjectReference Include="..\LitShare.DAL\LitShare.DAL.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="appsettings.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
 </Project>

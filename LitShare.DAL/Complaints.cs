@@ -4,17 +4,17 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace LitShare.DAL.Models
 {
     [Table("complaints")]
-    public class Complaint
+    public class Complaints
     {
         [Key]
-        public int Id { get; set; }
+        public int id { get; set; }
 
-        public string Text { get; set; }
+        public string text { get; set; }
 
         [Column("post_id")]
-        public int PostId { get; set; }
+        public int post_id { get; set; }
 
         [Column("complainant_id")]
-        public int ComplainantId { get; set; }
+        public int complainant_id { get; set; }
     }
 }
