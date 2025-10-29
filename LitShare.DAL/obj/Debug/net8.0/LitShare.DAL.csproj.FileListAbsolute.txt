@@ -1,0 +1,15 @@
+C:\Users\Lenovo\Desktop\LitShare\LitShare.DAL\bin\Debug\net8.0\LitShare.DAL.deps.json
+C:\Users\Lenovo\Desktop\LitShare\LitShare.DAL\bin\Debug\net8.0\LitShare.DAL.runtimeconfig.json
+C:\Users\Lenovo\Desktop\LitShare\LitShare.DAL\bin\Debug\net8.0\LitShare.DAL.dll
+C:\Users\Lenovo\Desktop\LitShare\LitShare.DAL\bin\Debug\net8.0\LitShare.DAL.pdb
+C:\Users\Lenovo\Desktop\LitShare\LitShare.DAL\obj\Debug\net8.0\LitShare.DAL.csproj.AssemblyReference.cache
+C:\Users\Lenovo\Desktop\LitShare\LitShare.DAL\obj\Debug\net8.0\LitShare.DAL.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Lenovo\Desktop\LitShare\LitShare.DAL\obj\Debug\net8.0\LitShare.DAL.AssemblyInfoInputs.cache
+C:\Users\Lenovo\Desktop\LitShare\LitShare.DAL\obj\Debug\net8.0\LitShare.DAL.AssemblyInfo.cs
+C:\Users\Lenovo\Desktop\LitShare\LitShare.DAL\obj\Debug\net8.0\LitShare.DAL.csproj.CoreCompileInputs.cache
+C:\Users\Lenovo\Desktop\LitShare\LitShare.DAL\obj\Debug\net8.0\LitShare.DAL.sourcelink.json
+C:\Users\Lenovo\Desktop\LitShare\LitShare.DAL\obj\Debug\net8.0\LitShare.DAL.dll
+C:\Users\Lenovo\Desktop\LitShare\LitShare.DAL\obj\Debug\net8.0\refint\LitShare.DAL.dll
+C:\Users\Lenovo\Desktop\LitShare\LitShare.DAL\obj\Debug\net8.0\LitShare.DAL.pdb
+C:\Users\Lenovo\Desktop\LitShare\LitShare.DAL\obj\Debug\net8.0\LitShare.DAL.genruntimeconfig.cache
+C:\Users\Lenovo\Desktop\LitShare\LitShare.DAL\obj\Debug\net8.0\ref\LitShare.DAL.dll
