@@ -1,5 +1,4 @@
-﻿
-using LitShare.DAL; // 1. Доступдо нашого DbContext
+﻿using LitShare.DAL;
 using LitShare.DAL.Models;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,7 +1,6 @@
-﻿
-using LitShare.DAL.Models; 
+﻿using LitShare.DAL.Models;
 using Microsoft.EntityFrameworkCore;
-using Npgsql; 
+using Npgsql;
 // ------------------------------
 
 namespace LitShare.DAL
@@ -9,7 +8,7 @@ namespace LitShare.DAL
     public class LitShareDbContext : DbContext
     {
         private static bool _mapperConfigured = false;
-       
+
 
 
 
@@ -21,17 +20,16 @@ namespace LitShare.DAL
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            
 
-            string connectionString = "User-----------------------------------------";
+
+            string connectionString = "User Id=postgres.arrxdcvkamsqxudjxvkm;Password=QioEm2I5SBGYHjs7;Server=aws-1-eu-west-3.pooler.supabase.com;Port=6543;Database=postgres";
 
             optionsBuilder.UseNpgsql(connectionString);
         }
 
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Цей рядок у вас має залишитись
             modelBuilder.Entity<BookGenres>()
                 .HasKey(bg => new { bg.post_id, bg.genre_id });
         }
