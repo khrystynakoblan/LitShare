@@ -2912,11 +2912,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Lenovo\\Desktop\\LitShare\\LitShare.BLL\\LitShare.BLL.csproj",
+      "projectUniqueName": "C:\\Users\\Lenovo\\Desktop\\4\\LitShare.BLL\\LitShare.BLL.csproj",
       "projectName": "LitShare.BLL",
-      "projectPath": "C:\\Users\\Lenovo\\Desktop\\LitShare\\LitShare.BLL\\LitShare.BLL.csproj",
+      "projectPath": "C:\\Users\\Lenovo\\Desktop\\4\\LitShare.BLL\\LitShare.BLL.csproj",
       "packagesPath": "C:\\Users\\Lenovo\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Lenovo\\Desktop\\LitShare\\LitShare.BLL\\obj\\",
+      "outputPath": "C:\\Users\\Lenovo\\Desktop\\4\\LitShare.BLL\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Lenovo\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -2933,8 +2933,8 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "C:\\Users\\Lenovo\\Desktop\\LitShare\\LitShare.DAL\\LitShare.DAL.csproj": {
-              "projectPath": "C:\\Users\\Lenovo\\Desktop\\LitShare\\LitShare.DAL\\LitShare.DAL.csproj"
+            "C:\\Users\\Lenovo\\Desktop\\4\\LitShare.DAL\\LitShare.DAL.csproj": {
+              "projectPath": "C:\\Users\\Lenovo\\Desktop\\4\\LitShare.DAL\\LitShare.DAL.csproj"
             }
           }
         }

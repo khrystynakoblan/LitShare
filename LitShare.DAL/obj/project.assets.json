@@ -2926,11 +2926,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Lenovo\\Desktop\\LitShare\\LitShare.DAL\\LitShare.DAL.csproj",
+      "projectUniqueName": "C:\\Users\\Lenovo\\Desktop\\4\\LitShare.DAL\\LitShare.DAL.csproj",
       "projectName": "LitShare.DAL",
-      "projectPath": "C:\\Users\\Lenovo\\Desktop\\LitShare\\LitShare.DAL\\LitShare.DAL.csproj",
+      "projectPath": "C:\\Users\\Lenovo\\Desktop\\4\\LitShare.DAL\\LitShare.DAL.csproj",
       "packagesPath": "C:\\Users\\Lenovo\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Lenovo\\Desktop\\LitShare\\LitShare.DAL\\obj\\",
+      "outputPath": "C:\\Users\\Lenovo\\Desktop\\4\\LitShare.DAL\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Lenovo\\AppData\\Roaming\\NuGet\\NuGet.Config",
