@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LitShare.Presentation")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b616583d243d89c953b3501f2fbd26a37dafc5cd")]
 [assembly: System.Reflection.AssemblyProductAttribute("LitShare.Presentation")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LitShare.Presentation")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

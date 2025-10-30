@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Lenovo\\Desktop\\LitShare\\LitShare.Presentation\\LitShare.Presentation.csproj": {}
+    "C:\\Users\\Lenovo\\Desktop\\wpf\\LitShare.Presentation\\LitShare.Presentation.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Lenovo\\Desktop\\LitShare\\LitShare.BLL\\LitShare.BLL.csproj": {
+    "C:\\Users\\Lenovo\\Desktop\\wpf\\LitShare.BLL\\LitShare.BLL.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Lenovo\\Desktop\\LitShare\\LitShare.BLL\\LitShare.BLL.csproj",
+        "projectUniqueName": "C:\\Users\\Lenovo\\Desktop\\wpf\\LitShare.BLL\\LitShare.BLL.csproj",
         "projectName": "LitShare.BLL",
-        "projectPath": "C:\\Users\\Lenovo\\Desktop\\LitShare\\LitShare.BLL\\LitShare.BLL.csproj",
+        "projectPath": "C:\\Users\\Lenovo\\Desktop\\wpf\\LitShare.BLL\\LitShare.BLL.csproj",
         "packagesPath": "C:\\Users\\Lenovo\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Lenovo\\Desktop\\LitShare\\LitShare.BLL\\obj\\",
+        "outputPath": "C:\\Users\\Lenovo\\Desktop\\wpf\\LitShare.BLL\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Lenovo\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -28,8 +28,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\Lenovo\\Desktop\\LitShare\\LitShare.DAL\\LitShare.DAL.csproj": {
-                "projectPath": "C:\\Users\\Lenovo\\Desktop\\LitShare\\LitShare.DAL\\LitShare.DAL.csproj"
+              "C:\\Users\\Lenovo\\Desktop\\wpf\\LitShare.DAL\\LitShare.DAL.csproj": {
+                "projectPath": "C:\\Users\\Lenovo\\Desktop\\wpf\\LitShare.DAL\\LitShare.DAL.csproj"
               }
             }
           }
@@ -71,14 +71,14 @@
         }
       }
     },
-    "C:\\Users\\Lenovo\\Desktop\\LitShare\\LitShare.DAL\\LitShare.DAL.csproj": {
+    "C:\\Users\\Lenovo\\Desktop\\wpf\\LitShare.DAL\\LitShare.DAL.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Lenovo\\Desktop\\LitShare\\LitShare.DAL\\LitShare.DAL.csproj",
+        "projectUniqueName": "C:\\Users\\Lenovo\\Desktop\\wpf\\LitShare.DAL\\LitShare.DAL.csproj",
         "projectName": "LitShare.DAL",
-        "projectPath": "C:\\Users\\Lenovo\\Desktop\\LitShare\\LitShare.DAL\\LitShare.DAL.csproj",
+        "projectPath": "C:\\Users\\Lenovo\\Desktop\\wpf\\LitShare.DAL\\LitShare.DAL.csproj",
         "packagesPath": "C:\\Users\\Lenovo\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Lenovo\\Desktop\\LitShare\\LitShare.DAL\\obj\\",
+        "outputPath": "C:\\Users\\Lenovo\\Desktop\\wpf\\LitShare.DAL\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Lenovo\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -144,14 +144,14 @@
         }
       }
     },
-    "C:\\Users\\Lenovo\\Desktop\\LitShare\\LitShare.Presentation\\LitShare.Presentation.csproj": {
+    "C:\\Users\\Lenovo\\Desktop\\wpf\\LitShare.Presentation\\LitShare.Presentation.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Lenovo\\Desktop\\LitShare\\LitShare.Presentation\\LitShare.Presentation.csproj",
+        "projectUniqueName": "C:\\Users\\Lenovo\\Desktop\\wpf\\LitShare.Presentation\\LitShare.Presentation.csproj",
         "projectName": "LitShare.Presentation",
-        "projectPath": "C:\\Users\\Lenovo\\Desktop\\LitShare\\LitShare.Presentation\\LitShare.Presentation.csproj",
+        "projectPath": "C:\\Users\\Lenovo\\Desktop\\wpf\\LitShare.Presentation\\LitShare.Presentation.csproj",
         "packagesPath": "C:\\Users\\Lenovo\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Lenovo\\Desktop\\LitShare\\LitShare.Presentation\\obj\\",
+        "outputPath": "C:\\Users\\Lenovo\\Desktop\\wpf\\LitShare.Presentation\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Lenovo\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -168,8 +168,8 @@
           "net8.0-windows7.0": {
             "targetAlias": "net8.0-windows",
             "projectReferences": {
-              "C:\\Users\\Lenovo\\Desktop\\LitShare\\LitShare.BLL\\LitShare.BLL.csproj": {
-                "projectPath": "C:\\Users\\Lenovo\\Desktop\\LitShare\\LitShare.BLL\\LitShare.BLL.csproj"
+              "C:\\Users\\Lenovo\\Desktop\\wpf\\LitShare.BLL\\LitShare.BLL.csproj": {
+                "projectPath": "C:\\Users\\Lenovo\\Desktop\\wpf\\LitShare.BLL\\LitShare.BLL.csproj"
               }
             }
           }
@@ -185,6 +185,10 @@
           "targetAlias": "net8.0-windows",
           "dependencies": {
             "Microsoft.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[9.0.10, )"
+            },
+            "Microsoft.EntityFrameworkCore.Relational": {
               "target": "Package",
               "version": "[9.0.10, )"
             },
@@ -208,7 +212,7 @@
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             },
-            "Microsoft.WindowsDesktop.App.WindowsForms": {
+            "Microsoft.WindowsDesktop.App.WPF": {
               "privateAssets": "none"
             }
           },
