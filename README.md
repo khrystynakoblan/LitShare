@@ -27,5 +27,3 @@ LitShare — це десктопний застосунок для обміну 
 -  Павленко Яна  
 -  Чорней Вікторія  
    
-Презентація
-https://www.canva.com/design/DAGyfDfDAO4/dPmqdOLBSN7_wCckdB2Q7Q/edit?utm_content=DAGyfDfDAO4&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton
