@@ -12,9 +12,9 @@ namespace LitShare.DAL.Models
 
         public string name { get; set; }
         public string email { get; set; }
+        public string phone { get; set; }
         public string password { get; set; }
         public string? about { get; set; }
-
         public string region { get; set; }
         public string district { get; set; }
         public string city { get; set; }

@@ -9,9 +9,6 @@ namespace LitShare.DAL
     {
         private static bool _mapperConfigured = false;
 
-
-
-
         public DbSet<Users> Users { get; set; }
         public DbSet<Posts> posts { get; set; }
         public DbSet<Genres> genres { get; set; }
@@ -24,7 +21,13 @@ namespace LitShare.DAL
 
             string connectionString = "User Id=postgres.arrxdcvkamsqxudjxvkm;Password=QioEm2I5SBGYHjs7;Server=aws-1-eu-west-3.pooler.supabase.com;Port=6543;Database=postgres";
 
-            optionsBuilder.UseNpgsql(connectionString);
+            optionsBuilder.UseNpgsql(connectionString, o =>
+            {
+                o.EnableRetryOnFailure(
+                    maxRetryCount: 5,
+                    maxRetryDelay: TimeSpan.FromSeconds(5),
+                    errorCodesToAdd: null);
+            });
         }
 
 
