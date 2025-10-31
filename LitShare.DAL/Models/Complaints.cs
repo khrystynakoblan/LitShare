@@ -11,6 +11,9 @@ namespace LitShare.DAL.Models
 
         public string text { get; set; }
 
+        [Column("date")]
+        public DateTime date { get; set; }
+
         [Column("post_id")]
         public int post_id { get; set; }
 
