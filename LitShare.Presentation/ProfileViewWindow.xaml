@@ -8,8 +8,8 @@
 
     <Grid Margin="20">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/> 
-            <RowDefinition Height="*"/>   
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <!-- Верхня панель -->
@@ -19,48 +19,57 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <TextBlock Text="LitShare"
-                       FontSize="22"
-                       FontWeight="Bold"
-                       Foreground="#2C3E50"
-                       VerticalAlignment="Center"
-                       Grid.Column="0"/>
+            <!-- Кнопка LitShare -->
+            <Button Content="LitShare"
+                    FontSize="22"
+                    FontWeight="Bold"
+                    Foreground="#2C3E50"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Cursor="Hand"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Left"
+                    Click="HomeButton_Click"/>
 
-            <TextBlock Text="Мій профіль"
-                       FontSize="16"
-                       Foreground="Gray"
-                       VerticalAlignment="Center"
-                       Grid.Column="1"
-                       HorizontalAlignment="Right"
-                       Margin="0,0,10,0"/>
+            <!-- Кнопка Мій профіль -->
+            <Button Content="Мій профіль"
+                    FontSize="16"
+                    Foreground="Gray"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Cursor="Hand"
+                    VerticalAlignment="Center"
+                    Grid.Column="1"
+                    HorizontalAlignment="Right"
+                    Margin="0,0,10,0"
+                    Click="MyProfileButton_Click"/>
         </Grid>
 
         <!-- Основна частина -->
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="250"/> 
-                <ColumnDefinition Width="*"/>   
+                <ColumnDefinition Width="250"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- Фото користувача -->
-            <StackPanel Grid.Column="0" VerticalAlignment="Top" Margin="10,10,20,0">
+            <!-- Фото користувача + ім’я -->
+            <StackPanel Grid.Column="0" VerticalAlignment="Top" Margin="10,10,20,0" HorizontalAlignment="Center">
                 <Border BorderBrush="LightGray" BorderThickness="1" CornerRadius="100"
                         Width="140" Height="140" HorizontalAlignment="Center">
                     <Ellipse Fill="#EAEAEA"/>
                 </Border>
-                <TextBlock Text="Фото користувача" FontSize="12" Foreground="Gray"
-                           HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                <TextBlock Text="Іван Петренко"
+                           FontSize="16"
+                           FontWeight="Bold"
+                           Foreground="#2C3E50"
+                           HorizontalAlignment="Center"
+                           Margin="0,5,0,0"/>
             </StackPanel>
 
-            <!-- Інформація -->
+            <!-- Дані користувача -->
             <StackPanel Grid.Column="1" VerticalAlignment="Top">
                 <Border BorderBrush="LightGray" BorderThickness="1" Padding="15" Margin="0,0,0,20">
                     <StackPanel>
-                        <TextBlock Text="Іван Петренко"
-                                   FontSize="18"
-                                   FontWeight="Bold"
-                                   Margin="0,0,0,10"/>
-
                         <Grid Margin="0,0,0,10">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="100"/>
@@ -97,7 +106,7 @@
                     </StackPanel>
                 </Border>
 
-                <!--Книги -->
+                <!-- Книги користувача -->
                 <Border BorderBrush="LightGray" BorderThickness="1" Padding="10">
                     <StackPanel>
                         <TextBlock Text="Книги користувача:"
@@ -105,7 +114,6 @@
                                    FontSize="15"
                                    Margin="0,0,0,10"/>
 
-                        <!-- Зменшена сітка -->
                         <UniformGrid Columns="3" Rows="2" Margin="0,0,0,10">
                             <Border BorderBrush="Gray" BorderThickness="1" Padding="5" Margin="5">
                                 <StackPanel>

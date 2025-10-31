@@ -8,8 +8,8 @@
 
     <Grid Margin="20">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/> <!-- Верхня панель -->
-            <RowDefinition Height="*"/>   <!-- Основний контент -->
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <!-- Верхня панель -->
@@ -19,46 +19,49 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <TextBlock Text="LitShare"
-                       FontSize="22"
-                       FontWeight="Bold"
-                       Foreground="#2C3E50"
-                       VerticalAlignment="Center"
-                       Grid.Column="0"/>
+            <!-- LitShare як кнопка -->
+            <Button Content="LitShare"
+                    FontSize="22"
+                    FontWeight="Bold"
+                    Foreground="#2C3E50"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Cursor="Hand"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Left"
+                    Click="HomeButton_Click"/>
 
-            <TextBlock Text="Мій профіль"
-                       FontSize="16"
-                       Foreground="Gray"
-                       VerticalAlignment="Center"
-                       Grid.Column="1"
-                       HorizontalAlignment="Right"
-                       Margin="0,0,10,0"/>
+            <!-- Мій профіль як кнопка -->
+            <Button Content="Мій профіль"
+                    FontSize="16"
+                    Foreground="Gray"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Cursor="Hand"
+                    VerticalAlignment="Center"
+                    Grid.Column="1"
+                    HorizontalAlignment="Right"
+                    Margin="0,0,10,0"
+                    Click="MyProfileButton_Click"/>
         </Grid>
 
-        <!--  Основна частина -->
+        <!-- Основна частина -->
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="250"/> 
-                <ColumnDefinition Width="*"/>   
+                <ColumnDefinition Width="250"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- Фото -->
+            <!-- Ліва панель (аватар) -->
             <StackPanel Grid.Column="0" VerticalAlignment="Top" Margin="10,10,20,0">
                 <Border BorderBrush="LightGray" BorderThickness="1" CornerRadius="100"
                         Width="140" Height="140" HorizontalAlignment="Center">
                     <Ellipse Fill="#EAEAEA"/>
                 </Border>
-                <Button Content="Змінити фото"
-                        Width="140"
-                        Margin="0,10,0,30"
-                        Background="#333"
-                        Foreground="White"
-                        FontSize="13"
-                        FontWeight="Bold"
-                        Cursor="Hand"/>
+                <!-- підпис під фото забрано за вимогою -->
             </StackPanel>
 
-            <!-- Поля для редагування -->
+            <!-- Права колонка -->
             <StackPanel Grid.Column="1" VerticalAlignment="Top">
                 <TextBlock Text="Основна інформація"
                            FontSize="17"
@@ -71,8 +74,8 @@
                         <ColumnDefinition Width="120"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="Ім’я:" FontWeight="Bold" Grid.Column="0"/>
-                    <TextBox Text="Іван" Grid.Column="1" IsReadOnly="True" Background="#EEE"/>
+                    <TextBlock Text="Ім’я:" FontWeight="Bold" Grid.Column="0" VerticalAlignment="Center"/>
+                    <TextBox Text="Іван" Grid.Column="1" IsReadOnly="True" Background="#EEE" Padding="5"/>
                 </Grid>
 
                 <!-- Прізвище -->
@@ -81,8 +84,8 @@
                         <ColumnDefinition Width="120"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="Прізвище:" FontWeight="Bold" Grid.Column="0"/>
-                    <TextBox Text="Петренко" Grid.Column="1" IsReadOnly="True" Background="#EEE"/>
+                    <TextBlock Text="Прізвище:" FontWeight="Bold" Grid.Column="0" VerticalAlignment="Center"/>
+                    <TextBox Text="Петренко" Grid.Column="1" IsReadOnly="True" Background="#EEE" Padding="5"/>
                 </Grid>
 
                 <!-- Район -->
@@ -91,7 +94,7 @@
                         <ColumnDefinition Width="120"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="Район:" FontWeight="Bold" Grid.Column="0"/>
+                    <TextBlock Text="Район:" FontWeight="Bold" Grid.Column="0" VerticalAlignment="Center"/>
                     <TextBox Grid.Column="1" Padding="5"/>
                 </Grid>
 
@@ -101,7 +104,7 @@
                         <ColumnDefinition Width="120"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="Область:" FontWeight="Bold" Grid.Column="0"/>
+                    <TextBlock Text="Область:" FontWeight="Bold" Grid.Column="0" VerticalAlignment="Center"/>
                     <TextBox Grid.Column="1" Padding="5"/>
                 </Grid>
 
@@ -111,7 +114,7 @@
                         <ColumnDefinition Width="120"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="Населений пункт:" FontWeight="Bold" Grid.Column="0"/>
+                    <TextBlock Text="Населений пункт:" FontWeight="Bold" Grid.Column="0" VerticalAlignment="Center"/>
                     <TextBox Grid.Column="1" Padding="5"/>
                 </Grid>
 
@@ -121,7 +124,7 @@
                         <ColumnDefinition Width="120"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="Email:" FontWeight="Bold" Grid.Column="0"/>
+                    <TextBlock Text="Email:" FontWeight="Bold" Grid.Column="0" VerticalAlignment="Center"/>
                     <TextBox Grid.Column="1" Padding="5"/>
                 </Grid>
 
@@ -131,54 +134,57 @@
                         <ColumnDefinition Width="120"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="Контактні дані:" FontWeight="Bold" Grid.Column="0"/>
+                    <TextBlock Text="Контактні дані:" FontWeight="Bold" Grid.Column="0" VerticalAlignment="Center"/>
                     <TextBox Grid.Column="1" Padding="5"/>
                 </Grid>
 
                 <!-- Про себе -->
-                <Grid Margin="0,0,0,10">
+                <Grid Margin="0,0,0,20">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="120"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="Про себе:" FontWeight="Bold" Grid.Column="0" VerticalAlignment="Top"/>
-                    <TextBox Grid.Column="1" Padding="5" Height="80" TextWrapping="Wrap" AcceptsReturn="True"/>
+                    <TextBox Grid.Column="1" Padding="5" Height="120" TextWrapping="Wrap" AcceptsReturn="True"/>
                 </Grid>
 
-                <!-- Кнопки -->
-                <Grid Margin="120,20,0,0">
+                <!-- Кнопки: ліва межа = 120 (як у полів), сіра по центру, червона до правого краю -->
+                <Grid Margin="120,0,0,0" HorizontalAlignment="Stretch">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1*"/> 
-                        <ColumnDefinition Width="1*"/> 
-                        <ColumnDefinition Width="1*"/> 
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
                     </Grid.ColumnDefinitions>
 
                     <Button Grid.Column="0"
                             Content="Зберегти зміни"
-                            Width="140" Height="40"
+                            Width="160" Height="44"
                             Background="#2E7D32"
                             Foreground="White"
                             FontWeight="Bold"
                             HorizontalAlignment="Left"
-                            Cursor="Hand"/>
+                            Cursor="Hand"
+                            Click="SaveButton_Click"/>
 
                     <Button Grid.Column="1"
                             Content="Скасувати"
-                            Width="140" Height="40"
+                            Width="160" Height="44"
                             Background="#BDBDBD"
+                            Foreground="Black"
                             FontWeight="Bold"
+                            HorizontalAlignment="Center"
                             Cursor="Hand"
-                            HorizontalAlignment="Center"/>
+                            Click="CancelButton_Click"/>
 
                     <Button Grid.Column="2"
                             Content="Видалити профіль"
-                            Height="40"
-                            Width="160"
+                            Width="180" Height="44"
                             Background="#D32F2F"
                             Foreground="White"
                             FontWeight="Bold"
+                            HorizontalAlignment="Right"
                             Cursor="Hand"
-                            HorizontalAlignment="Right"/>
+                            Click="DeleteButton_Click"/>
                 </Grid>
             </StackPanel>
         </Grid>
