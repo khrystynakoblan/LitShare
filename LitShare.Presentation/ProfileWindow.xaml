@@ -24,6 +24,7 @@
             <Setter Property="Background" Value="#555" />
             <Setter Property="Padding" Value="20, 10" />
         </Style>
+
         <Style x:Key="SideBarButtonStyle" TargetType="Button" BasedOn="{StaticResource ProfileButtonStyle}">
             <Setter Property="Width" Value="180"/>
             <Setter Property="Margin" Value="0, 10"/>
@@ -59,47 +60,49 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <Border Grid.Column="0" Background="White" BorderBrush="#DDD" BorderThickness="1" CornerRadius="5" Margin="10" Padding="15">
+            <Border Grid.Column="0" Background="White" BorderBrush="#DDD" BorderThickness="1" CornerRadius="5" Margin="10,10,10,72" Padding="15">
 
                 <Grid HorizontalAlignment="Center">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <Ellipse Grid.Row="0" Width="150" Height="150" Fill="#CCC" Stroke="#AAA" StrokeThickness="2" Margin="15,47,15,0" Grid.RowSpan="2" VerticalAlignment="Top">
-                        <Ellipse.OpacityMask>
-                            <VisualBrush>
-                                <VisualBrush.Visual>
-                                    <Path Fill="Black" Stretch="Uniform"
-                                          Data="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2M12,5C13.66,5 15,6.34 15,8C15,9.66 13.66,11 12,11C10.34,11 9,9.66 9,8C9,6.34 10.34,5 12,5M12,19.2C9.5,19.2 7.29,17.92 6,15.98C6.03,13.99 10,12.9 12,12.9C13.99,12.9 17.97,13.99 18,15.98C16.71,17.92 14.5,19.2 12,19.2Z" />
-                                </VisualBrush.Visual>
-                            </VisualBrush>
-                        </Ellipse.OpacityMask>
-                    </Ellipse>
+                    <StackPanel Grid.Row="0">
+                        <Ellipse Width="150" Height="150" Fill="#CCC" Stroke="#AAA" StrokeThickness="2" Margin="15,47,15,0">
+                            <Ellipse.OpacityMask>
+                                <VisualBrush>
+                                    <VisualBrush.Visual>
+                                        <Path Fill="Black" Stretch="Uniform"
+                                              Data="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2M12,5C13.66,5 15,6.34 15,8C15,9.66 13.66,11 12,11C10.34,11 9,9.66 9,8C9,6.34 10.34,5 12,5M12,19.2C9.5,19.2 7.29,17.92 6,15.98C6.03,13.99 10,12.9 12,12.9C13.99,12.9 17.97,13.99 18,15.98C16.71,17.92 14.5,19.2 12,19.2Z" />
+                                    </VisualBrush.Visual>
+                                </VisualBrush>
+                            </Ellipse.OpacityMask>
+                        </Ellipse>
 
-                    <TextBlock Grid.Row="2" Text="Ім'я" HorizontalAlignment="Center" FontSize="20" FontWeight="Bold" Margin="0,10,0,57"/>
+                        <TextBlock Grid.Row="2" Text="Ім'я" HorizontalAlignment="Center" FontSize="20" FontWeight="Bold" Margin="0,5,0,0"/>
+                    </StackPanel>
 
-                    <Button Grid.Row="3" Content="Додати книгу" 
-                            Style="{StaticResource SideBarButtonStyle}" 
-                            Click="AddBookButton_Click"/>
+                    <StackPanel Grid.Row="1" Margin="0,60,0,0">
+                        <Button Content="Додати книгу" 
+                                Style="{StaticResource SideBarButtonStyle}" 
+                                Click="AddBookButton_Click" Width="183"/>
 
-                    <Button Grid.Row="4" Content="Мої книги" 
-                            Style="{StaticResource SideBarButtonStyle}" 
-                            Click="MyBooksButton_Click"/>
+                        <Button Content="Мої книги" 
+                                Style="{StaticResource SideBarButtonStyle}" 
+                                Click="MyBooksButton_Click" Width="183"/>
 
-                    <Button Grid.Row="5" Content="Редагувати профіль" 
-                            Style="{StaticResource SideBarButtonStyle}" 
-                            Click="EditProfileButton_Click"/>
+                        <Button Content="Редагувати профіль" 
+                                Style="{StaticResource SideBarButtonStyle}" 
+                                Click="EditProfileButton_Click"/>
+                    </StackPanel>
+
                 </Grid>
             </Border>
 
             <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" Margin="10">
                 <StackPanel>
+
                     <Border Background="White" BorderBrush="#DDD" BorderThickness="1" CornerRadius="5" Padding="25" Margin="0,0,0,20">
                         <StackPanel>
                             <Border BorderBrush="#EEE" BorderThickness="0,0,0,2" Padding="0,0,0,5" Margin="0,0,0,20">
@@ -124,25 +127,26 @@
                                     <TextBlock Text="Область:" FontSize="14" FontWeight="Bold" Foreground="#555"/>
                                     <TextBlock Text="Lorem ipsum" FontSize="15" Margin="0,2,0,0"/>
                                 </StackPanel>
-                                <StackPanel Grid.Row="1" Grid.Column="0" Margin="5, 10">
+                                <StackPanel Grid.Row="1" Grid.Column="1" Margin="5, 10">
                                     <TextBlock Text="Район:" FontSize="14" FontWeight="Bold" Foreground="#555"/>
                                     <TextBlock Text="Lorem ipsum" FontSize="15" Margin="0,2,0,0"/>
                                 </StackPanel>
-                                <StackPanel Grid.Row="1" Grid.Column="1" Margin="5, 10">
+                                <StackPanel Grid.Row="2" Grid.Column="1" Margin="5, 10">
                                     <TextBlock Text="Населений пункт:" FontSize="14" FontWeight="Bold" Foreground="#555"/>
                                     <TextBlock Text="Lorem ipsum" FontSize="15" Margin="0,2,0,0"/>
                                 </StackPanel>
-                                <StackPanel Grid.Row="2" Grid.Column="0" Margin="5, 10">
+                                <StackPanel Grid.Row="1" Grid.Column="0" Margin="5, 10">
                                     <TextBlock Text="Контактні дані:" FontSize="14" FontWeight="Bold" Foreground="#555"/>
                                     <TextBlock Text="Lorem ipsum dolor" FontSize="15" Margin="0,2,0,0"/>
                                 </StackPanel>
-                                <StackPanel Grid.Row="3" Grid.Column="0" Margin="5, 10">
-                                    <TextBlock Text="EMAIL:" FontSize="14" FontWeight="Bold" Foreground="#555"/>
+                                <StackPanel Grid.Row="2" Grid.Column="0" Margin="5, 10">
+                                    <TextBlock Text="EMAIL:" FontSize="14" FontWeight="Bold" Foreground="#555" RenderTransformOrigin="1.221,-1.86" Height="22" Width="467"/>
                                     <TextBlock Text="Lorem ipsum" FontSize="15" Margin="0,2,0,0"/>
                                 </StackPanel>
                             </Grid>
                         </StackPanel>
                     </Border>
+
                     <Border Background="White" BorderBrush="#DDD" BorderThickness="1" CornerRadius="5" Padding="25" Margin="0,0,0,20" Height="194">
                         <StackPanel>
                             <Border BorderBrush="#EEE" BorderThickness="0,0,0,2" Padding="0,0,0,5" Margin="0,0,0,15">
@@ -152,6 +156,7 @@
                                        FontSize="15" TextWrapping="Wrap" LineHeight="22"/>
                         </StackPanel>
                     </Border>
+
                 </StackPanel>
             </ScrollViewer>
 

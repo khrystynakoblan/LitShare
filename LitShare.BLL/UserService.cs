@@ -36,12 +36,13 @@ namespace LitShare.BLL.Services
         // Метод для додавання нового користувача
         // У файлі LitShare.BLL.Services/UserService.cs
 
-        public void AddUser(string name, string email, string password, string region, string district, string city)
+        public void AddUser(string name, string email, string phone, string password, string region, string district, string city)
         {
             var newUser = new Users
             {
                 name = name,
                 email = email,
+                phone = phone,
                 password = password,
                 region = region,
                 district = district,
