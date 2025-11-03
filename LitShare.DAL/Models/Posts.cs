@@ -22,5 +22,8 @@ namespace LitShare.DAL.Models
 
         [Column("photo_url")]
         public string? photo_url { get; set; } // Може бути null
+
+        [ForeignKey("user_id")]
+        public virtual Users User { get; set; }
     }
 }
