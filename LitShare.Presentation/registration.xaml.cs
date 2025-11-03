@@ -44,7 +44,7 @@ namespace LitShare.Presentation
                 // 3. ОНОВЛЮЄМО ВИКЛИК МЕТОДУ BLL
                 // (Передаємо 'phone' у сервіс)
                 _userService.AddUser(name, email, phone, password, region, district, city);
-
+                
                 MessageBox.Show("Акаунт успішно створено! Тепер ви можете увійти.",
                                 "Реєстрація успішна", MessageBoxButton.OK, MessageBoxImage.Information);
 
