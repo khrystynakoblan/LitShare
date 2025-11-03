@@ -1,93 +1,126 @@
-﻿using System;
+﻿using LitShare.DAL;
+using LitShare.DAL.Models;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
-using LitShare.DAL;
-using LitShare.DAL.Models;
+using System.Windows.Media.Imaging;
 
 namespace LitShare
 {
     public partial class NewAdWindow : Window
     {
-        private readonly LitShareDbContext _context;
-
         public NewAdWindow()
         {
             InitializeComponent();
-            _context = new LitShareDbContext();
-            Loaded += NewAdWindow_Loaded;
+            LoadDealTypes();
+            LoadGenres();
         }
 
-        // Завантаження жанрів із бази
-        private void NewAdWindow_Loaded(object sender, RoutedEventArgs e)
+
+        private void LoadDealTypes()
         {
-            try
-            {
-                var genres = _context.genres.ToList();
-                GenreComboBox.ItemsSource = genres;
-                GenreComboBox.DisplayMemberPath = "name";
-                GenreComboBox.SelectedValuePath = "id";
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Помилка завантаження жанрів: {ex.Message}");
-            }
+            DealTypeComboBox.ItemsSource = Enum.GetValues(typeof(DealType)).Cast<DealType>();
         }
 
-        // Додавання оголошення
-        private async void AddAdButton_Click(object sender, RoutedEventArgs e)
+        private void LoadGenres()
         {
+            using var db = new LitShareDbContext();
+            var genres = db.genres.ToList();
+            GenreComboBox.ItemsSource = genres;
+            GenreComboBox.DisplayMemberPath = "name";
+            GenreComboBox.SelectedValuePath = "id";
+        }
+
+        private void AddAdButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(TitleTextBox.Text) ||
+                string.IsNullOrWhiteSpace(AuthorTextBox.Text) ||
+                string.IsNullOrWhiteSpace(DescriptionTextBox.Text) ||
+                DealTypeComboBox.SelectedItem == null ||
+                GenreComboBox.SelectedItem == null)
+            {
+                MessageBox.Show("Будь ласка, заповніть усі поля!");
+                return;
+            }
+
             try
             {
-                if (string.IsNullOrWhiteSpace(TitleTextBox.Text) ||
-                    string.IsNullOrWhiteSpace(AuthorTextBox.Text) ||
-                    string.IsNullOrWhiteSpace(DescriptionTextBox.Text) ||
-                    DealTypeComboBox.SelectedItem == null ||
-                    GenreComboBox.SelectedItem == null)
-                {
-                    MessageBox.Show("Будь ласка, заповніть всі поля перед додаванням!");
-                    return;
-                }
-
+                using var db = new LitShareDbContext();
 
                 var post = new Posts
                 {
-                    user_id = 1,
-                    title = TitleTextBox.Text.Trim(),
-                    author = AuthorTextBox.Text.Trim(),
-                    deal_type = (DealTypeComboBox.SelectedItem as ComboBoxItem)?.Content.ToString(),
-                    description = DescriptionTextBox.Text.Trim(),
-                    photo_url = "default.jpg"
+                    title = TitleTextBox.Text,
+                    author = AuthorTextBox.Text,
+                    description = DescriptionTextBox.Text,
+                    deal_type = (DealType)DealTypeComboBox.SelectedItem,
+                    user_id = 1,   // тимчасово
+                    photo_url = selectedPhotoPath
                 };
 
-                _context.posts.Add(post);
-                await _context.SaveChangesAsync(); // зберігаємо, щоб отримати post.id
+                db.posts.Add(post);
+                db.SaveChanges();
 
-
-                var selectedGenreId = (int)GenreComboBox.SelectedValue;
-
+               
+                var selectedGenre = (Genres)GenreComboBox.SelectedItem;
                 var bookGenre = new BookGenres
                 {
                     post_id = post.id,
-                    genre_id = selectedGenreId
+                    genre_id = selectedGenre.id
                 };
 
-                _context.bookGenres.Add(bookGenre);
-                await _context.SaveChangesAsync();
+                db.bookGenres.Add(bookGenre);
+                db.SaveChanges();
 
                 MessageBox.Show("Оголошення успішно додано!");
-                Close();
             }
-            catch (Exception ex)
+            catch (DbUpdateException ex)
             {
-                MessageBox.Show($"Помилка при збереженні: {ex.Message}");
+                MessageBox.Show($"Сталася помилка при додаванні оголошення:\n{ex.InnerException?.Message}");
             }
         }
-
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            Close();
+            this.Close();
         }
+
+        private string selectedPhotoPath; // Зберігатиме шлях до фото
+
+        private void AddPhotoButton_Click(object sender, RoutedEventArgs e)
+        {
+            var openFileDialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Title = "Виберіть фото книги",
+                Filter = "Зображення|*.jpg;*.jpeg;*.png;*.bmp;*.gif",
+                Multiselect = false
+            };
+
+
+            bool? result = openFileDialog.ShowDialog();
+
+                        if (result == true)
+                        {
+                            selectedPhotoPath = openFileDialog.FileName;
+
+                            if (BookImage != null)
+                            {
+                                BookImage.Source = new BitmapImage(new Uri(selectedPhotoPath));
+                            }
+
+                            MessageBox.Show("Фото вибрано успішно!");
+                        }
+
+
+            }
+
+
+
     }
+
+
+
+
 }
+
+
+

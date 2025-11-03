@@ -116,13 +116,6 @@ namespace LitShare.Presentation
                 Margin = new Thickness(0, 0, 0, 10)
             };
 
-            cover.Child = new TextBlock
-            {
-                Text = "🖼️",
-                FontSize = 32,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center
-            };
 
             var info = new StackPanel
             {
