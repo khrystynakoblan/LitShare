@@ -68,5 +68,39 @@ namespace LitShare.BLL.Services
 
             return filtered.ToList();
         }
+        public List<BookDto> GetBooksByUserId(int userId)
+        {
+            using (var db = new LitShareDbContext())
+            {
+                var postsWithGenres = (from p in db.posts
+                                    join bg in db.bookGenres on p.id equals bg.post_id
+                                    join g in db.genres on bg.genre_id equals g.id
+                                    join u in db.Users on p.user_id equals u.id
+                                    where u.id == userId 
+                                    select new
+                                    {
+                                        PostId = p.id,
+                                        Title = p.title,
+                                        Author = p.author,
+                                        Genre = g.name,
+                                        DealType = p.deal_type == "exchange" ? "Обмін" : "Безкоштовно",
+                                        Location = u.city,
+                                        ImagePath = p.photo_url
+                                    }).ToList();
+
+                return postsWithGenres
+                    .GroupBy(x => x.PostId)
+                    .Select(g => new BookDto
+                    {
+                        Title = g.First().Title,
+                        Author = g.First().Author,
+                        Location = g.First().Location,
+                        Genre = string.Join(", ", g.Select(x => x.Genre)),
+                        DealType = g.First().DealType,
+                        ImagePath = g.First().ImagePath
+                    })
+                    .ToList();
+            }
+        }
     }
 }
