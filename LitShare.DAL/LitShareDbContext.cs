@@ -1,16 +1,16 @@
 ﻿using LitShare.DAL.Models;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
-// ------------------------------
 
 namespace LitShare.DAL
 {
     public class LitShareDbContext : DbContext
     {
-        private static bool _mapperConfigured = false;
-
-
-
+        static LitShareDbContext()
+        {
+            // ВАЖЛИВО: Мапінг ПЕРЕД будь-яким використанням
+            NpgsqlConnection.GlobalTypeMapper.MapEnum<DealType>("deal_type_t");
+        }
 
         public DbSet<Users> Users { get; set; }
         public DbSet<Posts> posts { get; set; }
@@ -20,16 +20,15 @@ namespace LitShare.DAL
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            string connectionString = "User Id=postgres.arrxdcvkamsqxudjxvkm;Password=i9n4Nf?aAq#gT!N;Server=aws-1-eu-west-3.pooler.supabase.com;Port=5432;Database=postgres";
 
-
-            string connectionString = "User Id=postgres.arrxdcvkamsqxudjxvkm;Password=QioEm2I5SBGYHjs7;Server=aws-1-eu-west-3.pooler.supabase.com;Port=6543;Database=postgres";
-
-            optionsBuilder.UseNpgsql(connectionString);
+            optionsBuilder.UseNpgsql(connectionString, o => o.MapEnum<DealType>("deal_type_t"));
         }
-
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.HasPostgresEnum<DealType>("deal_type_t");
+
             modelBuilder.Entity<BookGenres>()
                 .HasKey(bg => new { bg.post_id, bg.genre_id });
         }

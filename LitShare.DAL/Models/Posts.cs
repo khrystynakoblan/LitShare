@@ -16,7 +16,7 @@ namespace LitShare.DAL.Models
         public string author { get; set; }
 
         [Column("deal_type")]
-        public string deal_type { get; set; } 
+        public DealType deal_type { get; set; }
 
         public string description { get; set; }
 
