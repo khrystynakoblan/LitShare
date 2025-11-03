@@ -1,5 +1,6 @@
 ﻿using System; // Потрібно для Exception
 using System.Windows;
+using System.Windows.Controls;
 using LitShare.BLL.Services; // 1. Підключаємо наш BLL
 
 namespace LitShare.Presentation
@@ -70,13 +71,36 @@ namespace LitShare.Presentation
         }
 
         // 6. Заготовка для кнопки "Увійти"
-        private void Button_Click_Login(object sender, RoutedEventArgs e)
+        private async void Button_Click_Login(object sender, RoutedEventArgs e)
         {
-            string email = txtLoginEmail.Text;
-            string password = txtLoginPassword.Password;
+            // Отримуємо посилання на кнопку, яка викликала подію
+            var button = sender as Button;
+            button.IsEnabled = false;
 
-            // TODO: Додайте логіку для перевірки логіна та пароля
-            MessageBox.Show("Логіка входу ще не реалізована.", "В розробці", MessageBoxButton.OK, MessageBoxImage.Information);
+            try
+            {
+                bool isValid = await _userService.ValidateUser(
+                    txtLoginEmail.Text,
+                    txtLoginPassword.Password
+                );
+
+                if (isValid)
+                {
+                    MessageBox.Show("Вхід успішний!");
+                }
+                else
+                {
+                    MessageBox.Show("Невірна пошта або пароль.");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Помилка: " + ex.Message);
+            }
+            finally
+            {
+                button.IsEnabled = true;
+            }
         }
     }
 }
