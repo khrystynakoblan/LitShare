@@ -25,7 +25,7 @@ namespace LitShare.BLL.Services
             }
         }
 
-        public void AddUser(string name, string email, string password, string region, string district, string city)
+        public void AddUser(string name, string email, string phone, string password, string region, string district, string city)
         {
             string hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
 
@@ -33,6 +33,7 @@ namespace LitShare.BLL.Services
             {
                 name = name,
                 email = email,
+                phone= phone,
                 password = hashedPassword,
                 region = region,
                 district = district,
