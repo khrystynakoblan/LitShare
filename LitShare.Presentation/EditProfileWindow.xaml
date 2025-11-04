@@ -6,20 +6,20 @@
         WindowStartupLocation="CenterScreen"
         Background="White">
 
+    <!-- ЄДИНИЙ кореневий Grid -->
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>   <!-- Верхня панель -->
             <RowDefinition Height="*"/>      <!-- Основна частина -->
         </Grid.RowDefinitions>
 
-        <!-- 🔹 Верхня панель -->
+        <!-- Верхня панель -->
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <!-- Кнопка LitShare -->
             <Button Content="LitShare"
                     FontSize="22"
                     FontWeight="Bold"
@@ -30,7 +30,6 @@
                     HorizontalAlignment="Left"
                     Click="HomeButton_Click"/>
 
-            <!-- Кнопка “Мій профіль” -->
             <Button Content="Мій профіль"
                     FontSize="16"
                     Foreground="Gray"
@@ -42,7 +41,7 @@
                     Click="MyProfileButton_Click"/>
         </Grid>
 
-        <!-- 🔹 Основна частина -->
+        <!-- Основна частина -->
         <Grid Grid.Row="1" Margin="0,15,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="250"/>
@@ -65,40 +64,31 @@
                         Click="ChangePhotoButton_Click"/>
             </StackPanel>
 
-            <!-- 🔹 Дані користувача -->
+            <!-- Дані користувача -->
             <StackPanel Grid.Column="1" VerticalAlignment="Top">
                 <TextBlock Text="Основна інформація"
                            FontSize="17"
                            FontWeight="Bold"
                            Margin="0,0,0,10"/>
 
-                <!-- Ім’я -->
                 <Grid Margin="0,0,0,10">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="120"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="Ім’я:" FontWeight="Bold"/>
-                    <TextBox x:Name="txtFirstName"
-                             IsReadOnly="True"
-                             Background="#EEE"
-                             Grid.Column="1"/>
+                    <TextBox x:Name="txtFirstName" IsReadOnly="True" Background="#EEE" Grid.Column="1"/>
                 </Grid>
 
-                <!-- Прізвище -->
                 <Grid Margin="0,0,0,10">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="120"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="Прізвище:" FontWeight="Bold"/>
-                    <TextBox x:Name="txtLastName"
-                             IsReadOnly="True"
-                             Background="#EEE"
-                             Grid.Column="1"/>
+                    <TextBox x:Name="txtLastName" IsReadOnly="True" Background="#EEE" Grid.Column="1"/>
                 </Grid>
 
-                <!-- Область -->
                 <Grid Margin="0,0,0,10">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="120"/>
@@ -108,7 +98,6 @@
                     <TextBox x:Name="txtRegion" Grid.Column="1"/>
                 </Grid>
 
-                <!-- Район -->
                 <Grid Margin="0,0,0,10">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="120"/>
@@ -118,7 +107,6 @@
                     <TextBox x:Name="txtDistrict" Grid.Column="1"/>
                 </Grid>
 
-                <!-- Місто -->
                 <Grid Margin="0,0,0,10">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="120"/>
@@ -128,7 +116,6 @@
                     <TextBox x:Name="txtCity" Grid.Column="1"/>
                 </Grid>
 
-                <!-- Контактні дані -->
                 <Grid Margin="0,0,0,10">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="120"/>
@@ -138,21 +125,15 @@
                     <TextBox x:Name="txtPhone" Grid.Column="1"/>
                 </Grid>
 
-                <!-- Про себе -->
                 <Grid Margin="0,0,0,15">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="120"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="Про себе:" FontWeight="Bold"/>
-                    <TextBox x:Name="txtAbout"
-                             Grid.Column="1"
-                             AcceptsReturn="True"
-                             Height="100"
-                             TextWrapping="Wrap"/>
+                    <TextBox x:Name="txtAbout" Grid.Column="1" AcceptsReturn="True" Height="100" TextWrapping="Wrap"/>
                 </Grid>
 
-                <!-- Кнопки -->
                 <Grid Margin="120,5,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="1*"/>
@@ -162,31 +143,17 @@
                         <ColumnDefinition Width="1*"/>
                     </Grid.ColumnDefinitions>
 
-                    <Button Grid.Column="0"
-                            Content="Зберегти зміни"
-                            Height="42"
-                            Background="#2E7D32"
-                            Foreground="White"
-                            FontWeight="Bold"
-                            Cursor="Hand"
-                            Click="SaveButton_Click"/>
+                    <Button Grid.Column="0" Content="Зберегти зміни" Height="42"
+                            Background="#2E7D32" Foreground="White" FontWeight="Bold"
+                            Cursor="Hand" Click="SaveButton_Click"/>
 
-                    <Button Grid.Column="2"
-                            Content="Скасувати"
-                            Height="42"
-                            Background="#BDBDBD"
-                            FontWeight="Bold"
-                            Cursor="Hand"
-                            Click="CancelButton_Click"/>
+                    <Button Grid.Column="2" Content="Скасувати" Height="42"
+                            Background="#BDBDBD" FontWeight="Bold"
+                            Cursor="Hand" Click="CancelButton_Click"/>
 
-                    <Button Grid.Column="4"
-                            Content="Видалити профіль"
-                            Height="42"
-                            Background="#D32F2F"
-                            Foreground="White"
-                            FontWeight="Bold"
-                            Cursor="Hand"
-                            Click="DeleteButton_Click"/>
+                    <Button Grid.Column="4" Content="Видалити профіль" Height="42"
+                            Background="#D32F2F" Foreground="White" FontWeight="Bold"
+                            Cursor="Hand" Click="DeleteButton_Click"/>
                 </Grid>
             </StackPanel>
         </Grid>
