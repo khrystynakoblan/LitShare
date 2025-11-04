@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -17,10 +18,10 @@ namespace LitShare.Presentation
         public EditProfileWindow()
         {
             InitializeComponent();
-            LoadUserData(1); //  тестовий ID користувача
+            LoadUserData(1); // тестовий ID користувача
         }
 
-        //  Завантаження даних користувача
+        // 🔹 Завантаження даних користувача
         private void LoadUserData(int userId)
         {
             _currentUser = _userService.GetUserById(userId);
@@ -30,17 +31,14 @@ namespace LitShare.Presentation
                 return;
             }
 
-            // Розбиваємо ім’я на частини (якщо записано через пробіл)
-            txtFirstName.Text = _currentUser.name.Split(' ').FirstOrDefault() ?? _currentUser.name;
-            txtLastName.Text = _currentUser.name.Split(' ').Skip(1).FirstOrDefault() ?? "";
-
+            txtFirstName.Text = _currentUser.name;
             txtRegion.Text = _currentUser.region;
             txtDistrict.Text = _currentUser.district;
             txtCity.Text = _currentUser.city;
             txtPhone.Text = _currentUser.phone;
             txtAbout.Text = _currentUser.about ?? "";
 
-            // Встановлення аватарки
+            // Фото
             if (!string.IsNullOrEmpty(_currentUser.photo_url))
             {
                 userPhotoEllipse.Fill = new ImageBrush(new BitmapImage(new Uri(_currentUser.photo_url)));
@@ -52,7 +50,6 @@ namespace LitShare.Presentation
                 userPhotoEllipse.Fill = new ImageBrush(new BitmapImage(new Uri(randomUrl)));
             }
 
-            // Створюємо копію користувача для кнопки "Скасувати"
             _originalUser = new Users
             {
                 id = _currentUser.id,
@@ -68,17 +65,17 @@ namespace LitShare.Presentation
             };
         }
 
-        // Зміна фото
+        // 🔹 Змінити фото
         private void ChangePhotoButton_Click(object sender, RoutedEventArgs e)
         {
             string randomUrl = $"https://randomuser.me/api/portraits/lego/{new Random().Next(0, 9)}.jpg";
             userPhotoEllipse.Fill = new ImageBrush(new BitmapImage(new Uri(randomUrl)));
 
             if (_currentUser != null)
-                _currentUser.photo_url = randomUrl; //  зберігаємо новий URL фото
+                _currentUser.photo_url = randomUrl;
         }
 
-        //  Зберегти зміни в базу
+        // 🔹 Зберегти зміни
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             if (_currentUser == null)
@@ -87,7 +84,7 @@ namespace LitShare.Presentation
                 return;
             }
 
-            // Оновлюємо дані користувача
+            _currentUser.name = txtFirstName.Text;
             _currentUser.region = txtRegion.Text;
             _currentUser.district = txtDistrict.Text;
             _currentUser.city = txtCity.Text;
@@ -99,8 +96,8 @@ namespace LitShare.Presentation
 
             try
             {
-                _userService.UpdateUser(_currentUser); // запис у БД
-                MessageBox.Show(" Зміни успішно збережено!", "LitShare", MessageBoxButton.OK, MessageBoxImage.Information);
+                _userService.UpdateUser(_currentUser);
+                MessageBox.Show("Зміни успішно збережено!", "LitShare", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
@@ -108,15 +105,13 @@ namespace LitShare.Presentation
             }
         }
 
-        //  Скасувати зміни
+        // 🔹 Скасувати зміни
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             if (_originalUser == null)
                 return;
 
-            //  Відновлюємо початкові дані
-            txtFirstName.Text = _originalUser.name.Split(' ').FirstOrDefault() ?? _originalUser.name;
-            txtLastName.Text = _originalUser.name.Split(' ').Skip(1).FirstOrDefault() ?? "";
+            txtFirstName.Text = _originalUser.name;
             txtRegion.Text = _originalUser.region;
             txtDistrict.Text = _originalUser.district;
             txtCity.Text = _originalUser.city;
@@ -126,10 +121,10 @@ namespace LitShare.Presentation
             if (!string.IsNullOrEmpty(_originalUser.photo_url))
                 userPhotoEllipse.Fill = new ImageBrush(new BitmapImage(new Uri(_originalUser.photo_url)));
 
-            MessageBox.Show(" Зміни скасовано. Дані відновлено.", "LitShare", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show("Зміни скасовано. Дані відновлено.", "LitShare", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
-        // 🔹Видалити профіль (тест)
+        // 🔹 Видалити профіль
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
             if (_currentUser == null)
@@ -158,19 +153,15 @@ namespace LitShare.Presentation
                     MessageBox.Show($"Помилка при видаленні: {ex.Message}", "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
-            else
-            {
-                MessageBox.Show("Видалення скасовано.", "LitShare", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
         }
 
-        
-         private async void HomeButton_Click(object sender, RoutedEventArgs e)
+        // 🔹 Кнопка “LitShare”
+        private async void HomeButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
                 this.Hide();
-                await Task.Delay(150); // невелика затримка для плавності
+                await Task.Delay(150);
                 var mainPage = new MainPage();
                 mainPage.Show();
                 this.Close();
@@ -182,10 +173,5 @@ namespace LitShare.Presentation
             }
         }
 
-
-        private void MyProfileButton_Click(object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show("Повернення до профілю (тест).", "LitShare");
-        }
     }
 }

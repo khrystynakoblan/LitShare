@@ -1,161 +1,193 @@
 <Window x:Class="LitShare.Presentation.EditProfileWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="LitShare — Редагування профілю"
-        Height="720" Width="940"
+        Title="LitShare"
+        Height="700"
+        Width="900"
+        Background="#FFF9F9F9"
         WindowStartupLocation="CenterScreen"
-        Background="White">
+        WindowState="Maximized">
 
-    <!-- ЄДИНИЙ кореневий Grid -->
-    <Grid Margin="20">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>   <!-- Верхня панель -->
-            <RowDefinition Height="*"/>      <!-- Основна частина -->
-        </Grid.RowDefinitions>
-
+    <DockPanel Margin="20">
         <!-- Верхня панель -->
-        <Grid Grid.Row="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-
-            <Button Content="LitShare"
-                    FontSize="22"
+        <DockPanel DockPanel.Dock="Top" Height="40" Margin="0,0,0,30">
+            <Button x:Name="HomeButton"
+                    Content="LitShare"
+                    FontSize="24"
                     FontWeight="Bold"
-                    Foreground="#2C3E50"
                     Background="Transparent"
                     BorderThickness="0"
+                    Foreground="Black"
                     Cursor="Hand"
-                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    DockPanel.Dock="Left"
+                    Margin="0,0,15,0"
                     Click="HomeButton_Click"/>
 
             <Button Content="Мій профіль"
-                    FontSize="16"
-                    Foreground="Gray"
-                    Background="Transparent"
+                    Background="#333"
+                    Foreground="White"
+                    Padding="15,5"
+                    FontWeight="Bold"
                     BorderThickness="0"
                     Cursor="Hand"
-                    HorizontalAlignment="Right"
-                    Grid.Column="1"
-                    Click="MyProfileButton_Click"/>
-        </Grid>
+                    DockPanel.Dock="Right"
+                    VerticalAlignment="Center"/>
+
+            <TextBlock Text="Редагування профілю"
+                       FontSize="18"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"/>
+        </DockPanel>
 
         <!-- Основна частина -->
-        <Grid Grid.Row="1" Margin="0,15,0,0">
+        <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="250"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="3*" />
             </Grid.ColumnDefinitions>
 
-            <!-- Фото + кнопка -->
-            <StackPanel Grid.Column="0" VerticalAlignment="Top" Margin="10,10,20,0" HorizontalAlignment="Center">
-                <Border BorderBrush="LightGray" BorderThickness="1" CornerRadius="100"
-                        Width="140" Height="140" HorizontalAlignment="Center">
+            <!-- Фото профілю -->
+            <StackPanel Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Top">
+                <Border Background="#E0E0E0" Width="200" Height="200" CornerRadius="100">
                     <Ellipse x:Name="userPhotoEllipse" Fill="#EAEAEA"/>
                 </Border>
-
-                <Button Content="Змінити фото"
-                        Width="150" Height="34" Margin="0,12,0,0"
+                <Button x:Name="ChangePhotoButton"
+                        Content="Змінити фото"
                         Background="#333"
                         Foreground="White"
-                        FontWeight="Bold"
+                        Width="200"
+                        Height="35"
+                        Margin="0,15,0,0"
+                        BorderThickness="0"
                         Cursor="Hand"
-                        Click="ChangePhotoButton_Click"/>
+                        FontWeight="Bold"
+                        Click="ChangePhotoButton_Click"/>  
             </StackPanel>
 
-            <!-- Дані користувача -->
-            <StackPanel Grid.Column="1" VerticalAlignment="Top">
-                <TextBlock Text="Основна інформація"
-                           FontSize="17"
-                           FontWeight="Bold"
-                           Margin="0,0,0,10"/>
+            <!-- Поля вводу -->
+            <Grid Grid.Column="1" Margin="40,0,0,0" VerticalAlignment="Top">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
 
-                <Grid Margin="0,0,0,10">
+                <!-- Ім'я -->
+                <Grid Margin="0,10" Grid.Row="0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="120"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="Ім’я:" FontWeight="Bold"/>
-                    <TextBox x:Name="txtFirstName" IsReadOnly="True" Background="#EEE" Grid.Column="1"/>
+                    <TextBlock Text="Ім'я" VerticalAlignment="Center" FontWeight="SemiBold" FontSize="14"/>
+                    <TextBox x:Name="txtFirstName" Grid.Column="1" Height="35" IsReadOnly="True" Background="#EEE" Padding="8,2"/>
                 </Grid>
 
-                <Grid Margin="0,0,0,10">
+                <!-- Область -->
+                <Grid Margin="0,10" Grid.Row="1">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="120"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="Прізвище:" FontWeight="Bold"/>
-                    <TextBox x:Name="txtLastName" IsReadOnly="True" Background="#EEE" Grid.Column="1"/>
+                    <TextBlock Text="Область" VerticalAlignment="Center" FontWeight="SemiBold" FontSize="14"/>
+                    <TextBox x:Name="txtRegion" Grid.Column="1" Height="35" Padding="8,2"/>
                 </Grid>
 
-                <Grid Margin="0,0,0,10">
+                <!-- Район -->
+                <Grid Margin="0,10" Grid.Row="2">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="120"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="Область:" FontWeight="Bold"/>
-                    <TextBox x:Name="txtRegion" Grid.Column="1"/>
+                    <TextBlock Text="Район" VerticalAlignment="Center" FontWeight="SemiBold" FontSize="14"/>
+                    <TextBox x:Name="txtDistrict" Grid.Column="1" Height="35" Padding="8,2"/>
                 </Grid>
 
-                <Grid Margin="0,0,0,10">
+                <!-- Місто -->
+                <Grid Margin="0,10" Grid.Row="3">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="120"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="Район:" FontWeight="Bold"/>
-                    <TextBox x:Name="txtDistrict" Grid.Column="1"/>
+                    <TextBlock Text="Місто" VerticalAlignment="Center" FontWeight="SemiBold" FontSize="14"/>
+                    <TextBox x:Name="txtCity" Grid.Column="1" Height="35" Padding="8,2"/>
                 </Grid>
 
-                <Grid Margin="0,0,0,10">
+                <!-- Телефон -->
+                <Grid Margin="0,10" Grid.Row="4">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="120"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="Місто:" FontWeight="Bold"/>
-                    <TextBox x:Name="txtCity" Grid.Column="1"/>
+                    <TextBlock Text="Телефон" VerticalAlignment="Center" FontWeight="SemiBold" FontSize="14"/>
+                    <TextBox x:Name="txtPhone" Grid.Column="1" Height="35" Padding="8,2"/>
                 </Grid>
 
-                <Grid Margin="0,0,0,10">
+                <!-- Про себе -->
+                <Grid Grid.Row="5" Margin="0,15,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="120"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="Контактні дані:" FontWeight="Bold"/>
-                    <TextBox x:Name="txtPhone" Grid.Column="1"/>
+                    <TextBlock Text="Про себе" 
+                               FontWeight="SemiBold" 
+                               FontSize="14"
+                               VerticalAlignment="Top"
+                               Margin="0,8,0,0"/>
+                    <TextBox x:Name="txtAbout"
+                             Grid.Column="1"
+                             AcceptsReturn="True"
+                             TextWrapping="Wrap"
+                             Height="100"
+                             VerticalScrollBarVisibility="Auto"
+                             Padding="8"/>
                 </Grid>
+            </Grid>
 
-                <Grid Margin="0,0,0,15">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="120"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="Про себе:" FontWeight="Bold"/>
-                    <TextBox x:Name="txtAbout" Grid.Column="1" AcceptsReturn="True" Height="100" TextWrapping="Wrap"/>
-                </Grid>
-
-                <Grid Margin="120,5,0,0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1*"/>
-                        <ColumnDefinition Width="20"/>
-                        <ColumnDefinition Width="1*"/>
-                        <ColumnDefinition Width="20"/>
-                        <ColumnDefinition Width="1*"/>
-                    </Grid.ColumnDefinitions>
-
-                    <Button Grid.Column="0" Content="Зберегти зміни" Height="42"
-                            Background="#2E7D32" Foreground="White" FontWeight="Bold"
-                            Cursor="Hand" Click="SaveButton_Click"/>
-
-                    <Button Grid.Column="2" Content="Скасувати" Height="42"
-                            Background="#BDBDBD" FontWeight="Bold"
-                            Cursor="Hand" Click="CancelButton_Click"/>
-
-                    <Button Grid.Column="4" Content="Видалити профіль" Height="42"
-                            Background="#D32F2F" Foreground="White" FontWeight="Bold"
-                            Cursor="Hand" Click="DeleteButton_Click"/>
-                </Grid>
+            <!-- Кнопки по центру всього екрана -->
+            <StackPanel Grid.ColumnSpan="2" 
+                        Orientation="Horizontal" 
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Bottom"
+                        Margin="0,0,0,50">
+                <Button Content="Зберегти зміни"
+                        x:Name="SaveButton"
+                        Click="SaveButton_Click"
+                        Background="#2E7D32"
+                        Foreground="White"
+                        Width="160"
+                        Height="40"
+                        Margin="0,0,15,0"
+                        BorderThickness="0"
+                        FontWeight="Bold"
+                        FontSize="14"
+                        Cursor="Hand"/>
+                <Button Content="Скасувати"
+                        x:Name="CancelButton"
+                        Click="CancelButton_Click"
+                        Background="#BDBDBD"
+                        Foreground="Black"
+                        Width="140"
+                        Height="40"
+                        Margin="0,0,15,0"
+                        BorderThickness="0"
+                        FontWeight="Bold"
+                        FontSize="14"
+                        Cursor="Hand"/>
+                <Button Content="Видалити профіль"
+                        x:Name="DeleteButton"
+                        Background="#D32F2F"
+                        Foreground="White"
+                        Width="160"
+                        Height="40"
+                        BorderThickness="0"
+                        FontWeight="Bold"
+                        FontSize="14"
+                        Cursor="Hand"/>
             </StackPanel>
         </Grid>
-    </Grid>
+    </DockPanel>
 </Window>
