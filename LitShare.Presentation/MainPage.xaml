@@ -63,14 +63,14 @@
                              GotFocus="SearchTextBox_GotFocus" LostFocus="SearchTextBox_LostFocus"/>
 
                     <!-- Кнопка "Мій профіль" -->
-                    <Button Grid.Column="1" Content="Мій профіль" Height="30" Width="120" 
+                    <Button Grid.Column="1" Content="+ Додати книгу" Height="30" Width="120" 
                             Background="#4A4A4A" Foreground="White" BorderThickness="0" 
-                            Margin="0,0,10,0" Cursor="Hand" Click="MyProfile_Click"/>
+                            Margin="0,0,10,0" Cursor="Hand" Click="AddBook_Click"/>
 
                     <!-- Кнопка "+ Додати книгу" -->
-                    <Button Grid.Column="2" Content="+ Додати книгу" Height="30" Width="120" 
+                    <Button Grid.Column="2" Content="Мій профіль" Height="30" Width="120" 
                             Background="#4A4A4A" Foreground="White" BorderThickness="0" 
-                            Cursor="Hand" Click="AddBook_Click"/>
+                            Cursor="Hand" Click="MyProfile_Click"/>
                 </Grid>
             </Border>
 
