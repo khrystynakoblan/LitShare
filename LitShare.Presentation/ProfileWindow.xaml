@@ -7,6 +7,7 @@
         mc:Ignorable="d"
         Title="LitShare - Мій профіль" Height="700" Width="1000"
         WindowStartupLocation="CenterScreen"
+        WindowState="Maximized"
         Background="#F9F9F9">
 
     <Window.Resources>

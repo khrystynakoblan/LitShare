@@ -22,7 +22,7 @@
             <Button Content="LitShare"
                     FontSize="22"
                     FontWeight="Bold"
-                    Foreground="#2C3E50"
+                    Foreground="Black"
                     Background="Transparent"
                     BorderThickness="0"
                     Cursor="Hand"

@@ -68,25 +68,41 @@ namespace LitShare.Presentation
                                 "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-            
+
 
         // 6. Заготовка для кнопки "Увійти"
         private async void Button_Click_Login(object sender, RoutedEventArgs e)
         {
-            // Отримуємо посилання на кнопку, яка викликала подію
             var button = sender as Button;
             button.IsEnabled = false;
 
             try
             {
-                bool isValid = await _userService.ValidateUser(
-                    txtLoginEmail.Text,
-                    txtLoginPassword.Password
-                );
+                string email = txtLoginEmail.Text;
+                string password = txtLoginPassword.Password;
+
+                bool isValid = await _userService.ValidateUser(email, password);
 
                 if (isValid)
                 {
-                    MessageBox.Show("Вхід успішний!");
+                    // ✅ Отримуємо користувача з БД
+                    var user = _userService.GetAllUsers()
+                        .FirstOrDefault(u => u.email == email);
+
+                    if (user != null)
+                    {
+                        MessageBox.Show($"Вхід успішний! Вітаємо, {user.name}.");
+
+                        // ✅ Передаємо айді користувача в MainPage
+                        var mainPage = new MainPage(user.id);
+                        mainPage.Show();
+
+                        this.Close(); // закриваємо вікно авторизації
+                    }
+                    else
+                    {
+                        MessageBox.Show("Користувача не знайдено після входу.");
+                    }
                 }
                 else
                 {
@@ -102,5 +118,6 @@ namespace LitShare.Presentation
                 button.IsEnabled = true;
             }
         }
+
     }
 }

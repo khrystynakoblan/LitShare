@@ -10,9 +10,11 @@ namespace LitShare
 {
     public partial class NewAdWindow : Window
     {
-        public NewAdWindow()
+        private readonly int _userId;
+        public NewAdWindow(int userId)
         {
             InitializeComponent();
+            _userId = userId;
             LoadDealTypes();
             LoadGenres();
         }
@@ -20,8 +22,17 @@ namespace LitShare
 
         private void LoadDealTypes()
         {
-            DealTypeComboBox.ItemsSource = Enum.GetValues(typeof(DealType)).Cast<DealType>();
+            var dealTypes = new[]
+            {
+                new { Value = DealType.Exchange, Display = "Обмін" },
+                new { Value = DealType.Donation, Display = "Безкоштовно" }
+            };
+
+            DealTypeComboBox.ItemsSource = dealTypes;
+            DealTypeComboBox.DisplayMemberPath = "Display";
+            DealTypeComboBox.SelectedValuePath = "Value";
         }
+
 
         private void LoadGenres()
         {
@@ -54,7 +65,7 @@ namespace LitShare
                     author = AuthorTextBox.Text,
                     description = DescriptionTextBox.Text,
                     deal_type = (DealType)DealTypeComboBox.SelectedItem,
-                    user_id = 1,   // тимчасово
+                    user_id = _userId,   // тимчасово
                     photo_url = selectedPhotoPath
                 };
 
@@ -73,6 +84,9 @@ namespace LitShare
                 db.SaveChanges();
 
                 MessageBox.Show("Оголошення успішно додано!");
+
+                this.DialogResult = true;
+                this.Close();
             }
             catch (DbUpdateException ex)
             {
@@ -85,11 +99,17 @@ namespace LitShare
             this.Close();
         }
 
+        private void MyProfile_Click(object sender, RoutedEventArgs e)
+        {
+            var profileWindow = new ProfileWindow(_userId);
+            profileWindow.ShowDialog();
+        }
+
         private string selectedPhotoPath; 
 
         private void HomeButton_Click(object sender, RoutedEventArgs e)
-        {           
-            MainPage mainWindow = new MainPage();
+        {
+            MainPage mainWindow = new MainPage(_userId);
             mainWindow.Show();
             this.Close();
         }

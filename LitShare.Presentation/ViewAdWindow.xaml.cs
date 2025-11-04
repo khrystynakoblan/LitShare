@@ -13,6 +13,7 @@ namespace LitShare.Presentation
         private BookDto? _currentBook;
 
         // Конструктор без параметрів для дизайнера
+
         public ViewAdWindow()
         {
             InitializeComponent();
@@ -92,21 +93,18 @@ namespace LitShare.Presentation
             }
         }
 
-        // Кнопка "Мій профіль"
-        private void MyProfile_Click(object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show("Відкриття вашого профілю...");
-            //TODO: відкриття профілю користувача
-        }
 
         // Профіль автора книги
         private void UserProfile_Click(object sender, RoutedEventArgs e)
         {
             if (_currentBook != null)
             {
-                MessageBox.Show($"Профіль автора книги (UserId має бути в BookDto)");
+                var profileWindow = new ProfileViewWindow(_currentBook.UserId);
+                profileWindow.Owner = this;
+                profileWindow.ShowDialog();
             }
         }
+
 
         // Назад
         private void Back_Click(object sender, RoutedEventArgs e)

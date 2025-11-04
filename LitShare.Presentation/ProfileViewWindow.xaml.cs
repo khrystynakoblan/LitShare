@@ -9,13 +9,12 @@ namespace LitShare.Presentation
         private readonly UserService _userService = new UserService();
         private readonly BookService _bookService = new BookService();
 
-        public ProfileViewWindow()
+        public ProfileViewWindow(int userId)
         {
             InitializeComponent();
-
-            int testUserId = 1; // 🔹 тестовий ID користувача
-            _ = LoadUserProfileAsync(testUserId);
+            _ = LoadUserProfileAsync(userId);
         }
+
 
         private async Task LoadUserProfileAsync(int userId)
         {
@@ -42,10 +41,10 @@ namespace LitShare.Presentation
 
         private void HomeButton_Click(object sender, RoutedEventArgs e)
         {
-            this.Hide(); // спочатку сховати
-            var mainPage = new MainPage();
-            mainPage.Show();
-            this.Close(); // а тоді повністю закрити
+            //this.Hide(); // спочатку сховати
+            //var mainPage = new MainPage();
+            //mainPage.Show();
+            //this.Close(); // а тоді повністю закрити
         }
 
 

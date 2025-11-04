@@ -1,4 +1,5 @@
 ﻿using LitShare.BLL.Services; // 1. ДОДАНО: Підключаємо BLL
+using LitShare.DAL.Models;
 using System.Threading.Tasks;  // 2. ДОДАНО: Потрібно для асинхронності
 using System.Windows;
 
@@ -8,14 +9,14 @@ namespace LitShare.Presentation
     {
         // 3. ДОДАНО: Створюємо екземпляр сервісу
         private readonly UserService _userService = new UserService();
+        private readonly int _userId;
 
-        public ProfileWindow()
+
+        public ProfileWindow(int userId)
         {
             InitializeComponent();
-
-            // 4. ДОДАНО: Викликаємо завантаження даних
-            int testUserId = 2; // <--- ВАШ ТЕСТОВИЙ ID (поставте ID, який існує в БД)
-            _ = LoadUserProfileAsync(testUserId); // Запускаємо асинхронно
+            _userId = userId;
+            _ = LoadUserProfileAsync(_userId);
         }
 
         // 5. ДОДАНО: Новий метод для завантаження даних
@@ -23,34 +24,26 @@ namespace LitShare.Presentation
         {
             try
             {
-                // Отримуємо користувача. 
-                // ВАЖЛИВО: Використовуємо GetUserProfileById, бо він має включати 'posts'
                 var user = _userService.GetUserProfileById(userId);
 
                 if (user != null)
                 {
-                    // Заповнюємо TextBlock'и даними
                     txtNameSidebar.Text = user.name;
                     txtNameMain.Text = user.name;
-                    txtRegion.Text = user.region ?? "—"; // (?? "—" означає "якщо null, то поставити "—")
+                    txtRegion.Text = user.region ?? "—";
                     txtDistrict.Text = user.district ?? "—";
                     txtCity.Text = user.city ?? "—";
                     txtPhone.Text = user.phone ?? "—";
                     txtEmail.Text = user.email;
                     txtAbout.Text = user.about ?? "Інформація про себе ще не заповнена.";
-
-                    // TODO: Тут вам ще треба буде завантажити список книг (posts)
-                    // var books = await _bookService.GetBooksByUserIdAsync(userId);
-                    // BooksList.ItemsSource = books; // (якщо у вас є BooksList)
                 }
                 else
                 {
-                    MessageBox.Show($"Тестовий користувач з ID {userId} не знайдений.", "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show($"Користувача з ID {userId} не знайдено.", "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
             catch (Exception ex)
             {
-                // Це покаже помилку, якщо, наприклад, немає зв'язку з БД
                 MessageBox.Show($"Сталася помилка при завантаженні: {ex.Message}", "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -65,14 +58,22 @@ namespace LitShare.Presentation
 
         private void AddBookButton_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Тут відкриється вікно 'Додати книгу'");
-            // ...
+            var newAdWindow = new NewAdWindow(_userId);
+            bool? result = newAdWindow.ShowDialog();
+
+            if (result == true)
+            {
+                var myBooksWindow = new MyBook(_userId);
+                myBooksWindow.Show();
+                this.Close();
+            }
         }
+
 
         private void MyBooksButton_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Тут відкриється вікно 'Мої книги'");
-            // ...
+            var myBooksWindow = new MyBook(_userId);
+            myBooksWindow.Show();
         }
 
         private void EditProfileButton_Click(object sender, RoutedEventArgs e)

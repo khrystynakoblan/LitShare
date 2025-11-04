@@ -13,20 +13,23 @@ namespace LitShare.Presentation
     {
         private readonly LitShareDbContext _context;
         private List<BookItem> _allBooks;
+        private readonly int _userId;
 
-        public MyBook()
+        public MyBook(int userId)
         {
             InitializeComponent();
             _context = new LitShareDbContext();
+            _userId = userId;
             LoadBooks();
             SearchTextBox.TextChanged += SearchTextBox_TextChanged;
         }
+
 
         private void LoadBooks()
         {
             try
             {
-                int currentUserId = 1; // тут має бути ID поточного користувача
+                int currentUserId = _userId; ; // ID поточного користувача
 
                 _allBooks = _context.posts
                     .Where(p => p.user_id == currentUserId)
@@ -70,112 +73,12 @@ namespace LitShare.Presentation
 
         private void DisplayBooks(List<BookItem> books)
         {
-            BooksGrid.Children.Clear();
-
-            if (books.Count == 0)
-            {
-                var noResultsText = new TextBlock
-                {
-                    Text = "Книги не знайдено",
-                    FontSize = 16,
-                    Foreground = System.Windows.Media.Brushes.Gray,
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    Margin = new Thickness(0, 50, 0, 0)
-                };
-                BooksGrid.Children.Add(noResultsText);
-                return;
-            }
-
-            foreach (var book in books)
-            {
-                var card = CreateBookCard(book.Title, book.Author, book.City);
-                BooksGrid.Children.Add(card);
-            }
-        }
-
-        private Border CreateBookCard(string title, string author, string city)
-        {
-            var border = new Border
-            {
-                BorderBrush = System.Windows.Media.Brushes.LightGray,
-                BorderThickness = new Thickness(1),
-                CornerRadius = new CornerRadius(8),
-                Background = System.Windows.Media.Brushes.White,
-                Height = 285,
-                Margin = new Thickness(10)
-            };
-
-            var stack = new StackPanel { Margin = new Thickness(10) };
-
-            var cover = new Border
-            {
-                Width = 120,
-                Height = 160,
-                Background = System.Windows.Media.Brushes.LightGray,
-                CornerRadius = new CornerRadius(4),
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center,
-                Margin = new Thickness(0, 0, 0, 10)
-            };
-
-
-            var info = new StackPanel
-            {
-                HorizontalAlignment = HorizontalAlignment.Center,
-                Margin = new Thickness(0, 0, 0, 10)
-            };
-
-            info.Children.Add(new TextBlock
-            {
-                Text = title,
-                FontWeight = FontWeights.SemiBold,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                TextWrapping = TextWrapping.Wrap,
-                MaxWidth = 140
-            });
-
-            info.Children.Add(new TextBlock
-            {
-                Text = author,
-                FontSize = 12,
-                Foreground = System.Windows.Media.Brushes.Gray,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                TextWrapping = TextWrapping.Wrap,
-                MaxWidth = 140
-            });
-
-            info.Children.Add(new TextBlock
-            {
-                Text = city,
-                FontSize = 12,
-                Foreground = System.Windows.Media.Brushes.Gray,
-                HorizontalAlignment = HorizontalAlignment.Center
-            });
-
-            var editButton = new Button
-            {
-                Content = "Редагувати",
-                Height = 30,
-                Background = System.Windows.Media.Brushes.Black,
-                Foreground = System.Windows.Media.Brushes.White,
-                BorderThickness = new Thickness(0),
-                Cursor = System.Windows.Input.Cursors.Hand,
-                HorizontalAlignment = HorizontalAlignment.Stretch
-            };
-
-            stack.Children.Add(cover);
-            stack.Children.Add(info);
-            stack.Children.Add(editButton);
-
-            border.Child = stack;
-
-            return border;
+            BooksItemsControl.ItemsSource = books;
         }
 
         private void HomeButton_Click(object sender, RoutedEventArgs e)
         {
-            MainWindow mainWindow = new MainWindow();
+            MainPage mainWindow = new MainPage(_userId);
             mainWindow.Show();
             this.Close();
         }
