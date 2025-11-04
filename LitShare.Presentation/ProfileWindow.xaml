@@ -24,7 +24,6 @@
             <Setter Property="Background" Value="#555" />
             <Setter Property="Padding" Value="20, 10" />
         </Style>
-
         <Style x:Key="SideBarButtonStyle" TargetType="Button" BasedOn="{StaticResource ProfileButtonStyle}">
             <Setter Property="Width" Value="180"/>
             <Setter Property="Margin" Value="0, 10"/>
@@ -60,8 +59,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <Border Grid.Column="0" Background="White" BorderBrush="#DDD" BorderThickness="1" CornerRadius="5" Margin="10,10,10,72" Padding="15">
-
+            <Border Grid.Column="0" Background="White" BorderBrush="#DDD" BorderThickness="1" CornerRadius="5" Margin="10,10,10,54" Padding="15">
                 <Grid HorizontalAlignment="Center">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -80,34 +78,31 @@
                             </Ellipse.OpacityMask>
                         </Ellipse>
 
-                        <TextBlock Grid.Row="2" Text="Ім'я" HorizontalAlignment="Center" FontSize="20" FontWeight="Bold" Margin="0,5,0,0"/>
+                        <TextBlock x:Name="txtNameSidebar" Grid.Row="2" Text="..." HorizontalAlignment="Center" FontSize="20" FontWeight="Bold" Margin="0,5,0,0"/>
                     </StackPanel>
 
                     <StackPanel Grid.Row="1" Margin="0,60,0,0">
                         <Button Content="Додати книгу" 
                                 Style="{StaticResource SideBarButtonStyle}" 
                                 Click="AddBookButton_Click" Width="183"/>
-
                         <Button Content="Мої книги" 
                                 Style="{StaticResource SideBarButtonStyle}" 
-                                Click="MyBooksButton_Click" Width="183"/>
-
+                                Click="MyBooksButton_Click" Width="183" Height="40"/>
                         <Button Content="Редагувати профіль" 
                                 Style="{StaticResource SideBarButtonStyle}" 
-                                Click="EditProfileButton_Click"/>
+                                Click="EditProfileButton_Click"  Width="183" Height="40"/>
                     </StackPanel>
-
                 </Grid>
             </Border>
 
             <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" Margin="10">
                 <StackPanel>
-
                     <Border Background="White" BorderBrush="#DDD" BorderThickness="1" CornerRadius="5" Padding="25" Margin="0,0,0,20">
                         <StackPanel>
                             <Border BorderBrush="#EEE" BorderThickness="0,0,0,2" Padding="0,0,0,5" Margin="0,0,0,20">
                                 <TextBlock Text="Основна інформація:" FontSize="18" FontWeight="Bold"/>
                             </Border>
+
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
@@ -119,47 +114,47 @@
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
+
                                 <StackPanel Grid.Row="0" Grid.Column="0" Margin="5, 10">
                                     <TextBlock Text="Ім'я:" FontSize="14" FontWeight="Bold" Foreground="#555"/>
-                                    <TextBlock Text="Lorem ipsum" FontSize="15" Margin="0,2,0,0"/>
+                                    <TextBlock x:Name="txtNameMain" Text="..." FontSize="15" Margin="0,2,0,0"/>
                                 </StackPanel>
                                 <StackPanel Grid.Row="0" Grid.Column="1" Margin="5, 10">
                                     <TextBlock Text="Область:" FontSize="14" FontWeight="Bold" Foreground="#555"/>
-                                    <TextBlock Text="Lorem ipsum" FontSize="15" Margin="0,2,0,0"/>
+                                    <TextBlock x:Name="txtRegion" Text="..." FontSize="15" Margin="0,2,0,0"/>
                                 </StackPanel>
                                 <StackPanel Grid.Row="1" Grid.Column="1" Margin="5, 10">
                                     <TextBlock Text="Район:" FontSize="14" FontWeight="Bold" Foreground="#555"/>
-                                    <TextBlock Text="Lorem ipsum" FontSize="15" Margin="0,2,0,0"/>
+                                    <TextBlock x:Name="txtDistrict" Text="..." FontSize="15" Margin="0,2,0,0"/>
                                 </StackPanel>
                                 <StackPanel Grid.Row="2" Grid.Column="1" Margin="5, 10">
                                     <TextBlock Text="Населений пункт:" FontSize="14" FontWeight="Bold" Foreground="#555"/>
-                                    <TextBlock Text="Lorem ipsum" FontSize="15" Margin="0,2,0,0"/>
+                                    <TextBlock x:Name="txtCity" Text="..." FontSize="15" Margin="0,2,0,0"/>
                                 </StackPanel>
                                 <StackPanel Grid.Row="1" Grid.Column="0" Margin="5, 10">
                                     <TextBlock Text="Контактні дані:" FontSize="14" FontWeight="Bold" Foreground="#555"/>
-                                    <TextBlock Text="Lorem ipsum dolor" FontSize="15" Margin="0,2,0,0"/>
+                                    <TextBlock x:Name="txtPhone" Text="..." FontSize="15" Margin="0,2,0,0"/>
                                 </StackPanel>
                                 <StackPanel Grid.Row="2" Grid.Column="0" Margin="5, 10">
                                     <TextBlock Text="EMAIL:" FontSize="14" FontWeight="Bold" Foreground="#555" RenderTransformOrigin="1.221,-1.86" Height="22" Width="467"/>
-                                    <TextBlock Text="Lorem ipsum" FontSize="15" Margin="0,2,0,0"/>
+                                    <TextBlock x:Name="txtEmail" Text="..." FontSize="15" Margin="0,2,0,0"/>
                                 </StackPanel>
                             </Grid>
                         </StackPanel>
                     </Border>
 
-                    <Border Background="White" BorderBrush="#DDD" BorderThickness="1" CornerRadius="5" Padding="25" Margin="0,0,0,20" Height="194">
+                    <Border Background="White" BorderBrush="#DDD" BorderThickness="1" CornerRadius="5" Padding="25" Margin="0,0,0,20" Height="184">
                         <StackPanel>
                             <Border BorderBrush="#EEE" BorderThickness="0,0,0,2" Padding="0,0,0,5" Margin="0,0,0,15">
                                 <TextBlock Text="Про себе:" FontSize="18" FontWeight="Bold"/>
                             </Border>
-                            <TextBlock Text="Lorem ipsum dolor sit amet et delectus accommodare his consul copiosae legendos at vix ad putent delectus delicata usu. Vidit dissentiet eos cu eum an brute copiosae hendrerit. Eos erant dolorum an. Per facer affert ut. Mei iisque mentitum moderatius cu."
-                                       FontSize="15" TextWrapping="Wrap" LineHeight="22"/>
+
+                            <TextBlock x:Name="txtAbout" Text="..."
+                                         FontSize="15" TextWrapping="Wrap" LineHeight="22"/>
                         </StackPanel>
                     </Border>
-
                 </StackPanel>
             </ScrollViewer>
-
         </Grid>
     </Grid>
 </Window>
