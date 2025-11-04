@@ -1,6 +1,7 @@
 ﻿using LitShare.DAL;
 using LitShare.BLL.DTOs;
 using Microsoft.EntityFrameworkCore;
+using LitShare.DAL.Models;
 
 namespace LitShare.BLL.Services
 {
@@ -23,7 +24,7 @@ namespace LitShare.BLL.Services
                         Author = p.author,
                         Location = p.User.city,
                         Genre = string.Join(", ", p.BookGenres.Select(bg => bg.Genre.name)),
-                        DealType = p.deal_type == "exchange" ? "Обмін" : "Безкоштовно",
+                        DealType = p.deal_type == DealType.Exchange ? "Обмін" : "Безкоштовно",
                         ImagePath = p.photo_url
                     })
                     .ToListAsync();
@@ -95,7 +96,7 @@ namespace LitShare.BLL.Services
                         Author = p.author,
                         Location = p.User.city,
                         Genre = string.Join(", ", p.BookGenres.Select(bg => bg.Genre.name)),
-                        DealType = p.deal_type == "exchange" ? "Обмін" : "Безкоштовно",
+                        DealType = p.deal_type == DealType.Exchange ? "Обмін" : "Безкоштовно",
                         ImagePath = p.photo_url
                     })
                     .ToListAsync();
