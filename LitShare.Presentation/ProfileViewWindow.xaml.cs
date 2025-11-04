@@ -13,7 +13,7 @@ namespace LitShare.Presentation
         {
             InitializeComponent();
 
-            int testUserId = 2; // 🔹 тестовий ID користувача
+            int testUserId = 1; // 🔹 тестовий ID користувача
             _ = LoadUserProfileAsync(testUserId);
         }
 

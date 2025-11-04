@@ -89,7 +89,7 @@ namespace LitShare
 
         private void HomeButton_Click(object sender, RoutedEventArgs e)
         {           
-            MainWindow mainWindow = new MainWindow();
+            MainPage mainWindow = new MainPage();
             mainWindow.Show();
             this.Close();
         }
