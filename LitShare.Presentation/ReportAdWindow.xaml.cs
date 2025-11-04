@@ -7,16 +7,13 @@ namespace LitShare.Presentation
     {
         private readonly int _adId;
         private readonly ComplaintsService _complaintService = new ComplaintsService();
-        private readonly int _currentUserId = 3; // Заміни на поточного користувача
+        private readonly int _currentUserId; // Заміни на поточного користувача
 
-        public ReportAdWindow() : this(2)
-        {
-        }
-
-        public ReportAdWindow(int adId)
+        public ReportAdWindow(int adId, int userId)
         {
             InitializeComponent();
             _adId = adId;
+            _currentUserId = userId;
 
             Loaded += (s, e) =>
             {

@@ -10,6 +10,7 @@ namespace LitShare.Presentation
     public partial class ViewAdWindow : Window
     {
         private readonly BookService _bookService = new BookService();
+        private readonly int _userId;
         private BookDto? _currentBook;
 
         // Конструктор без параметрів для дизайнера
@@ -21,9 +22,10 @@ namespace LitShare.Presentation
         }
 
         // Конструктор із передачею Id книги
-        public ViewAdWindow(int bookId) : this()
+        public ViewAdWindow(int bookId, int userId) : this()
         {
             _ = LoadBook(bookId);
+            _userId = userId;
         }
 
         // Тимчасове заповнення для дизайнера
@@ -99,7 +101,7 @@ namespace LitShare.Presentation
         {
             if (_currentBook != null)
             {
-                var profileWindow = new ProfileViewWindow(_currentBook.UserId);
+                var profileWindow = new ProfileViewWindow(_currentBook.UserId, _userId);
                 profileWindow.Owner = this;
                 profileWindow.ShowDialog();
             }
@@ -111,6 +113,10 @@ namespace LitShare.Presentation
         {
             Close();
         }
+        private void HomePage_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
 
         // Скарга на оголошення
         private void ReportAd_Click(object sender, RoutedEventArgs e)
@@ -119,7 +125,7 @@ namespace LitShare.Presentation
 
             Hide();
 
-            var reportWindow = new ReportAdWindow(_currentBook.Id);
+            var reportWindow = new ReportAdWindow(_currentBook.Id, _userId);
             reportWindow.Owner = this;
             reportWindow.ShowDialog();
 

@@ -149,7 +149,7 @@ namespace LitShare.Presentation
         {
             if (sender is FrameworkElement element && element.Tag is int bookId && bookId > 0)
             {
-                var viewWindow = new ViewAdWindow(bookId);
+                var viewWindow = new ViewAdWindow(bookId, _userId);
                 viewWindow.Owner = this;
                 viewWindow.ShowDialog();
             }

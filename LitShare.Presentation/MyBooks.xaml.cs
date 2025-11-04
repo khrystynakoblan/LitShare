@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using LitShare.DAL;
 using LitShare.DAL.Models;
 
@@ -24,12 +23,11 @@ namespace LitShare.Presentation
             SearchTextBox.TextChanged += SearchTextBox_TextChanged;
         }
 
-
         private void LoadBooks()
         {
             try
             {
-                int currentUserId = _userId; ; // ID поточного користувача
+                int currentUserId = _userId;
 
                 _allBooks = _context.posts
                     .Where(p => p.user_id == currentUserId)
@@ -80,6 +78,11 @@ namespace LitShare.Presentation
         {
             MainPage mainWindow = new MainPage(_userId);
             mainWindow.Show();
+            this.Close();
+        }
+
+        private void BackButton_Click(object sender, RoutedEventArgs e)
+        {
             this.Close();
         }
 
