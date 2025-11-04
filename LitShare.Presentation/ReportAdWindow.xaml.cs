@@ -51,13 +51,17 @@ namespace LitShare.Presentation
 
             try
             {
-                _complaintService.AddComplaint(_adId, _currentUserId, fullText);
+                // 🔹 === ВИПРАВЛЕНО (Рядок 54) ===
+                // Порядок: (string, int, int)
+                _complaintService.AddComplaint(fullText, _adId, _currentUserId);
+                // 🔹 ==============================
+
                 MessageBox.Show("Скаргу надіслано. Дякуємо!", "Успіх", MessageBoxButton.OK, MessageBoxImage.Information);
                 this.Close();
             }
-            catch
+            catch (Exception ex) // (Добра практика - додати 'ex' до catch)
             {
-                MessageBox.Show("Сталася помилка при збереженні скарги.", "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Сталася помилка при збереженні скарги: {ex.Message}", "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

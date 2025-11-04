@@ -14,17 +14,21 @@ namespace LitShare.Presentation
         // 5. ДОДАНО: Поле для збереження ID
         private int _currentComplaintId;
 
-        // 6. ЗМІНЕНО: Конструктор тепер приймає ID
-        public ComplaintReviewWindow(int complaintId)
+        // 6. 🔹 ЗМІНЕNO: Конструктор тепер БЕЗ ПАРАМЕТРІВ (для тесту)
+        public ComplaintReviewWindow()
         {
             InitializeComponent();
-            _currentComplaintId = complaintId; // Зберігаємо ID
 
-            // 7. ДОДАНО: Викликаємо завантаження
+            // 🔹 7. ДОДАНО: Жорстко задаємо тестовий ID
+            int testComplaintId = 1; // <--- ПОСТАВ ТУТ ID СКАРГИ, ЯКА 100% ІСНУЄ В ТВОЇЙ БД
+
+            _currentComplaintId = testComplaintId; // Зберігаємо ID
+
+            // 8. Викликаємо завантаження
             _ = LoadComplaintDataAsync(_currentComplaintId);
         }
 
-        // 8. ДОДАНО: Метод завантаження даних
+        // 9. Метод завантаження даних (залишається як є)
         private async Task LoadComplaintDataAsync(int complaintId)
         {
             try
@@ -35,12 +39,12 @@ namespace LitShare.Presentation
                 if (complaint != null && complaint.Post != null)
                 {
                     // Заповнюємо поля
-                    txtComplaintReason.Text = complaint.text; // (виходячи з вашого DTO)
+                    txtComplaintReason.Text = complaint.text;
                     txtPostTitle.Text = complaint.Post.title;
-                    txtPostDescription.Text = complaint.Post.description; // (припускаю, що поле називається 'description')
+                    txtPostDescription.Text = complaint.Post.description;
 
                     // Треба вручну завантажити автора оголошення
-                    var author = _userService.GetUserById(complaint.Post.user_id); // (припускаю, що поле 'user_id')
+                    var author = _userService.GetUserById(complaint.Post.user_id);
                     txtPostAuthor.Text = author?.name ?? "Невідомий автор";
                 }
                 else

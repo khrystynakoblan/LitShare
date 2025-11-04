@@ -114,7 +114,6 @@
                             HorizontalAlignment="Right"
                             Click="RejectButton_Click"/>
                 </Grid>
-
             </StackPanel>
         </Border>
     </Grid>

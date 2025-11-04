@@ -15,9 +15,14 @@ namespace LitShare.DAL.Models
         public DateTime date { get; set; }
 
         [Column("post_id")]
+        [ForeignKey("Post")]
         public int post_id { get; set; }
 
         [Column("complainant_id")]
+        [ForeignKey("Complainant")]
         public int complainant_id { get; set; }
+
+        public virtual Posts Post { get; set; }
+        public virtual Users Complainant { get; set; }
     }
 }
