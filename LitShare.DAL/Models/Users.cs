@@ -4,10 +4,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LitShare.DAL.Models
 {
-    [Table("users")] 
+    [Table("users")]
     public class Users
     {
-        [Key] 
+        [Key]
         public int id { get; set; }
 
         public string name { get; set; }
@@ -18,5 +18,6 @@ namespace LitShare.DAL.Models
         public string region { get; set; }
         public string district { get; set; }
         public string city { get; set; }
+        public ICollection<Posts>? posts { get; set; }
     }
 }

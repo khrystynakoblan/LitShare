@@ -60,5 +60,15 @@ namespace LitShare.BLL.Services
                 return await Task.Run(() => BCrypt.Net.BCrypt.Verify(password, user.password));
             }
         }
+        public Users? GetUserProfileById(int id)
+        {
+            using (var context = new LitShareDbContext())
+            {
+                
+                return context.Users
+                    .Include(u => u.posts)
+                    .FirstOrDefault(u => u.id == id);
+            }
+        }
     }
 }

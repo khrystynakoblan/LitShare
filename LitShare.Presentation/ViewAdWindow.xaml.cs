@@ -1,6 +1,7 @@
 ﻿using LitShare.BLL.DTOs;
 using LitShare.BLL.Services;
 using System;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Imaging;
 
@@ -9,9 +10,9 @@ namespace LitShare.Presentation
     public partial class ViewAdWindow : Window
     {
         private readonly BookService _bookService = new BookService();
-        private PostDto? _currentBook;
+        private BookDto? _currentBook;
 
-        // Конструктор без параметрів для WPF/Dизайнера
+        // Конструктор без параметрів для дизайнера
         public ViewAdWindow()
         {
             InitializeComponent();
@@ -21,10 +22,10 @@ namespace LitShare.Presentation
         // Конструктор із передачею Id книги
         public ViewAdWindow(int bookId) : this()
         {
-            LoadBook(bookId);
+            _ = LoadBook(bookId);
         }
 
-        // Тимчасовий placeholder для дизайнера
+        // Тимчасове заповнення для дизайнера
         private void SetPlaceholder()
         {
             TitleText.Text = "Назва (тест)";
@@ -35,23 +36,25 @@ namespace LitShare.Presentation
             PostImage.Source = null;
         }
 
-        // Завантаження книги з бази
-        private void LoadBook(int bookId)
+        // Завантаження книги
+        private async Task LoadBook(int bookId)
         {
             try
             {
-                _currentBook = _bookService.GetBookById(bookId);
+                _currentBook = await _bookService.GetBookById(bookId);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Помилка при зверненні до БД: {ex.Message}", "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Помилка при зверненні до бази: {ex.Message}",
+                    "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
                 Close();
                 return;
             }
 
             if (_currentBook == null)
             {
-                MessageBox.Show("Книга не знайдена.", "Помилка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Книга не знайдена.", "Помилка",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
                 Close();
                 return;
             }
@@ -65,10 +68,10 @@ namespace LitShare.Presentation
             LoadBookImage(_currentBook.ImagePath);
         }
 
-        // Завантаження зображення
-        private void LoadBookImage(string? imageUrl)
+        // Завантаження фото
+        private void LoadBookImage(string? url)
         {
-            if (string.IsNullOrWhiteSpace(imageUrl))
+            if (string.IsNullOrWhiteSpace(url))
             {
                 PostImage.Source = null;
                 return;
@@ -76,12 +79,12 @@ namespace LitShare.Presentation
 
             try
             {
-                var bitmap = new BitmapImage();
-                bitmap.BeginInit();
-                bitmap.UriSource = new Uri(imageUrl, UriKind.RelativeOrAbsolute);
-                bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                bitmap.EndInit();
-                PostImage.Source = bitmap;
+                var img = new BitmapImage();
+                img.BeginInit();
+                img.UriSource = new Uri(url, UriKind.RelativeOrAbsolute);
+                img.CacheOption = BitmapCacheOption.OnLoad;
+                img.EndInit();
+                PostImage.Source = img;
             }
             catch
             {
@@ -93,36 +96,36 @@ namespace LitShare.Presentation
         private void MyProfile_Click(object sender, RoutedEventArgs e)
         {
             MessageBox.Show("Відкриття вашого профілю...");
+            //TODO: відкриття профілю користувача
         }
 
-        // Кнопка перегляду профілю користувача
+        // Профіль автора книги
         private void UserProfile_Click(object sender, RoutedEventArgs e)
         {
             if (_currentBook != null)
             {
-                MessageBox.Show($"Профіль користувача (тут можна додати user_id якщо є в BookDto)");
+                MessageBox.Show($"Профіль автора книги (UserId має бути в BookDto)");
             }
         }
 
-        // Кнопка "Назад"
+        // Назад
         private void Back_Click(object sender, RoutedEventArgs e)
         {
             Close();
         }
 
-        // Кнопка "Скарга на оголошення"
+        // Скарга на оголошення
         private void ReportAd_Click(object sender, RoutedEventArgs e)
         {
-            if (_currentBook != null)
-            {
-                this.Hide();
+            if (_currentBook == null) return;
 
-                var reportWindow = new ReportAdWindow(_currentBook.Id);
-                reportWindow.Owner = this;
-                reportWindow.ShowDialog();
+            Hide();
 
-                this.Show();
-            }
+            var reportWindow = new ReportAdWindow(_currentBook.Id);
+            reportWindow.Owner = this;
+            reportWindow.ShowDialog();
+
+            Show();
         }
     }
 }

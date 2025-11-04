@@ -16,7 +16,7 @@ namespace LitShare.DAL.Models
         public string author { get; set; }
 
         [Column("deal_type")]
-        public string deal_type { get; set; } 
+        public DealType deal_type { get; set; }
 
         public string description { get; set; }
 
@@ -25,5 +25,7 @@ namespace LitShare.DAL.Models
 
         [ForeignKey("user_id")]
         public virtual Users User { get; set; }
+        public virtual ICollection<BookGenres> BookGenres { get; set; } = new List<BookGenres>();
+
     }
 }
