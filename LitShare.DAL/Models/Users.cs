@@ -18,6 +18,7 @@ namespace LitShare.DAL.Models
         public string region { get; set; }
         public string district { get; set; }
         public string city { get; set; }
+        public string? photo_url { get; set; }
         public ICollection<Posts>? posts { get; set; }
     }
 }
