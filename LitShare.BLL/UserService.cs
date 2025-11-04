@@ -55,4 +55,32 @@ namespace LitShare.BLL.Services
             }
         }
     }
+    public class PostService
+    {
+        public Posts? GetPostById(int id)
+        {
+            using (var context = new LitShareDbContext())
+            {
+                return context.posts.FirstOrDefault(p => p.id == id);
+            }
+        }
+    }
+    public class ComplaintService
+    {
+        public void AddComplaint(int postId, int complainantId, string text)
+        {
+            var complaint = new Complaints
+            {
+                post_id = postId,
+                complainant_id = complainantId,
+                text = text
+            };
+
+            using (var context = new LitShareDbContext())
+            {
+                context.complaints.Add(complaint);
+                context.SaveChanges();
+            }
+        }
+    }
 }
