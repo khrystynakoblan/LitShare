@@ -12,8 +12,8 @@ namespace LitShare.Presentation
 {
     public partial class MainPage : Window
     {
-        public ObservableCollection<BookDto> AllBooks { get; set; }
-        public ObservableCollection<BookDto> FilteredBooks { get; set; }
+        public ObservableCollection<PostDto> AllBooks { get; set; }
+        public ObservableCollection<PostDto> FilteredBooks { get; set; }
 
         private readonly BookService _bookService;
         private bool isSearchPlaceholder = true;
@@ -25,7 +25,7 @@ namespace LitShare.Presentation
             _bookService = new BookService();
 
             InitializeBooks();
-            FilteredBooks = new ObservableCollection<BookDto>(AllBooks);
+            FilteredBooks = new ObservableCollection<PostDto>(AllBooks);
             BooksItemsControl.ItemsSource = FilteredBooks;
             UpdateResultsCount();
 
@@ -39,12 +39,12 @@ namespace LitShare.Presentation
             try
             {
                 var groupedBooks = _bookService.GetAllBooks();
-                AllBooks = new ObservableCollection<BookDto>(groupedBooks);
+                AllBooks = new ObservableCollection<PostDto>(groupedBooks);
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Помилка завантаження книг: {ex.Message}");
-                AllBooks = new ObservableCollection<BookDto>();
+                AllBooks = new ObservableCollection<PostDto>();
             }
         }
 
@@ -153,8 +153,24 @@ namespace LitShare.Presentation
 
         private void BookCard_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Тут буде сторінка перегляду оголошення.");
+            if (sender is FrameworkElement element && element.DataContext is PostDto book)
+            {
+                var viewWindow = new ViewAdWindow(book.Id);
+                viewWindow.Owner = this;
+
+                this.IsEnabled = false;  // ❗ блокуємо основне вікно, але не ховаємо
+
+                viewWindow.Closed += (s, args) =>
+                {
+                    this.IsEnabled = true; // повертаємо керування
+                    this.Activate();
+                };
+
+                viewWindow.Show(); // ❗ НЕ ShowDialog
+            }
         }
+
+
 
         // Лічильник результатів
         private void UpdateResultsCount()
