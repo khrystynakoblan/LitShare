@@ -97,7 +97,15 @@
                                     <StackPanel>
                                         <!-- Зображення книги -->
                                         <Border Height="180" Background="#E8E8E8">
-                                            <Image Source="{Binding ImagePath}" Stretch="UniformToFill"/>
+                                            <!-- Зображення книги -->
+                                            <Border Height="180" Background="#E8E8E8" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                <Image Source="{Binding ImagePath}" 
+                                                   Stretch="Uniform" 
+                                                   HorizontalAlignment="Center" 
+                                                   VerticalAlignment="Center"
+                                                   Margin="5"/>
+                                            </Border>
+
                                         </Border>
 
                                         <!-- Інформація про книгу -->
