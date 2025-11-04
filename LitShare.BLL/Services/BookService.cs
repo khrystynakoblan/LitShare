@@ -1,49 +1,57 @@
 ﻿using LitShare.DAL;
 using LitShare.BLL.DTOs;
+using Microsoft.EntityFrameworkCore;
 
 namespace LitShare.BLL.Services
 {
     public class BookService
     {
-        public List<BookDto> GetAllBooks()
+        public async Task<List<BookDto>> GetAllBooksAsync()
         {
-            using (var db = new LitShareDbContext())
+            try
             {
-                var postsWithGenres = (from p in db.posts
-                                       join bg in db.bookGenres on p.id equals bg.post_id
-                                       join g in db.genres on bg.genre_id equals g.id
-                                       join u in db.Users on p.user_id equals u.id
-                                       select new
-                                       {
-                                           PostId = p.id,
-                                           Title = p.title,
-                                           Author = p.author,
-                                           Genre = g.name,
-                                           DealType = p.deal_type == "exchange" ? "Обмін" : "Безкоштовно",
-                                           Location = u.city,
-                                           ImagePath = p.photo_url
-                                       }).ToList();
+                using var db = new LitShareDbContext();
 
-                return postsWithGenres
-                    .GroupBy(x => x.PostId)
-                    .Select(g => new BookDto
+                var books = await db.posts
+                    .Include(p => p.BookGenres)
+                        .ThenInclude(bg => bg.Genre)
+                    .Include(p => p.User)
+                    .AsNoTracking()
+                    .Select(p => new BookDto
                     {
-                        Title = g.First().Title,
-                        Author = g.First().Author,
-                        Location = g.First().Location,
-                        Genre = string.Join(", ", g.Select(x => x.Genre)),
-                        DealType = g.First().DealType,
-                        ImagePath = g.First().ImagePath
+                        Title = p.title,
+                        Author = p.author,
+                        Location = p.User.city,
+                        Genre = string.Join(", ", p.BookGenres.Select(bg => bg.Genre.name)),
+                        DealType = p.deal_type == "exchange" ? "Обмін" : "Безкоштовно",
+                        ImagePath = p.photo_url
                     })
-                    .ToList();
+                    .ToListAsync();
+
+                return books;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Помилка при завантаженні книг: {ex.Message}");
+                return new List<BookDto>();
             }
         }
 
-        public List<string> GetGenres()
+        public async Task<List<string>> GetGenresAsync()
         {
-            using (var db = new LitShareDbContext())
+            try
             {
-                return db.genres.Select(g => g.name).ToList();
+                using var db = new LitShareDbContext();
+                return await db.genres
+                    .AsNoTracking()
+                    .OrderBy(g => g.name)
+                    .Select(g => g.name)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Помилка при завантаженні жанрів: {ex.Message}");
+                return new List<string>();
             }
         }
 
@@ -68,39 +76,38 @@ namespace LitShare.BLL.Services
 
             return filtered.ToList();
         }
-        public List<BookDto> GetBooksByUserId(int userId)
-        {
-            using (var db = new LitShareDbContext())
-            {
-                var postsWithGenres = (from p in db.posts
-                                    join bg in db.bookGenres on p.id equals bg.post_id
-                                    join g in db.genres on bg.genre_id equals g.id
-                                    join u in db.Users on p.user_id equals u.id
-                                    where u.id == userId 
-                                    select new
-                                    {
-                                        PostId = p.id,
-                                        Title = p.title,
-                                        Author = p.author,
-                                        Genre = g.name,
-                                        DealType = p.deal_type == "exchange" ? "Обмін" : "Безкоштовно",
-                                        Location = u.city,
-                                        ImagePath = p.photo_url
-                                    }).ToList();
 
-                return postsWithGenres
-                    .GroupBy(x => x.PostId)
-                    .Select(g => new BookDto
+        public async Task<List<BookDto>> GetBooksByUserIdAsync(int userId)
+        {
+            try
+            {
+                using var db = new LitShareDbContext();
+
+                var books = await db.posts
+                    .Where(p => p.user_id == userId)
+                    .Include(p => p.BookGenres)
+                        .ThenInclude(bg => bg.Genre)
+                    .Include(p => p.User)
+                    .AsNoTracking()
+                    .Select(p => new BookDto
                     {
-                        Title = g.First().Title,
-                        Author = g.First().Author,
-                        Location = g.First().Location,
-                        Genre = string.Join(", ", g.Select(x => x.Genre)),
-                        DealType = g.First().DealType,
-                        ImagePath = g.First().ImagePath
+                        Title = p.title,
+                        Author = p.author,
+                        Location = p.User.city,
+                        Genre = string.Join(", ", p.BookGenres.Select(bg => bg.Genre.name)),
+                        DealType = p.deal_type == "exchange" ? "Обмін" : "Безкоштовно",
+                        ImagePath = p.photo_url
                     })
-                    .ToList();
+                    .ToListAsync();
+
+                return books;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Помилка при завантаженні книг користувача: {ex.Message}");
+                return new List<BookDto>();
             }
         }
+
     }
 }

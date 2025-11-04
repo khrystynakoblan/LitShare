@@ -1,4 +1,5 @@
 using LitShare.BLL.Services;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace LitShare.Presentation
@@ -13,10 +14,10 @@ namespace LitShare.Presentation
             InitializeComponent();
 
             int testUserId = 2; // 🔹 тестовий ID користувача
-            LoadUserProfile(testUserId);
+            _ = LoadUserProfileAsync(testUserId);
         }
 
-        private void LoadUserProfile(int userId)
+        private async Task LoadUserProfileAsync(int userId)
         {
             var user = _userService.GetUserProfileById(userId);
 
@@ -29,8 +30,8 @@ namespace LitShare.Presentation
                 txtPhone.Text = user.phone ?? "—";
                 txtAbout.Text = user.about ?? "Користувач ще не заповнив інформацію про себе.";
 
-                // книги користувача
-                var books = _bookService.GetBooksByUserId(userId);
+                // 🔹 асинхронне завантаження книг
+                var books = await _bookService.GetBooksByUserIdAsync(userId);
                 BooksList.ItemsSource = books;
             }
             else
@@ -41,8 +42,12 @@ namespace LitShare.Presentation
 
         private void HomeButton_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Перехід на головну сторінку (ще не реалізовано).");
+            this.Hide(); // спочатку сховати
+            var mainPage = new MainPage();
+            mainPage.Show();
+            this.Close(); // а тоді повністю закрити
         }
+
 
         private void MyProfileButton_Click(object sender, RoutedEventArgs e)
         {

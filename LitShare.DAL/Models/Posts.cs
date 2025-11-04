@@ -25,5 +25,7 @@ namespace LitShare.DAL.Models
 
         [ForeignKey("user_id")]
         public virtual Users User { get; set; }
+        public virtual ICollection<BookGenres> BookGenres { get; set; } = new List<BookGenres>();
+
     }
 }

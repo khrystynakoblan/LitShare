@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -12,82 +13,64 @@ namespace LitShare.Presentation
 {
     public partial class MainPage : Window
     {
-        public ObservableCollection<BookDto> AllBooks { get; set; }
-        public ObservableCollection<BookDto> FilteredBooks { get; set; }
+        public ObservableCollection<BookDto> AllBooks { get; set; } = new();
+        public ObservableCollection<BookDto> FilteredBooks { get; set; } = new();
 
-        private readonly BookService _bookService;
+        private readonly BookService _bookService = new();
         private bool isSearchPlaceholder = true;
-        private List<CheckBox> genreCheckBoxes = new();
+        private readonly List<CheckBox> genreCheckBoxes = new();
 
         public MainPage()
         {
             InitializeComponent();
-            _bookService = new BookService();
-
-            InitializeBooks();
-            FilteredBooks = new ObservableCollection<BookDto>(AllBooks);
-            BooksItemsControl.ItemsSource = FilteredBooks;
-            UpdateResultsCount();
-
-            LoadGenres();
-            SetupSearchPlaceholder();
+            Loaded += MainPage_Loaded;
         }
 
-        // Ініціалізація та завантаження даних
-        private void InitializeBooks()
+        private async void MainPage_Loaded(object sender, RoutedEventArgs e)
         {
             try
             {
-                var groupedBooks = _bookService.GetAllBooks();
-                AllBooks = new ObservableCollection<BookDto>(groupedBooks);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Помилка завантаження книг: {ex.Message}");
-                AllBooks = new ObservableCollection<BookDto>();
-            }
-        }
+                ResultsCountText.Text = "Завантаження даних...";
 
-        private void LoadGenres()
-        {
-            try
-            {
-                var genres = _bookService.GetGenres();
+                var booksTask = _bookService.GetAllBooksAsync();
+                var genresTask = _bookService.GetGenresAsync();
 
+                await Task.WhenAll(booksTask, genresTask);
+
+                AllBooks = new ObservableCollection<BookDto>(booksTask.Result);
+                FilteredBooks = new ObservableCollection<BookDto>(booksTask.Result);
+                BooksItemsControl.ItemsSource = FilteredBooks;
+
+                // genres
+                var genres = genresTask.Result;
                 GenresPanel.Children.Clear();
                 genreCheckBoxes.Clear();
-
                 foreach (var genre in genres)
                 {
-                    var checkBox = new CheckBox
-                    {
-                        Content = genre,
-                        Margin = new Thickness(0, 3, 0, 3)
-                    };
-
+                    var checkBox = new CheckBox { Content = genre, Margin = new Thickness(0, 3, 0, 3) };
                     checkBox.Checked += FilterChanged;
                     checkBox.Unchecked += FilterChanged;
-
                     GenresPanel.Children.Add(checkBox);
                     genreCheckBoxes.Add(checkBox);
                 }
+
+                UpdateResultsCount();
+                SetupSearchPlaceholder();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Помилка завантаження жанрів: {ex.Message}");
+                MessageBox.Show($"Помилка ініціалізації: {ex.Message}");
             }
         }
 
-        // Пошук і фільтрація
+
         private void FilterChanged(object sender, RoutedEventArgs e) => ApplyFilters();
 
-        private List<string> GetSelectedGenres()
-        {
-            return genreCheckBoxes
+        private List<string> GetSelectedGenres() =>
+            genreCheckBoxes
                 .Where(cb => cb.IsChecked == true && cb.Content != null)
                 .Select(cb => cb.Content!.ToString()!)
                 .ToList();
-        }
 
         private void ApplyFilters()
         {
@@ -99,8 +82,7 @@ namespace LitShare.Presentation
                               FreeRadio?.IsChecked == true ? "Безкоштовно" : null;
             var selectedGenres = GetSelectedGenres();
 
-            var filtered = _bookService.GetFilteredBooks(
-                AllBooks.ToList(), search, location, dealType, selectedGenres);
+            var filtered = _bookService.GetFilteredBooks(AllBooks.ToList(), search, location, dealType, selectedGenres);
 
             FilteredBooks.Clear();
             foreach (var book in filtered)
@@ -109,8 +91,6 @@ namespace LitShare.Presentation
             UpdateResultsCount();
         }
 
-
-        // Пошук — Placeholder
         private void SetupSearchPlaceholder()
         {
             SearchTextBox.Text = "Пошук...";
@@ -140,7 +120,6 @@ namespace LitShare.Presentation
                 ApplyFilters();
         }
 
-
         private void MyProfile_Click(object sender, RoutedEventArgs e)
         {
             MessageBox.Show("Тут буде сторінка профілю користувача.");
@@ -156,7 +135,6 @@ namespace LitShare.Presentation
             MessageBox.Show("Тут буде сторінка перегляду оголошення.");
         }
 
-        // Лічильник результатів
         private void UpdateResultsCount()
         {
             int count = FilteredBooks?.Count ?? 0;
@@ -169,4 +147,5 @@ namespace LitShare.Presentation
             ResultsCountText.Text = $"Знайдено: {count} {booksWord}";
         }
     }
+
 }
