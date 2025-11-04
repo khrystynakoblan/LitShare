@@ -1,5 +1,6 @@
 ﻿using LitShare.DAL;
 using LitShare.DAL.Models;
+using LitShare.Presentation;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Windows;
@@ -84,8 +85,14 @@ namespace LitShare
             this.Close();
         }
 
-        private string selectedPhotoPath; // Зберігатиме шлях до фото
+        private string selectedPhotoPath; 
 
+        private void HomeButton_Click(object sender, RoutedEventArgs e)
+        {           
+            MainWindow mainWindow = new MainWindow();
+            mainWindow.Show();
+            this.Close();
+        }
         private void AddPhotoButton_Click(object sender, RoutedEventArgs e)
         {
             var openFileDialog = new Microsoft.Win32.OpenFileDialog
@@ -109,17 +116,8 @@ namespace LitShare
 
                             MessageBox.Show("Фото вибрано успішно!");
                         }
-
-
             }
-
-
-
     }
-
-
-
-
 }
 
 

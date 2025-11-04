@@ -26,7 +26,10 @@ namespace LitShare.Presentation
         {
             try
             {
+                int currentUserId = 1; // тут має бути ID поточного користувача
+
                 _allBooks = _context.posts
+                    .Where(p => p.user_id == currentUserId)
                     .Join(_context.Users, p => p.user_id, u => u.id, (p, u) => new BookItem
                     {
                         Id = p.id,
@@ -168,6 +171,13 @@ namespace LitShare.Presentation
             border.Child = stack;
 
             return border;
+        }
+
+        private void HomeButton_Click(object sender, RoutedEventArgs e)
+        {
+            MainWindow mainWindow = new MainWindow();
+            mainWindow.Show();
+            this.Close();
         }
 
         private class BookItem
