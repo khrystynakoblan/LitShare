@@ -1,0 +1,57 @@
+using LitShare.BLL.Services;
+using System.Windows;
+
+namespace LitShare.Presentation
+{
+    public partial class ProfileViewWindow : Window
+    {
+        private readonly UserService _userService = new UserService();
+        private readonly BookService _bookService = new BookService();
+
+        public ProfileViewWindow()
+        {
+            InitializeComponent();
+
+            int testUserId = 2; // 🔹 тестовий ID користувача
+            LoadUserProfile(testUserId);
+        }
+
+        private void LoadUserProfile(int userId)
+        {
+            var user = _userService.GetUserProfileById(userId);
+
+            if (user != null)
+            {
+                txtName.Text = user.name;
+                txtRegion.Text = user.region;
+                txtDistrict.Text = user.district;
+                txtCity.Text = user.city;
+                txtPhone.Text = user.phone ?? "—";
+                txtAbout.Text = user.about ?? "Користувач ще не заповнив інформацію про себе.";
+
+                // книги користувача
+                var books = _bookService.GetBooksByUserId(userId);
+                BooksList.ItemsSource = books;
+            }
+            else
+            {
+                MessageBox.Show("Користувача не знайдено!", "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void HomeButton_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Перехід на головну сторінку (ще не реалізовано).");
+        }
+
+        private void MyProfileButton_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Ви вже переглядаєте свій профіль.");
+        }
+
+        private void BackButton_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Назад до попереднього вікна (ще не реалізовано).");
+        }
+    }
+}
