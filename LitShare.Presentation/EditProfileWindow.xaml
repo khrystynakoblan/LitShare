@@ -6,49 +6,44 @@
         WindowStartupLocation="CenterScreen"
         Background="White">
 
-    <Grid>
+    <Grid Margin="20">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <!-- Фіксована верхня панель -->
-            <RowDefinition Height="*"/>
-            <!-- Основна частина -->
+            <RowDefinition Height="Auto"/>   <!-- Верхня панель -->
+            <RowDefinition Height="*"/>      <!-- Основна частина -->
         </Grid.RowDefinitions>
 
-        <!--  Верхня панель -->
-        <Button Content="LitShare"
-            FontSize="22"
-            FontWeight="Bold"
-            Foreground="#2C3E50"
-            Background="Transparent"
-            BorderThickness="0"
-            Cursor="Hand"
-            VerticalAlignment="Center"
-            HorizontalAlignment="Left"
-            Click="HomeButton_Click"/>
+        <!-- 🔹 Верхня панель -->
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
 
-            <!-- Логотип зліва -->
-            <TextBlock Text="LitShare"
-                       FontSize="22"
-                       FontWeight="Bold"
-                       Foreground="#2C3E50"
-                       VerticalAlignment="Center"
-                       Grid.Column="0"/>
+            <!-- Кнопка LitShare -->
+            <Button Content="LitShare"
+                    FontSize="22"
+                    FontWeight="Bold"
+                    Foreground="#2C3E50"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Cursor="Hand"
+                    HorizontalAlignment="Left"
+                    Click="HomeButton_Click"/>
 
-            <!-- Кнопка “Мій профіль” справа -->
+            <!-- Кнопка “Мій профіль” -->
             <Button Content="Мій профіль"
                     FontSize="16"
                     Foreground="Gray"
                     Background="Transparent"
                     BorderThickness="0"
                     Cursor="Hand"
-                    VerticalAlignment="Center"
                     HorizontalAlignment="Right"
-                    Grid.Column="2"
+                    Grid.Column="1"
                     Click="MyProfileButton_Click"/>
         </Grid>
 
-        <!--  Основна частина -->
-        <Grid Grid.Row="1" Margin="20">
+        <!-- 🔹 Основна частина -->
+        <Grid Grid.Row="1" Margin="0,15,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="250"/>
                 <ColumnDefinition Width="*"/>
@@ -70,7 +65,7 @@
                         Click="ChangePhotoButton_Click"/>
             </StackPanel>
 
-            <!--  Дані користувача -->
+            <!-- 🔹 Дані користувача -->
             <StackPanel Grid.Column="1" VerticalAlignment="Top">
                 <TextBlock Text="Основна інформація"
                            FontSize="17"
@@ -157,7 +152,7 @@
                              TextWrapping="Wrap"/>
                 </Grid>
 
-                <!--  Кнопки під формою -->
+                <!-- Кнопки -->
                 <Grid Margin="120,5,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="1*"/>
