@@ -14,11 +14,14 @@ namespace LitShare.Presentation
         private readonly UserService _userService = new UserService();
         private Users _currentUser;   // поточний користувач
         private Users _originalUser;  // копія для "Скасувати"
+        private readonly int _userId;
 
-        public EditProfileWindow()
+        public EditProfileWindow(int userId)
         {
             InitializeComponent();
-            LoadUserData(1); // тестовий ID користувача
+
+            LoadUserData(userId); // тестовий ID користувача
+            _userId = userId;
         }
 
         // 🔹 Завантаження даних користувача
@@ -103,6 +106,7 @@ namespace LitShare.Presentation
             {
                 MessageBox.Show($"Помилка при збереженні: {ex.Message}", "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+            this.Close();
         }
 
         // 🔹 Скасувати зміни
@@ -162,7 +166,7 @@ namespace LitShare.Presentation
             {
                 this.Hide();
                 await Task.Delay(150);
-                var mainPage = new MainPage();
+                var mainPage = new MainPage(_userId);
                 mainPage.Show();
                 this.Close();
             }

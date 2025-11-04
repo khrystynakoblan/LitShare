@@ -24,16 +24,6 @@
                     Margin="0,0,15,0"
                     Click="HomeButton_Click"/>
 
-            <Button Content="Мій профіль"
-                    Background="#333"
-                    Foreground="White"
-                    Padding="15,5"
-                    FontWeight="Bold"
-                    BorderThickness="0"
-                    Cursor="Hand"
-                    DockPanel.Dock="Right"
-                    VerticalAlignment="Center"/>
-
             <TextBlock Text="Редагування профілю"
                        FontSize="18"
                        VerticalAlignment="Center"
@@ -179,6 +169,7 @@
                         Cursor="Hand"/>
                 <Button Content="Видалити профіль"
                         x:Name="DeleteButton"
+                        Click="DeleteButton_Click"
                         Background="#D32F2F"
                         Foreground="White"
                         Width="160"

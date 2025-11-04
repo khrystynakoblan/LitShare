@@ -2,6 +2,7 @@
 using LitShare.DAL.Models;
 using System.Threading.Tasks;  // 2. ДОДАНО: Потрібно для асинхронності
 using System.Windows;
+using System.Windows.Media.Effects;
 
 namespace LitShare.Presentation
 {
@@ -78,8 +79,8 @@ namespace LitShare.Presentation
 
         private void EditProfileButton_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Тут відкриється вікно 'Редагувати профіль'");
-            // ...
+            var editProfileWindow = new EditProfileWindow(_userId);
+            editProfileWindow.Show();
         }
     }
 }
