@@ -15,7 +15,6 @@
     <!--StartupUri="ReportAdWindow.xaml">-->
     <!--StartupUri="ViewAdWindow.xaml">-->
 
-
     <Application.Resources>
 
     </Application.Resources>

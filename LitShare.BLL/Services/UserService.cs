@@ -33,7 +33,7 @@ namespace LitShare.BLL.Services
             {
                 name = name,
                 email = email,
-                phone= phone,
+                phone = phone,
                 password = hashedPassword,
                 region = region,
                 district = district,
@@ -64,11 +64,58 @@ namespace LitShare.BLL.Services
         {
             using (var context = new LitShareDbContext())
             {
-                
                 return context.Users
                     .Include(u => u.posts)
                     .FirstOrDefault(u => u.id == id);
             }
         }
+         public void UpdateUserPhoto(int userId, string newPhotoUrl)
+        {
+            using (var context = new LitShareDbContext())
+            {
+                var user = context.Users.Find(userId);
+                if (user != null)
+                {
+                    user.photo_url = newPhotoUrl;
+                    context.SaveChanges();
+                }
+            }
+        }
+        public void UpdateUser(Users updatedUser)
+        {
+            using (var context = new LitShareDbContext())
+            {
+                var existingUser = context.Users.FirstOrDefault(u => u.id == updatedUser.id);
+
+                if (existingUser != null)
+                {
+                    existingUser.region = updatedUser.region;
+                    existingUser.district = updatedUser.district;
+                    existingUser.city = updatedUser.city;
+                    existingUser.phone = updatedUser.phone;
+                    existingUser.about = updatedUser.about;
+                    existingUser.photo_url = updatedUser.photo_url;
+
+                    context.SaveChanges();
+                }
+            }
+        }
+        public void DeleteUser(int id)
+        {
+            using (var context = new LitShareDbContext())
+            {
+                var user = context.Users.FirstOrDefault(u => u.id == id);
+                if (user == null)
+                    throw new Exception("Користувача не знайдено.");
+
+                var posts = context.posts.Where(p => p.user_id == id).ToList();
+                if (posts.Any())
+                    context.posts.RemoveRange(posts);
+
+                context.Users.Remove(user);
+                context.SaveChanges();
+            }
+        }
     }
+
 }
