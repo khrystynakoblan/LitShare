@@ -109,6 +109,29 @@ namespace LitShare.BLL.Services
                 return new List<BookDto>();
             }
         }
+        public async Task<BookDto?> GetBookById(int id)
+        {
+            using var db = new LitShareDbContext();
+
+            return await db.posts
+                .Include(p => p.BookGenres)
+                    .ThenInclude(bg => bg.Genre)
+                .Include(p => p.User)
+                .AsNoTracking()
+                .Where(p => p.id == id)
+                .Select(p => new BookDto
+                {
+                    Id = p.id,
+                    Title = p.title,
+                    Author = p.author,
+                    Location = p.User.city,
+                    Genre = string.Join(", ", p.BookGenres.Select(bg => bg.Genre.name)),
+                    DealType = p.deal_type == DealType.Exchange ? "Обмін" : "Безкоштовно",
+                    ImagePath = p.photo_url
+                })
+                .FirstOrDefaultAsync();
+        }
+
 
     }
 }
