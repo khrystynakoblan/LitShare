@@ -7,12 +7,13 @@ namespace LitShare.Presentation
     {
         private readonly int _adId;
         private readonly ComplaintsService _complaintService = new ComplaintsService();
-        private readonly int _currentUserId = 1; // Тут заміни на ID поточного користувача з авторизації
+        private readonly int _currentUserId; // Заміни на поточного користувача
 
-        public ReportAdWindow(int adId)
+        public ReportAdWindow(int adId, int userId)
         {
             InitializeComponent();
             _adId = adId;
+            _currentUserId = userId;
 
             Loaded += (s, e) =>
             {
@@ -51,18 +52,20 @@ namespace LitShare.Presentation
 
             try
             {
-                // 🔹 === ВИПРАВЛЕНО (Рядок 54) ===
-                // Порядок: (string, int, int)
                 _complaintService.AddComplaint(fullText, _adId, _currentUserId);
-                // 🔹 ==============================
-
                 MessageBox.Show("Скаргу надіслано. Дякуємо!", "Успіх", MessageBoxButton.OK, MessageBoxImage.Information);
                 this.Close();
             }
-            catch (Exception ex) // (Добра практика - додати 'ex' до catch)
+            catch (Exception ex)
             {
-                MessageBox.Show($"Сталася помилка при збереженні скарги: {ex.Message}", "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(
+                    $"Помилка: {ex.InnerException?.Message ?? ex.Message}",
+                    "Помилка при збереженні скарги",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error
+                );
             }
+
         }
 
         private void BackButton_Click(object sender, RoutedEventArgs e)

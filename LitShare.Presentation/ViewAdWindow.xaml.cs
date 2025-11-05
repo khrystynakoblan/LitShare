@@ -10,9 +10,11 @@ namespace LitShare.Presentation
     public partial class ViewAdWindow : Window
     {
         private readonly BookService _bookService = new BookService();
+        private readonly int _userId;
         private BookDto? _currentBook;
 
         // Конструктор без параметрів для дизайнера
+
         public ViewAdWindow()
         {
             InitializeComponent();
@@ -20,9 +22,10 @@ namespace LitShare.Presentation
         }
 
         // Конструктор із передачею Id книги
-        public ViewAdWindow(int bookId) : this()
+        public ViewAdWindow(int bookId, int userId) : this()
         {
             _ = LoadBook(bookId);
+            _userId = userId;
         }
 
         // Тимчасове заповнення для дизайнера
@@ -92,24 +95,25 @@ namespace LitShare.Presentation
             }
         }
 
-        // Кнопка "Мій профіль"
-        private void MyProfile_Click(object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show("Відкриття вашого профілю...");
-            //TODO: відкриття профілю користувача
-        }
 
         // Профіль автора книги
         private void UserProfile_Click(object sender, RoutedEventArgs e)
         {
             if (_currentBook != null)
             {
-                MessageBox.Show($"Профіль автора книги (UserId має бути в BookDto)");
+                var profileWindow = new ProfileViewWindow(_currentBook.UserId, _userId);
+                profileWindow.Owner = this;
+                profileWindow.ShowDialog();
             }
         }
 
+
         // Назад
         private void Back_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+        private void HomePage_Click(object sender, RoutedEventArgs e)
         {
             Close();
         }
@@ -121,7 +125,7 @@ namespace LitShare.Presentation
 
             Hide();
 
-            var reportWindow = new ReportAdWindow(_currentBook.Id);
+            var reportWindow = new ReportAdWindow(_currentBook.Id, _userId);
             reportWindow.Owner = this;
             reportWindow.ShowDialog();
 

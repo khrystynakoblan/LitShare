@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:LitShare.Presentation"
         mc:Ignorable="d"
         Title="LitShare - Вхід" Height="650" Width="450"
+        WindowState="Maximized"
         WindowStartupLocation="CenterScreen"
         Background="#F0F0F0">
 

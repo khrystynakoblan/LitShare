@@ -2,10 +2,18 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:LitShare.Presentation"
-             StartupUri="ComplaintReviewWindow.xaml">
-             <!--StartupUri="MainPage.xaml">-->
-
-
+             StartupUri="registration.xaml">
+    <!--StartupUri="MainPage.xaml">-->
+    <!--StartupUri="ComplaintReviewWindow.xaml">-->
+    <!--StartupUri="ComplaintsPage.xaml">-->
+    <!--StartupUri="Edit_AD.xaml">-->
+    <!--StartupUri="MyBooks.xaml">-->
+    <!--StartupUri="New_AD.xaml">-->
+    <!--StartupUri="ProfileViewWindow.xaml">-->
+    <!--StartupUri="ProfileWindow.xaml">-->
+    <!--StartupUri="registration.xaml">-->
+    <!--StartupUri="ReportAdWindow.xaml">-->
+    <!--StartupUri="ViewAdWindow.xaml">-->
 
     <Application.Resources>
 

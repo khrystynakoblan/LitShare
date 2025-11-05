@@ -20,11 +20,15 @@ namespace LitShare.Presentation
         private bool isSearchPlaceholder = true;
         private readonly List<CheckBox> genreCheckBoxes = new();
 
-        public MainPage()
+        private readonly int _userId;
+
+        public MainPage(int userId)
         {
             InitializeComponent();
+            _userId = userId; // 🔹 зберігаємо ID користувача
             Loaded += MainPage_Loaded;
         }
+
 
         private async void MainPage_Loaded(object sender, RoutedEventArgs e)
         {
@@ -122,18 +126,40 @@ namespace LitShare.Presentation
 
         private void MyProfile_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Тут буде сторінка профілю користувача.");
+            var profileWindow = new ProfileWindow(_userId);
+            profileWindow.ShowDialog();
         }
 
-        private void AddBook_Click(object sender, RoutedEventArgs e)
+        private async void AddBook_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Тут буде сторінка додавання книги.");
-        }
+            var newAdWindow = new NewAdWindow(_userId);
+            bool? result = newAdWindow.ShowDialog();
 
+            if (result == true)
+            {
+                // Оновити список книг після додавання
+                var books = await _bookService.GetAllBooksAsync();
+                AllBooks = new ObservableCollection<BookDto>(books);
+                FilteredBooks = new ObservableCollection<BookDto>(books);
+                BooksItemsControl.ItemsSource = FilteredBooks;
+                UpdateResultsCount();
+            }
+        }
         private void BookCard_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Тут буде сторінка перегляду оголошення.");
+            if (sender is FrameworkElement element && element.Tag is int bookId && bookId > 0)
+            {
+                var viewWindow = new ViewAdWindow(bookId, _userId);
+                viewWindow.Owner = this;
+                viewWindow.ShowDialog();
+            }
+            else
+            {
+                MessageBox.Show("Не вдалося визначити книгу для перегляду.", "Помилка", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
         }
+
+
 
         private void UpdateResultsCount()
         {

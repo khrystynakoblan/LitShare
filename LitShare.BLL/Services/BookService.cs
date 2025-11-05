@@ -20,6 +20,7 @@ namespace LitShare.BLL.Services
                     .AsNoTracking()
                     .Select(p => new BookDto
                     {
+                        Id = p.id,
                         Title = p.title,
                         Author = p.author,
                         Location = p.User.city,
@@ -92,6 +93,7 @@ namespace LitShare.BLL.Services
                     .AsNoTracking()
                     .Select(p => new BookDto
                     {
+                        Id = p.id,
                         Title = p.title,
                         Author = p.author,
                         Location = p.User.city,
@@ -127,7 +129,8 @@ namespace LitShare.BLL.Services
                     Location = p.User.city,
                     Genre = string.Join(", ", p.BookGenres.Select(bg => bg.Genre.name)),
                     DealType = p.deal_type == DealType.Exchange ? "Обмін" : "Безкоштовно",
-                    ImagePath = p.photo_url
+                    ImagePath = p.photo_url,
+                    UserId = p.id
                 })
                 .FirstOrDefaultAsync();
         }

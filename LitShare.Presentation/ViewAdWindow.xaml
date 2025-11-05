@@ -11,23 +11,18 @@
 
         <!-- Верхня панель -->
         <Grid Margin="20,20,20,0" VerticalAlignment="Top">
-            <TextBlock Text="LitShare"
-                       FontSize="24"
-                       FontWeight="Bold"
-                       Foreground="#444"
-                       HorizontalAlignment="Left"
-                       VerticalAlignment="Top"/>
+            <Button Content="LitShare"
+                FontSize="24"
+                FontWeight="Bold"
+                Background="Transparent"
+                BorderThickness="0"
+                Foreground="#444"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Cursor="Hand"
+                Click="HomePage_Click"/>
 
-            <Button Content="Мій профіль"
-                    x:Name="MyProfileButton"
-                    Background="#555"
-                    Foreground="White"
-                    Padding="10,5"
-                    Width="110"
-                    Height="40"
-                    HorizontalAlignment="Right"
-                    VerticalAlignment="Top"
-                    Click="MyProfile_Click"/>
+
         </Grid>
 
         <!-- Центрований контент -->

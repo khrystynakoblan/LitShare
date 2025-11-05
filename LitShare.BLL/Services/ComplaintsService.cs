@@ -59,7 +59,8 @@ namespace LitShare.BLL.Services
                 text = reasonText,
                 post_id = postId,
                 complainant_id = complainantId,
-                date = DateTime.Now 
+                date = DateTime.UtcNow
+
             };
 
             using (var context = new LitShareDbContext())

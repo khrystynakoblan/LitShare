@@ -8,14 +8,15 @@ namespace LitShare.Presentation
     {
         private readonly UserService _userService = new UserService();
         private readonly BookService _bookService = new BookService();
+        private readonly int _userId;
 
-        public ProfileViewWindow()
+        public ProfileViewWindow(int userBookId, int userId)
         {
             InitializeComponent();
-
-            int testUserId = 1; // 🔹 тестовий ID користувача
-            _ = LoadUserProfileAsync(testUserId);
+            _userId = userId;
+            _ = LoadUserProfileAsync(userBookId);
         }
+
 
         private async Task LoadUserProfileAsync(int userId)
         {
@@ -30,7 +31,6 @@ namespace LitShare.Presentation
                 txtPhone.Text = user.phone ?? "—";
                 txtAbout.Text = user.about ?? "Користувач ще не заповнив інформацію про себе.";
 
-                // 🔹 асинхронне завантаження книг
                 var books = await _bookService.GetBooksByUserIdAsync(userId);
                 BooksList.ItemsSource = books;
             }
@@ -42,21 +42,20 @@ namespace LitShare.Presentation
 
         private void HomeButton_Click(object sender, RoutedEventArgs e)
         {
-            this.Hide(); // спочатку сховати
-            var mainPage = new MainPage();
+            var mainPage = new MainPage(_userId);
             mainPage.Show();
-            this.Close(); // а тоді повністю закрити
+            this.Close();
         }
-
 
         private void MyProfileButton_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Ви вже переглядаєте свій профіль.");
+            var profileWindow = new ProfileWindow(_userId);
+            profileWindow.ShowDialog();
         }
 
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Назад до попереднього вікна (ще не реалізовано).");
+            this.Close();
         }
     }
 }
