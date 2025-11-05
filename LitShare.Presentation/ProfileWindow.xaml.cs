@@ -1,6 +1,5 @@
-﻿using LitShare.BLL.Services; // 1. ДОДАНО: Підключаємо BLL
-using LitShare.DAL.Models;
-using System.Threading.Tasks;  // 2. ДОДАНО: Потрібно для асинхронності
+﻿using LitShare.BLL.Services; 
+using System.Threading.Tasks;  
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Effects;
@@ -10,7 +9,6 @@ namespace LitShare.Presentation
 {
     public partial class ProfileWindow : Window
     {
-        // 3. ДОДАНО: Створюємо екземпляр сервісу
         private readonly UserService _userService = new UserService();
         private readonly int _userId;
 
@@ -22,7 +20,6 @@ namespace LitShare.Presentation
             _ = LoadUserProfileAsync(_userId);
         }
 
-        // 5. ДОДАНО: Новий метод для завантаження даних
         private async Task LoadUserProfileAsync(int userId)
         {
             try
@@ -61,9 +58,6 @@ namespace LitShare.Presentation
             }
         }
 
-
-
-        // --- ЗАГЛУШКИ ДЛЯ КНОПОК (Залишаються, як у вас) ---
 
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {

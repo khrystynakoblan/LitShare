@@ -137,7 +137,7 @@
                 </Grid>
             </Grid>
 
-            <!-- Кнопки по центру всього екрана -->
+            <!-- Кнопки -->
             <StackPanel Grid.ColumnSpan="2" 
                         Orientation="Horizontal" 
                         HorizontalAlignment="Center"

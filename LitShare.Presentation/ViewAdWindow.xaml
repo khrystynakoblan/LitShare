@@ -25,7 +25,6 @@
 
         </Grid>
 
-        <!-- Центрований контент -->
         <Border Width="900"
                 Padding="40"
                 Background="#f9f9f9"

@@ -7,7 +7,7 @@ namespace LitShare.Presentation
     {
         private readonly int _adId;
         private readonly ComplaintsService _complaintService = new ComplaintsService();
-        private readonly int _currentUserId; // Заміни на поточного користувача
+        private readonly int _currentUserId; 
 
         public ReportAdWindow(int adId, int userId)
         {

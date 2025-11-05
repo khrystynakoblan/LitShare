@@ -31,7 +31,6 @@ namespace LitShare
         }
 
 
-        // Завантаження жанрів у ComboBox
         private void LoadGenres()
         {
             var genres = _context.genres.ToList();
@@ -40,13 +39,20 @@ namespace LitShare
             GenreComboBox.SelectedValuePath = "id";
         }
 
-        // Завантаження enum DealType у ComboBox
         private void LoadDealTypes()
         {
-            DealTypeComboBox.ItemsSource = Enum.GetValues(typeof(DealType));
+            var dealTypes = new[]
+            {
+                new { Value = DealType.Exchange, Display = "Обмін" },
+                new { Value = DealType.Donation, Display = "Безкоштовно" }
+            };
+
+            DealTypeComboBox.ItemsSource = dealTypes;
+            DealTypeComboBox.DisplayMemberPath = "Display";
+            DealTypeComboBox.SelectedValuePath = "Value";
         }
 
-        // Завантаження оголошення для редагування
+
         private void LoadPostData()
         {
             _currentPost = _context.posts.FirstOrDefault(p => p.id == _postId);
@@ -61,16 +67,15 @@ namespace LitShare
             TitleTextBox.Text = _currentPost.title;
             AuthorTextBox.Text = _currentPost.author;
             DescriptionTextBox.Text = _currentPost.description;
-            DealTypeComboBox.SelectedItem = _currentPost.deal_type;
+            DealTypeComboBox.SelectedValue = _currentPost.deal_type;
 
-            // Підтягнути жанр з таблиці зв’язків
+
             var bookGenre = _context.bookGenres.FirstOrDefault(bg => bg.post_id == _postId);
             if (bookGenre != null)
             {
                 GenreComboBox.SelectedValue = bookGenre.genre_id;
             }
 
-            // Завантаження фото (якщо є URL)
             if (!string.IsNullOrEmpty(_currentPost.photo_url))
             {
                 try
@@ -84,7 +89,6 @@ namespace LitShare
             }
         }
 
-        // Зміна фото
         private void AddPhotoButton_Click(object sender, RoutedEventArgs e)
         {
             var openFileDialog = new OpenFileDialog
@@ -96,15 +100,13 @@ namespace LitShare
             {
                 string selectedFile = openFileDialog.FileName;
 
-                // Встановлюємо у вікні
                 BookImage.Source = new BitmapImage(new Uri(selectedFile));
 
-                // Зберігаємо шлях до фото (у цьому прикладі — локальний шлях)
+                // Зберігаємо шлях до фото (локальний шлях)
                 _currentPost.photo_url = selectedFile;
             }
         }
 
-        // Збереження змін
         private void AddAdButton_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -118,19 +120,17 @@ namespace LitShare
                 _currentPost.title = TitleTextBox.Text;
                 _currentPost.author = AuthorTextBox.Text;
                 _currentPost.description = DescriptionTextBox.Text;
-                _currentPost.deal_type = (DealType)DealTypeComboBox.SelectedItem;
+                _currentPost.deal_type = (DealType)DealTypeComboBox.SelectedValue;
 
-                // Оновити жанр у таблиці book_genres
                 var existingGenre = _context.bookGenres.FirstOrDefault(bg => bg.post_id == _postId);
                 int selectedGenreId = (int)GenreComboBox.SelectedValue;
 
                 if (existingGenre != null)
                 {
-                    // Якщо жанр змінюється — видаляємо старий і додаємо новий
                     if (existingGenre.genre_id != selectedGenreId)
                     {
                         _context.bookGenres.Remove(existingGenre);
-                        _context.SaveChanges(); // обов’язково, щоб звільнити зв’язок
+                        _context.SaveChanges(); 
 
                         _context.bookGenres.Add(new BookGenres
                         {
@@ -141,7 +141,6 @@ namespace LitShare
                 }
                 else
                 {
-                    // Якщо запису ще немає — додаємо новий
                     _context.bookGenres.Add(new BookGenres
                     {
                         post_id = _postId,
@@ -160,7 +159,6 @@ namespace LitShare
             }
         }
 
-        // Відхилити зміни
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             if (MessageBox.Show("Скасувати зміни?", "Підтвердження", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
@@ -169,7 +167,6 @@ namespace LitShare
             }
         }
 
-        // Кнопка LitShare → повернення на головну
         private void HomeButton_Click(object sender, RoutedEventArgs e)
         {
             MainPage mainWindow = new MainPage(_userId);

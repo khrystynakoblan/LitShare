@@ -11,7 +11,6 @@
         Background="#F0F0F0">
 
     <Window.Resources>
-        <!-- Стиль вкладок -->
         <Style TargetType="TabItem">
             <Setter Property="Template">
                 <Setter.Value>
@@ -48,7 +47,6 @@
 
         <TabControl x:Name="mainTabs" BorderThickness="0" Background="Transparent">
 
-            <!-- === ВКЛАДКА УВІЙТИ === -->
             <TabItem Header="Увійти" x:Name="loginTab" HorizontalAlignment="Left" Width="158" Margin="-14,0,0,0">
                 <StackPanel>
                     <TextBlock Text="Електронна пошта:" Margin="0,15,0,5" FontSize="14"/>
@@ -66,7 +64,6 @@
                 </StackPanel>
             </TabItem>
 
-            <!-- === ВКЛАДКА ЗАРЕЄСТРУВАТИСЯ === -->
             <TabItem Header="Зареєструватися" IsSelected="True" Margin="5,0,10,0">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel>

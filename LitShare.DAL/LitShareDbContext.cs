@@ -9,11 +9,6 @@ namespace LitShare.DAL
 
         private static bool _mapperConfigured = false;
 
-        static LitShareDbContext()
-        {
-            NpgsqlConnection.GlobalTypeMapper.MapEnum<DealType>("deal_type_t");
-        }
-
         public DbSet<Users> Users { get; set; }
         public DbSet<Posts> posts { get; set; }
         public DbSet<Genres> genres { get; set; }

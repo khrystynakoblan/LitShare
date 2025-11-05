@@ -136,7 +136,6 @@ namespace LitShare.Presentation
 
             if (result == true)
             {
-                // Оновити список книг після додавання
                 var books = await _bookService.GetAllBooksAsync();
                 AllBooks = new ObservableCollection<BookDto>(books);
                 FilteredBooks = new ObservableCollection<BookDto>(books);
@@ -157,8 +156,6 @@ namespace LitShare.Presentation
                 MessageBox.Show("Не вдалося визначити книгу для перегляду.", "Помилка", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
-
-
 
         private void UpdateResultsCount()
         {

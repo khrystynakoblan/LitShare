@@ -27,7 +27,6 @@
                     VerticalAlignment="Top"/>
         </Grid>
 
-        <!-- Центрований, розтягнутий блок -->
         <Border Width="780"
                 Height="500"
                 Padding="50"

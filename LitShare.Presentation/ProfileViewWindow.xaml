@@ -13,7 +13,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- 🔹 Верхня панель -->
+        <!-- Верхня панель -->
         <Grid Margin="0,0,0,15">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
@@ -44,7 +44,7 @@
                     Click="MyProfileButton_Click"/>
         </Grid>
 
-        <!-- 🔹 Основна частина -->
+        <!-- Основна частина -->
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="250"/>
@@ -103,7 +103,7 @@
                     </StackPanel>
                 </Border>
 
-                <!-- 🔹 Книги -->
+                <!-- Книги -->
                 <Border BorderBrush="LightGray" BorderThickness="1" Padding="10">
                     <StackPanel>
                         <TextBlock Text="Книги користувача:"
@@ -111,7 +111,7 @@
                    FontSize="15"
                    Margin="0,0,0,10"/>
 
-                        <!-- 🔹 Додаємо ScrollViewer для прокручування -->
+                        <!-- ScrollViewer для прокручування -->
                         <ScrollViewer VerticalScrollBarVisibility="Auto" Height="300">
                             <ItemsControl x:Name="BooksList">
                                 <ItemsControl.ItemsPanel>

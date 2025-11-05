@@ -32,7 +32,7 @@
                     Cursor="Hand"
                     Click="BackButton_Click"/>
 
-            <!-- 🔍 Поле пошуку -->
+            <!-- Поле пошуку -->
             <Grid Height="30" Margin="20,0,20,0">
                 <TextBox x:Name="SearchTextBox"
                          VerticalAlignment="Center"

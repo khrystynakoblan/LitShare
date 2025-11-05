@@ -65,7 +65,7 @@ namespace LitShare
                     author = AuthorTextBox.Text,
                     description = DescriptionTextBox.Text,
                     deal_type = (DealType)DealTypeComboBox.SelectedValue,
-                    user_id = _userId,   // тимчасово
+                    user_id = _userId,   
                     photo_url = selectedPhotoPath
                 };
 

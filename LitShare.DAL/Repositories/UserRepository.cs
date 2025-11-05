@@ -8,16 +8,13 @@ namespace LitShare.DAL.Repositories
 {
     public class UserRepository
     {
-        // 1. Поле для збереження контексту
         private readonly LitShareDbContext _context;
 
-        // 2. Конструктор, який "просить" DbContext
         public UserRepository(LitShareDbContext context)
         {
             _context = context;
         }
 
-        // 3. Методи тепер використовують _context, а не створюють новий
         public async Task<List<Users>> GetAllUsersAsync()
         {
             return await _context.Users.ToListAsync();

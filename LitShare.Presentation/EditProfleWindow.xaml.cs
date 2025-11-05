@@ -12,19 +12,18 @@ namespace LitShare.Presentation
     public partial class EditProfileWindow : Window
     {
         private readonly UserService _userService = new UserService();
-        private Users _currentUser;   // поточний користувач
-        private Users _originalUser;  // копія для "Скасувати"
+        private Users _currentUser;   
+        private Users _originalUser; 
         private readonly int _userId;
 
         public EditProfileWindow(int userId)
         {
             InitializeComponent();
 
-            LoadUserData(userId); // тестовий ID користувача
+            LoadUserData(userId); 
             _userId = userId;
         }
 
-        // 🔹 Завантаження даних користувача
         private void LoadUserData(int userId)
         {
             _currentUser = _userService.GetUserById(userId);
@@ -41,7 +40,6 @@ namespace LitShare.Presentation
             txtPhone.Text = _currentUser.phone;
             txtAbout.Text = _currentUser.about ?? "";
 
-            // Фото
             if (!string.IsNullOrEmpty(_currentUser.photo_url))
             {
                 userPhotoEllipse.Fill = new ImageBrush(new BitmapImage(new Uri(_currentUser.photo_url)));
@@ -68,7 +66,6 @@ namespace LitShare.Presentation
             };
         }
 
-        // 🔹 Змінити фото
         private void ChangePhotoButton_Click(object sender, RoutedEventArgs e)
         {
             string randomUrl = $"https://randomuser.me/api/portraits/lego/{new Random().Next(0, 9)}.jpg";
@@ -78,7 +75,6 @@ namespace LitShare.Presentation
                 _currentUser.photo_url = randomUrl;
         }
 
-        // 🔹 Зберегти зміни
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             if (_currentUser == null)
@@ -110,7 +106,6 @@ namespace LitShare.Presentation
             this.Close();
         }
 
-        // 🔹 Скасувати зміни
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             if (_originalUser == null)
@@ -129,7 +124,6 @@ namespace LitShare.Presentation
             MessageBox.Show("Зміни скасовано. Дані відновлено.", "LitShare", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
-        // 🔹 Видалити профіль
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
             if (_currentUser == null)
@@ -158,9 +152,12 @@ namespace LitShare.Presentation
                     MessageBox.Show($"Помилка при видаленні: {ex.Message}", "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
+
+            var authPage = new AuthWindow();
+            authPage.Show();
+            this.Close();
         }
 
-        // 🔹 Кнопка “LitShare”
         private async void HomeButton_Click(object sender, RoutedEventArgs e)
         {
             try

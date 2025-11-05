@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
-using LitShare.BLL.Services; // 1. Підключаємо наш BLL
-
+using LitShare.BLL.Services;
+using System.Text.RegularExpressions;
+using System.Linq;
 namespace LitShare.Presentation
 {
     public partial class AuthWindow : Window
@@ -14,37 +15,54 @@ namespace LitShare.Presentation
             InitializeComponent();
         }
 
-        // --- ОНОВЛЕНИЙ МЕТОД РЕЄСТРАЦІЇ ---
         private void Button_Click_Register(object sender, RoutedEventArgs e)
         {
-            // Збираємо дані з усіх полів
-            string name = txtName.Text;
-            string email = txtEmail.Text;
+            string name = txtName.Text.Trim();
+            string email = txtEmail.Text.Trim();
+            string phone = txtPhone.Text.Trim();
+            string password = txtPassword.Password; 
+            string region = txtRegion.Text.Trim();
+            string district = txtDistrict.Text.Trim();
+            string city = txtCity.Text.Trim();
 
-            // 1. ЗЧИТУЄМО НОВЕ ПОЛЕ
-            string phone = txtPhone.Text;
+            var errors = new System.Text.StringBuilder();
 
-            string password = txtPassword.Password;
-            string region = txtRegion.Text;
-            string district = txtDistrict.Text;
-            string city = txtCity.Text;
-
-            // 2. ОНОВЛЮЄМО ВАЛІДАЦІЮ
-            // (Додаємо перевірку на телефон)
-            if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(email) ||
-                string.IsNullOrEmpty(password) || string.IsNullOrEmpty(phone))
+            if (string.IsNullOrEmpty(name))
             {
-                MessageBox.Show("Будь ласка, заповніть Ім'я, Пошту, Номер телефону та Пароль.",
-                                "Помилка валідації", MessageBoxButton.OK, MessageBoxImage.Warning);
+                errors.AppendLine("- Ім'я не може бути порожнім.");
+            }
+
+            if (!IsValidEmail(email))
+            {
+                errors.AppendLine("- Введено некоректний формат E-mail.");
+            }
+
+            if (!IsValidPhone(phone))
+            {
+                errors.AppendLine("- Номер телефону має бути у форматі +380XXXXXXXXX або 0XXXXXXXXX.");
+            }
+
+            if (!IsValidPassword(password))
+            {
+                errors.AppendLine("- Пароль має бути не менше 8 символів.");
+            }
+
+
+            if (errors.Length > 0)
+            {
+                MessageBox.Show(
+                    "Будь ласка, виправте наступні помилки:\n\n" + errors.ToString(),
+                    "Помилка валідації",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning
+                );
                 return;
             }
 
             try
             {
-                // 3. ОНОВЛЮЄМО ВИКЛИК МЕТОДУ BLL
-                // (Передаємо 'phone' у сервіс)
                 _userService.AddUser(name, email, phone, password, region, district, city);
-                
+
                 MessageBox.Show("Акаунт успішно створено! Тепер ви можете увійти.",
                                 "Реєстрація успішна", MessageBoxButton.OK, MessageBoxImage.Information);
 
@@ -70,7 +88,6 @@ namespace LitShare.Presentation
         }
 
 
-        // 6. Заготовка для кнопки "Увійти"
         private async void Button_Click_Login(object sender, RoutedEventArgs e)
         {
             var button = sender as Button;
@@ -82,10 +99,8 @@ namespace LitShare.Presentation
                 string password = txtLoginPassword.Password;
 
                 bool isValid = await _userService.ValidateUser(email, password);
-
                 if (isValid)
                 {
-                    // ✅ Отримуємо користувача з БД
                     var user = _userService.GetAllUsers()
                         .FirstOrDefault(u => u.email == email);
 
@@ -93,11 +108,10 @@ namespace LitShare.Presentation
                     {
                         MessageBox.Show($"Вхід успішний! Вітаємо, {user.name}.");
 
-                        // ✅ Передаємо айді користувача в MainPage
                         var mainPage = new MainPage(user.id);
                         mainPage.Show();
 
-                        this.Close(); // закриваємо вікно авторизації
+                        this.Close(); 
                     }
                     else
                     {
@@ -119,5 +133,30 @@ namespace LitShare.Presentation
             }
         }
 
+        private bool IsValidEmail(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email)) return false;
+
+            string emailPattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
+            return Regex.IsMatch(email, emailPattern);
+        }
+
+        private bool IsValidPhone(string phone)
+        {
+            if (string.IsNullOrWhiteSpace(phone)) return false;
+
+            string phonePattern = @"^(\+380\d{9}|0\d{9})$";
+            return Regex.IsMatch(phone, phonePattern);
+        }
+
+
+        private bool IsValidPassword(string password)
+        {
+            if (string.IsNullOrWhiteSpace(password)) return false;
+
+            if (password.Length < 8) return false;
+
+            return true;
+        }
     }
 }

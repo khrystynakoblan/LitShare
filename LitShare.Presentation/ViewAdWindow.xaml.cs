@@ -13,22 +13,18 @@ namespace LitShare.Presentation
         private readonly int _userId;
         private BookDto? _currentBook;
 
-        // Конструктор без параметрів для дизайнера
-
         public ViewAdWindow()
         {
             InitializeComponent();
             SetPlaceholder();
         }
 
-        // Конструктор із передачею Id книги
         public ViewAdWindow(int bookId, int userId) : this()
         {
             _ = LoadBook(bookId);
             _userId = userId;
         }
 
-        // Тимчасове заповнення для дизайнера
         private void SetPlaceholder()
         {
             TitleText.Text = "Назва (тест)";
@@ -39,7 +35,6 @@ namespace LitShare.Presentation
             PostImage.Source = null;
         }
 
-        // Завантаження книги
         private async Task LoadBook(int bookId)
         {
             try
@@ -71,7 +66,6 @@ namespace LitShare.Presentation
             LoadBookImage(_currentBook.ImagePath);
         }
 
-        // Завантаження фото
         private void LoadBookImage(string? url)
         {
             if (string.IsNullOrWhiteSpace(url))
@@ -96,7 +90,6 @@ namespace LitShare.Presentation
         }
 
 
-        // Профіль автора книги
         private void UserProfile_Click(object sender, RoutedEventArgs e)
         {
             if (_currentBook != null)
@@ -108,7 +101,6 @@ namespace LitShare.Presentation
         }
 
 
-        // Назад
         private void Back_Click(object sender, RoutedEventArgs e)
         {
             Close();
@@ -118,7 +110,6 @@ namespace LitShare.Presentation
             Close();
         }
 
-        // Скарга на оголошення
         private void ReportAd_Click(object sender, RoutedEventArgs e)
         {
             if (_currentBook == null) return;
