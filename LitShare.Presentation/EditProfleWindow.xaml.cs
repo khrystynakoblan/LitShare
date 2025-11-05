@@ -106,6 +106,7 @@ namespace LitShare.Presentation
             {
                 MessageBox.Show($"Помилка при збереженні: {ex.Message}", "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+            this.DialogResult = true; 
             this.Close();
         }
 

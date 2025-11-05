@@ -25,7 +25,7 @@ namespace LitShare.Presentation
         public MainPage(int userId)
         {
             InitializeComponent();
-            _userId = userId; // 🔹 зберігаємо ID користувача
+            _userId = userId; // зберігаємо ID користувача
             Loaded += MainPage_Loaded;
         }
 
@@ -45,7 +45,6 @@ namespace LitShare.Presentation
                 FilteredBooks = new ObservableCollection<BookDto>(booksTask.Result);
                 BooksItemsControl.ItemsSource = FilteredBooks;
 
-                // genres
                 var genres = genresTask.Result;
                 GenresPanel.Children.Clear();
                 genreCheckBoxes.Clear();

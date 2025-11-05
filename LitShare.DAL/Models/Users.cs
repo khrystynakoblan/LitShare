@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using NpgsqlTypes;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 
@@ -15,6 +16,7 @@ namespace LitShare.DAL.Models
         public string phone { get; set; }
         public string password { get; set; }
         public string? about { get; set; }
+
         public string region { get; set; }
         public string district { get; set; }
         public string city { get; set; }

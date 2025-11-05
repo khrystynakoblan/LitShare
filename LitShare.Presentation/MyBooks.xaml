@@ -76,7 +76,20 @@
                                         <TextBlock Text="{Binding Title}" FontWeight="Bold" TextWrapping="Wrap" TextAlignment="Center"/>
                                         <TextBlock Text="{Binding Author}" FontSize="11" Foreground="Gray" TextAlignment="Center"/>
                                         <TextBlock Text="{Binding City}" FontSize="11" Foreground="Gray" TextAlignment="Center"/>
+
+                                        <!-- Кнопка редагування -->
+                                        <Button Content="Редагувати"
+                                            Background="#333"
+                                            Foreground="White"
+                                            FontWeight="Bold"
+                                            Margin="10,8,10,0"
+                                            Padding="5,2"
+                                            BorderThickness="0"
+                                            Cursor="Hand"
+                                            HorizontalAlignment="Center"
+                                            Click="EditBookButton_Click"/>
                                     </StackPanel>
+
                                 </StackPanel>
                             </Border>
                         </DataTemplate>

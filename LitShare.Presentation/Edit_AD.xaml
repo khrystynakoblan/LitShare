@@ -5,6 +5,7 @@
         Height="700"
         Width="900"
         Background="#FFF9F9F9"
+        WindowState="Maximized"
         WindowStartupLocation="CenterScreen">
     <DockPanel Margin="20">
 
@@ -22,16 +23,6 @@
                 DockPanel.Dock="Left"
                 Margin="0,0,15,0"
                 Click="HomeButton_Click"/>
-
-            <Button Content="Мій профіль"
-                    Background="#333"
-                    Foreground="White"
-                    Padding="15,5"
-                    FontWeight="Bold"
-                    BorderThickness="0"
-                    Cursor="Hand"
-                    DockPanel.Dock="Right"
-                    VerticalAlignment="Center"/>
 
             <TextBlock Text="Редагувати оголошення"
                        FontSize="18"

@@ -1,5 +1,6 @@
 ﻿using LitShare.DAL;
 using LitShare.DAL.Models;
+using LitShare.Presentation;
 using Microsoft.Win32;
 using System;
 using System.IO;
@@ -12,28 +13,15 @@ namespace LitShare
     public partial class EditAdWindow : Window
     {
         private readonly LitShareDbContext _context;
-        private readonly int _postId = 1;
+        private readonly int _postId;
         private Posts _currentPost;
-        private readonly int _userId = 1;
-
-        public EditAdWindow()
-        {
-            InitializeComponent();
-            _context = new LitShareDbContext();
-            _postId = 1;
-            _userId = 1;
-
-            LoadGenres();
-            LoadDealTypes();
-            LoadPostData();
-
-        }
+        private readonly int _userId;
 
         public EditAdWindow(int postId, int userId)
         {
             InitializeComponent();
             _context = new LitShareDbContext();
-            
+
             _postId = postId;
             _userId = userId;
 
@@ -41,6 +29,7 @@ namespace LitShare
             LoadDealTypes();
             LoadPostData();
         }
+
 
         // Завантаження жанрів у ComboBox
         private void LoadGenres()
@@ -137,10 +126,22 @@ namespace LitShare
 
                 if (existingGenre != null)
                 {
-                    existingGenre.genre_id = selectedGenreId;
+                    // Якщо жанр змінюється — видаляємо старий і додаємо новий
+                    if (existingGenre.genre_id != selectedGenreId)
+                    {
+                        _context.bookGenres.Remove(existingGenre);
+                        _context.SaveChanges(); // обов’язково, щоб звільнити зв’язок
+
+                        _context.bookGenres.Add(new BookGenres
+                        {
+                            post_id = _postId,
+                            genre_id = selectedGenreId
+                        });
+                    }
                 }
                 else
                 {
+                    // Якщо запису ще немає — додаємо новий
                     _context.bookGenres.Add(new BookGenres
                     {
                         post_id = _postId,
@@ -149,6 +150,7 @@ namespace LitShare
                 }
 
                 _context.SaveChanges();
+
                 MessageBox.Show("Оголошення успішно оновлено!", "Успіх", MessageBoxButton.OK, MessageBoxImage.Information);
                 Close();
             }
@@ -163,14 +165,16 @@ namespace LitShare
         {
             if (MessageBox.Show("Скасувати зміни?", "Підтвердження", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
-                Close();
+                this.Close();
             }
         }
 
         // Кнопка LitShare → повернення на головну
         private void HomeButton_Click(object sender, RoutedEventArgs e)
         {
-            Close();
+            MainPage mainWindow = new MainPage(_userId);
+            mainWindow.Show();
+            this.Close();
         }
     }
 }

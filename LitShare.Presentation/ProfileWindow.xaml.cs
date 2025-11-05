@@ -2,7 +2,9 @@
 using LitShare.DAL.Models;
 using System.Threading.Tasks;  // 2. ДОДАНО: Потрібно для асинхронності
 using System.Windows;
+using System.Windows.Media;
 using System.Windows.Media.Effects;
+using System.Windows.Media.Imaging;
 
 namespace LitShare.Presentation
 {
@@ -37,6 +39,16 @@ namespace LitShare.Presentation
                     txtPhone.Text = user.phone ?? "—";
                     txtEmail.Text = user.email;
                     txtAbout.Text = user.about ?? "Інформація про себе ще не заповнена.";
+
+                    if (!string.IsNullOrEmpty(user.photo_url))
+                    {
+                        userPhotoEllipse.Fill = new ImageBrush(new BitmapImage(new Uri(user.photo_url)));
+                    }
+                    else
+                    {
+                        string defaultUrl = $"https://randomuser.me/api/portraits/lego/{new Random().Next(0, 9)}.jpg";
+                        userPhotoEllipse.Fill = new ImageBrush(new BitmapImage(new Uri(defaultUrl)));
+                    }
                 }
                 else
                 {
@@ -48,6 +60,7 @@ namespace LitShare.Presentation
                 MessageBox.Show($"Сталася помилка при завантаженні: {ex.Message}", "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
 
 
         // --- ЗАГЛУШКИ ДЛЯ КНОПОК (Залишаються, як у вас) ---
@@ -80,7 +93,12 @@ namespace LitShare.Presentation
         private void EditProfileButton_Click(object sender, RoutedEventArgs e)
         {
             var editProfileWindow = new EditProfileWindow(_userId);
-            editProfileWindow.Show();
+            bool? result = editProfileWindow.ShowDialog(); 
+
+            if (result == true)
+            {
+                _ = LoadUserProfileAsync(_userId);
+            }
         }
     }
 }

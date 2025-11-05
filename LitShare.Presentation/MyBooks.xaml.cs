@@ -81,6 +81,19 @@ namespace LitShare.Presentation
             this.Close();
         }
 
+        private void EditBookButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.DataContext is BookItem selectedBook)
+            {
+                var editWindow = new EditAdWindow(selectedBook.Id, _userId);
+                editWindow.Owner = this;
+                editWindow.ShowDialog();
+
+                LoadBooks();
+            }
+        }
+
+
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
