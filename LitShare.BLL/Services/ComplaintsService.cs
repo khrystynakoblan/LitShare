@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using LitShare.DAL;
 using LitShare.BLL.DTOs;
-using LitShare.DAL.Models; // Потрібно для 'Complaints'
-using Microsoft.EntityFrameworkCore; // Потрібно для .Include()
+using LitShare.DAL.Models;
+using Microsoft.EntityFrameworkCore; 
 
 namespace LitShare.BLL.Services
 {
     public class ComplaintsService
     {
-        // === 1. ВАШ ІСНУЮЧИЙ МЕТОД ===
         public List<ComplaintDto> GetAllComplaints()
         {
             using (var context = new LitShareDbContext())
@@ -40,8 +39,6 @@ namespace LitShare.BLL.Services
             }
         }
 
-        // === 3. МЕТОД, ЯКИЙ МИ ДОДАЛИ РАНІШЕ ===
-        // (Для кнопок у ComplaintReviewWindow)
         public void DeleteComplaint(int complaintId)
         {
             using (var context = new LitShareDbContext())
