@@ -6,10 +6,8 @@
         WindowStartupLocation="CenterScreen"
         Background="White">
 
-    <Grid>
-
-        <!-- Верхня панель -->
-        <Grid Margin="20,20,20,0" VerticalAlignment="Top">
+    <Grid Margin="0,40,0,40">
+        <Grid Margin="20,0,20,0" VerticalAlignment="Top">
             <TextBlock Text="LitShare"
                        FontSize="24"
                        FontWeight="Bold"
@@ -27,77 +25,92 @@
                     VerticalAlignment="Top"/>
         </Grid>
 
-        <!-- Центрований, розтягнутий блок -->
         <Border Width="780"
-                Height="500"
+                MaxHeight="700" 
+                MinHeight="500"
                 Padding="50"
                 Background="#f9f9f9"
                 CornerRadius="8"
                 BorderBrush="#ddd"
                 BorderThickness="1"
                 HorizontalAlignment="Center"
-                VerticalAlignment="Center">
+                VerticalAlignment="Center"
+                SnapsToDevicePixels="True">
 
-            <StackPanel VerticalAlignment="Center">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel VerticalAlignment="Center">
 
-                <TextBlock Text="Звіт про проблему"
-                           FontSize="20"
-                           FontWeight="Bold"
-                           Foreground="#333"
-                           Margin="0,0,0,20"
-                           HorizontalAlignment="Center"/>
+                    <TextBlock Text="Звіт про проблему"
+                               FontSize="20"
+                               FontWeight="Bold"
+                               Foreground="#333"
+                               Margin="0,0,0,20"
+                               HorizontalAlignment="Center"/>
 
-                <TextBlock Text="Оберіть проблему:"
-                           FontSize="15"
-                           FontWeight="SemiBold"
-                           Margin="0,0,0,10"/>
+                    <TextBlock Text="Оберіть проблему:"
+                               FontSize="15"
+                               FontWeight="SemiBold"
+                               Margin="0,0,0,10"/>
 
-                <StackPanel>
-                    <RadioButton x:Name="FalseInfoRadio" Content="Неправдива інформація в оголошенні" GroupName="ReportReason" Margin="0,5"/>
-                    <RadioButton x:Name="SpamRadio" Content="Неприпустимий контент або спам" GroupName="ReportReason" Margin="0,5"/>
-                    <RadioButton x:Name="ExchangeRadio" Content="Проблеми з обміном" GroupName="ReportReason" Margin="0,5"/>
-                    <RadioButton x:Name="OtherRadio" Content="Інше" GroupName="ReportReason" Margin="0,5"/>
+                    <StackPanel>
+                        <RadioButton x:Name="FalseInfoRadio" Content="Неправдива інформація в оголошенні" GroupName="ReportReason" Margin="0,5"/>
+                        <RadioButton x:Name="SpamRadio" Content="Неприпустимий контент або спам" GroupName="ReportReason" Margin="0,5"/>
+                        <RadioButton x:Name="ExchangeRadio" Content="Проблеми з обміном" GroupName="ReportReason" Margin="0,5"/>
+                        <RadioButton x:Name="OtherRadio" Content="Інше" GroupName="ReportReason" Margin="0,5"/>
+                    </StackPanel>
+
+                    <Grid Margin="0,20,0,10">
+                        <TextBox x:Name="DetailsTextBox"
+                                 Height="120"
+                                 TextWrapping="Wrap"
+                                 AcceptsReturn="True"
+                                 VerticalScrollBarVisibility="Auto"/>
+                        <TextBlock x:Name="PlaceholderText"
+                                   Text="Опишіть проблему детальніше..."
+                                   Foreground="Gray"
+                                   Margin="5,5,0,0"
+                                   IsHitTestVisible="False"
+                                   VerticalAlignment="Top"
+                                   Padding="2"
+                                   FontStyle="Italic"
+                                   Visibility="Visible"/>
+                    </Grid>
+
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Center"
+                                Margin="0,10,0,0">
+                        <Button Content="Надіслати"
+                                Width="180"
+                                Height="40"
+                                Background="#555"
+                                Foreground="White"
+                                Margin="0,0,10,0"
+                                Click="SubmitButton_Click"/>
+
+                        <Button Content="&lt; Назад"
+                                Width="180"
+                                Height="40"
+                                Background="White"
+                                BorderBrush="#555"
+                                Foreground="#333"
+                                Click="BackButton_Click"/>
+                    </StackPanel>
+
+                    <TextBlock x:Name="StatusMessage"
+                               Text=""
+                               FontWeight="SemiBold"
+                               Foreground="Green"
+                               Margin="0,15,0,10"
+                               HorizontalAlignment="Center"
+                               TextWrapping="Wrap"
+                               TextAlignment="Center"
+                               LineHeight="22"
+                               Padding="4"
+                               SnapsToDevicePixels="True"
+                               UseLayoutRounding="True"
+                               VerticalAlignment="Center"/>
                 </StackPanel>
-
-                <!-- TextBox з Placeholder -->
-                <Grid Margin="0,20,0,10">
-                    <TextBox x:Name="DetailsTextBox"
-                             Height="120"
-                             TextWrapping="Wrap"
-                             AcceptsReturn="True"
-                             VerticalScrollBarVisibility="Auto"/>
-                    <TextBlock x:Name="PlaceholderText"
-                               Text="Опишіть проблему детальніше..."
-                               Foreground="Gray"
-                               Margin="5,5,0,0"
-                               IsHitTestVisible="False"
-                               VerticalAlignment="Top"
-                               Padding="2"
-                               FontStyle="Italic"
-                               Visibility="Visible"/>
-                </Grid>
-
-                <!-- Кнопки -->
-                <StackPanel Orientation="Horizontal"
-                            HorizontalAlignment="Center"
-                            Margin="0,10,0,0">
-                    <Button Content="Надіслати"
-                            Width="180"
-                            Height="40"
-                            Background="#555"
-                            Foreground="White"
-                            Margin="0,0,10,0"
-                            Click="SubmitButton_Click"/>
-
-                    <Button Content="&lt; Назад"
-                            Width="180"
-                            Height="40"
-                            Background="White"
-                            BorderBrush="#555"
-                            Foreground="#333"
-                            Click="BackButton_Click"/>
-                </StackPanel>
-            </StackPanel>
+            </ScrollViewer>
         </Border>
     </Grid>
 </Window>
