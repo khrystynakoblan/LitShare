@@ -84,6 +84,13 @@ namespace LitShare.Presentation
             myBooksWindow.Show();
         }
 
+        private void HomeButton_Click(object sender, RoutedEventArgs e)
+        {
+            var mainPage = new MainPage(_userId);
+            mainPage.Show();
+            this.Close();
+        }
+
         private void EditProfileButton_Click(object sender, RoutedEventArgs e)
         {
             var editProfileWindow = new EditProfileWindow(_userId);

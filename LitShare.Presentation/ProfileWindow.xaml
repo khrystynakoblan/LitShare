@@ -44,7 +44,16 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <TextBlock Text="LitShare" Grid.Column="0" FontSize="24" FontWeight="Bold" VerticalAlignment="Center"/>
+                <Button Content="LitShare"
+                    FontSize="22"
+                    FontWeight="Bold"
+                    Foreground="Black"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Cursor="Hand"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Left"
+                    Click="HomeButton_Click"/>
                 <Button Grid.Column="1" Content="← Назад" 
                         Style="{StaticResource BackButtonStyle}"
                         Margin="20,0,0,0"

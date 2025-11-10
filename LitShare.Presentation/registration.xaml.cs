@@ -63,9 +63,6 @@ namespace LitShare.Presentation
             {
                 _userService.AddUser(name, email, phone, password, region, district, city);
 
-                MessageBox.Show("Акаунт успішно створено! Тепер ви можете увійти.",
-                                "Реєстрація успішна", MessageBoxButton.OK, MessageBoxImage.Information);
-
                 mainTabs.SelectedItem = loginTab;
             }
             catch (Exception ex)
@@ -106,8 +103,6 @@ namespace LitShare.Presentation
 
                     if (user != null)
                     {
-                        MessageBox.Show($"Вхід успішний! Вітаємо, {user.name}.");
-
                         var mainPage = new MainPage(user.id);
                         mainPage.Show();
 

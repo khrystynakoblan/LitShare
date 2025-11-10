@@ -6,9 +6,6 @@ namespace LitShare.DAL
 {
     public class LitShareDbContext : DbContext
     {
-
-        private static bool _mapperConfigured = false;
-
         public DbSet<Users> Users { get; set; }
         public DbSet<Posts> posts { get; set; }
         public DbSet<Genres> genres { get; set; }
