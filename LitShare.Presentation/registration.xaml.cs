@@ -48,6 +48,11 @@ namespace LitShare.Presentation
                 ShowError(txtEmail, errorEmail, "Некоректний формат E-mail.");
                 hasError = true;
             }
+            else if (IsEmailExists(email))
+            {
+                ShowError(txtEmail, errorEmail, "Користувач з такою поштою вже зареєстрований.");
+                hasError = true;
+            }
 
             if (string.IsNullOrEmpty(phone))
             {
@@ -59,15 +64,20 @@ namespace LitShare.Presentation
                 ShowError(txtPhone, errorPhone, "Номер телефону має бути у форматі +380XXXXXXXXX або 0XXXXXXXXX.");
                 hasError = true;
             }
+            else if (IsPhoneExists(phone))
+            {
+                ShowError(txtPhone, errorPhone, "Користувач з таким номером вже зареєстрований.");
+                hasError = true;
+            }
 
             if (string.IsNullOrEmpty(password))
             {
                 ShowError(txtPassword, errorPassword, "Це поле обов'язкове для заповнення.");
                 hasError = true;
             }
-            else if (!IsValidPassword(password))
+            else if (!IsValidPassword(password, out string passwordError))
             {
-                ShowError(txtPassword, errorPassword, "Пароль має бути не менше 8 символів.");
+                ShowError(txtPassword, errorPassword, passwordError);
                 hasError = true;
             }
 
@@ -146,7 +156,7 @@ namespace LitShare.Presentation
                     ShowError(txtLoginPassword, errorLoginPassword, "Це поле обов'язкове для заповнення.");
                     hasError = true;
                 }
-                else if (!IsValidPassword(password))
+                else if (password.Length < 8)
                 {
                     ShowError(txtLoginPassword, errorLoginPassword, "Пароль має бути не менше 8 символів.");
                     hasError = true;
@@ -189,7 +199,6 @@ namespace LitShare.Presentation
             }
         }
 
-        // 🧩 Валідація полів
         private bool IsValidEmail(string email)
         {
             if (string.IsNullOrWhiteSpace(email)) return false;
@@ -204,13 +213,69 @@ namespace LitShare.Presentation
             return Regex.IsMatch(phone, phonePattern);
         }
 
-        private bool IsValidPassword(string password)
+        private bool IsValidPassword(string password, out string errorMessage)
         {
-            if (string.IsNullOrWhiteSpace(password)) return false;
-            return password.Length >= 8;
+            errorMessage = string.Empty;
+
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                errorMessage = "Пароль не може бути порожнім.";
+                return false;
+            }
+
+            if (password.Length < 8)
+            {
+                errorMessage = "Пароль має містити мінімум 8 символів.";
+                return false;
+            }
+
+            if (!password.Any(char.IsDigit))
+            {
+                errorMessage = "Пароль має містити хоча б одну цифру.";
+                return false;
+            }
+
+            if (!password.Any(char.IsUpper))
+            {
+                errorMessage = "Пароль має містити хоча б одну велику літеру.";
+                return false;
+            }
+
+            if (!password.Any(char.IsLower))
+            {
+                errorMessage = "Пароль має містити хоча б одну малу літеру.";
+                return false;
+            }
+
+            return true;
         }
 
-        // 🧠 Допоміжні методи
+        private bool IsEmailExists(string email)
+        {
+            try
+            {
+                var users = _userService.GetAllUsers();
+                return users.Any(u => u.email.Equals(email, StringComparison.OrdinalIgnoreCase));
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private bool IsPhoneExists(string phone)
+        {
+            try
+            {
+                var users = _userService.GetAllUsers();
+                return users.Any(u => u.phone == phone);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         private void ShowError(Control control, TextBlock errorBlock, string message)
         {
             control.BorderBrush = Brushes.Red;
