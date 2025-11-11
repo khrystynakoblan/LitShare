@@ -191,6 +191,14 @@ namespace LitShare.Presentation
             }
         }
 
+        public void ScrollToBottom()
+        {
+            // Якщо є ScrollViewer — просто прокручуємо його вниз
+            BooksScrollViewer?.UpdateLayout();
+            BooksScrollViewer?.ScrollToEnd();
+        }
+
     }
 
 }
+
