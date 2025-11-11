@@ -225,7 +225,7 @@ namespace LitShare.BLL.Tests
                 .Options;
 
             var context = new LitShareDbContext(options);
-            await context.Database.EnsureDeletedAsync(); // видаляємо базу → згенерує помилку
+            await context.Database.EnsureDeletedAsync(); 
             var service = new BookService(context);
 
             var result = await service.GetAllBooksAsync();
@@ -290,22 +290,22 @@ namespace LitShare.BLL.Tests
      
         public async Task GetBooksByUserIdAsync_Should_Trigger_Catch_And_Return_Empty_List()
         {
-            // Arrange
+           
             var options = new DbContextOptionsBuilder<LitShareDbContext>()
                 .UseInMemoryDatabase(Guid.NewGuid().ToString())
                 .Options;
 
             var brokenContext = new LitShareDbContext(options);
-            await brokenContext.Database.EnsureDeletedAsync(); // зламаємо БД
+            await brokenContext.Database.EnsureDeletedAsync();
 
             var service = new BookService(brokenContext);
 
-            // Act
+            
             var result = await service.GetBooksByUserIdAsync(123);
 
-            // Assert
+            
             Assert.NotNull(result);
-            Assert.Empty(result); // ✅ catch повинен спрацювати
+            Assert.Empty(result); 
         }
     }
 }
