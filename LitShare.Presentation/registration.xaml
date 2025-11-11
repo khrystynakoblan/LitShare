@@ -5,8 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LitShare.Presentation"
         mc:Ignorable="d"
-        Title="LitShare - Вхід" Height="650" Width="450"
-        WindowState="Maximized"
+        Title="LitShare - Вхід" Height="600" Width="420"
         WindowStartupLocation="CenterScreen"
         Background="#F0F0F0">
 
@@ -24,7 +23,7 @@
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsSelected" Value="True">
                                 <Setter Property="FontWeight" Value="Bold" />
-                                <Setter Property="FontSize" Value="16" />
+                                <Setter Property="FontSize" Value="14" />
                                 <Setter TargetName="Underline" Property="Visibility" Value="Visible" />
                             </Trigger>
                             <Trigger Property="IsSelected" Value="False">
@@ -43,20 +42,22 @@
 
     <Border BorderBrush="LightGray" BorderThickness="1" Background="White"
             HorizontalAlignment="Center" VerticalAlignment="Center"
-            Padding="35" Width="400" CornerRadius="10" >
+            Padding="30" Width="380" CornerRadius="10">
 
         <TabControl x:Name="mainTabs" BorderThickness="0" Background="Transparent">
 
             <TabItem Header="Увійти" x:Name="loginTab" HorizontalAlignment="Left" Width="158" Margin="-14,0,0,0">
                 <StackPanel>
-                    <TextBlock Text="Електронна пошта:" Margin="0,15,0,5" FontSize="14"/>
-                    <TextBox x:Name="txtLoginEmail" Padding="10" FontSize="14"/>
-                    
-                    <TextBlock Text="Пароль:" Margin="0,15,0,5" FontSize="14"/>
-                    <PasswordBox x:Name="txtLoginPassword" Padding="10" FontSize="14"/>
+                    <TextBlock Text="Електронна пошта:" Margin="0,15,0,5" FontSize="13"/>
+                    <TextBox x:Name="txtLoginEmail" Padding="8" Margin="0,0,0,1" FontSize="13"/>
+                    <TextBlock x:Name="errorLoginEmail" Foreground="Red" FontSize="10" Visibility="Collapsed" Margin="0,0,0,5"/>
 
-                    <Button Content="Увійти" Padding="12" Margin="0,30,0,0" 
-                            FontSize="15" FontWeight="Bold"
+                    <TextBlock Text="Пароль:" Margin="0,8,0,5" FontSize="13"/>
+                    <PasswordBox x:Name="txtLoginPassword" Padding="8" Margin="0,0,0,1" FontSize="13"/>
+                    <TextBlock x:Name="errorLoginPassword" Foreground="Red" FontSize="10" Visibility="Collapsed" Margin="0,0,0,5"/>
+
+                    <Button Content="Увійти" Padding="10" Margin="0,15,0,0" 
+                            FontSize="14" FontWeight="Bold"
                             Background="#333" Foreground="White" 
                             Click="Button_Click_Login"
                             BorderThickness="0" 
@@ -65,39 +66,49 @@
             </TabItem>
 
             <TabItem Header="Зареєструватися" IsSelected="True" Margin="5,0,10,0">
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <StackPanel>
-                        <TextBlock Text="Ім'я:" FontSize="14"/>
-                        <TextBox x:Name="txtName" Padding="10" Margin="0,5,0,15" FontSize="14"/>
+                <StackPanel>
+                    <TextBlock Text="Ім'я:" FontSize="12" Margin="0,3,0,0"/>
+                    <TextBox x:Name="txtName" Padding="6" Margin="0,2,0,1" FontSize="12"/>
+                    <TextBlock x:Name="errorName" Foreground="Red" FontSize="10" Visibility="Collapsed" Margin="0,0,0,2"/>
 
-                        <TextBlock Text="Електронна пошта:" FontSize="14"/>
-                        <TextBox x:Name="txtEmail" Padding="10" Margin="0,5,0,15" FontSize="14"/>
+                    <TextBlock Text="Електронна пошта:" FontSize="12"/>
+                    <TextBox x:Name="txtEmail" Padding="6" Margin="0,2,0,1" FontSize="12"/>
+                    <TextBlock x:Name="errorEmail" Foreground="Red" FontSize="10" Visibility="Collapsed" Margin="0,0,0,2"/>
 
-                        <TextBlock Text="Номер телефону:" FontSize="14"/>
-                        <TextBox x:Name="txtPhone" Padding="10" Margin="0,5,0,15" FontSize="14"/>
-                        <TextBlock Text="Пароль:" FontSize="14"/>
-                        <PasswordBox x:Name="txtPassword" Padding="10" Margin="0,5,0,15" FontSize="14"/>
+                    <TextBlock Text="Номер телефону:" FontSize="12"/>
+                    <TextBox x:Name="txtPhone" Padding="6" Margin="0,2,0,1" FontSize="12"/>
+                    <TextBlock x:Name="errorPhone" Foreground="Red" FontSize="10" Visibility="Collapsed" Margin="0,0,0,2"/>
 
-                        <TextBlock Text="Область:" FontSize="14"/>
-                        <TextBox x:Name="txtRegion" Padding="10" Margin="0,5,0,15" FontSize="14"/>
+                    <TextBlock Text="Пароль:" FontSize="12"/>
+                    <PasswordBox x:Name="txtPassword" Padding="6" Margin="0,2,0,1" FontSize="12"/>
+                    <TextBlock x:Name="errorPassword" Foreground="Red" FontSize="10" Visibility="Collapsed" Margin="0,0,0,2"/>
 
-                        <TextBlock Text="Район:" FontSize="14"/>
-                        <TextBox x:Name="txtDistrict" Padding="10" Margin="0,5,0,15" FontSize="14"/>
+                    <TextBlock Text="Підтвердження пароля:" FontSize="12"/>
+                    <PasswordBox x:Name="txtConfirmPassword" Padding="6" Margin="0,2,0,1" FontSize="12"/>
+                    <TextBlock x:Name="errorConfirmPassword" Foreground="Red" FontSize="10" Visibility="Collapsed" Margin="0,0,0,2"/>
 
-                        <TextBlock Text="Населений пункт:" FontSize="14"/>
-                        <TextBox x:Name="txtCity" Padding="10" Margin="0,5,0,20" FontSize="14"/>
+                    <TextBlock Text="Область:" FontSize="12"/>
+                    <TextBox x:Name="txtRegion" Padding="6" Margin="0,2,0,1" FontSize="12"/>
+                    <TextBlock x:Name="errorRegion" Foreground="Red" FontSize="10" Visibility="Collapsed" Margin="0,0,0,2"/>
 
-                        <TextBlock Text="Створюючи профіль, ви погоджуєтеся з Умовами використання"
-                                   TextWrapping="Wrap" FontSize="11" Foreground="Gray" Margin="0,10,0,20"/>
+                    <TextBlock Text="Район:" FontSize="12"/>
+                    <TextBox x:Name="txtDistrict" Padding="6" Margin="0,2,0,1" FontSize="12"/>
+                    <TextBlock x:Name="errorDistrict" Foreground="Red" FontSize="10" Visibility="Collapsed" Margin="0,0,0,2"/>
 
-                        <Button x:Name="RegisterButton" Content="Створити акаунт" Padding="12" 
-                                FontSize="15" FontWeight="Bold"
-                                Background="#333" Foreground="White"
-                                Click="Button_Click_Register"
-                                BorderThickness="0"
-                                Cursor="Hand"/>
-                    </StackPanel>
-                </ScrollViewer>
+                    <TextBlock Text="Населений пункт:" FontSize="12"/>
+                    <TextBox x:Name="txtCity" Padding="6" Margin="0,2,0,1" FontSize="12"/>
+                    <TextBlock x:Name="errorCity" Foreground="Red" FontSize="10" Visibility="Collapsed" Margin="0,0,0,2"/>
+
+                    <TextBlock Text="Створюючи профіль, ви погоджуєтеся з Умовами використання"
+                               TextWrapping="Wrap" FontSize="9" Foreground="Gray" Margin="0,2,0,6"/>
+
+                    <Button x:Name="RegisterButton" Content="Створити акаунт" Padding="8" 
+                            FontSize="13" FontWeight="Bold"
+                            Background="#333" Foreground="White"
+                            Click="Button_Click_Register"
+                            BorderThickness="0"
+                            Cursor="Hand"/>
+                </StackPanel>
             </TabItem>
 
         </TabControl>
