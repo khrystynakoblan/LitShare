@@ -4,6 +4,7 @@ using LitShare.Presentation;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Windows;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace LitShare
@@ -45,15 +46,8 @@ namespace LitShare
 
         private void AddAdButton_Click(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(TitleTextBox.Text) ||
-                string.IsNullOrWhiteSpace(AuthorTextBox.Text) ||
-                string.IsNullOrWhiteSpace(DescriptionTextBox.Text) ||
-                DealTypeComboBox.SelectedItem == null ||
-                GenreComboBox.SelectedItem == null)
-            {
-                MessageBox.Show("Будь ласка, заповніть усі поля!");
+            if (!ValidateFields())
                 return;
-            }
 
             try
             {
@@ -65,14 +59,13 @@ namespace LitShare
                     author = AuthorTextBox.Text,
                     description = DescriptionTextBox.Text,
                     deal_type = (DealType)DealTypeComboBox.SelectedValue,
-                    user_id = _userId,   
+                    user_id = _userId,
                     photo_url = selectedPhotoPath
                 };
 
                 db.posts.Add(post);
                 db.SaveChanges();
 
-               
                 var selectedGenre = (Genres)GenreComboBox.SelectedItem;
                 var bookGenre = new BookGenres
                 {
@@ -83,9 +76,10 @@ namespace LitShare
                 db.bookGenres.Add(bookGenre);
                 db.SaveChanges();
 
-                MessageBox.Show("Оголошення успішно додано!");
+                var mainWindow = new MainPage(_userId);
+                mainWindow.Loaded += (s, e2) => mainWindow.ScrollToBottom();
+                mainWindow.Show();
 
-                this.DialogResult = true;
                 this.Close();
             }
             catch (DbUpdateException ex)
@@ -93,6 +87,7 @@ namespace LitShare
                 MessageBox.Show($"Сталася помилка при додаванні оголошення:\n{ex.InnerException?.Message}");
             }
         }
+
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
@@ -133,11 +128,102 @@ namespace LitShare
                             {
                                 BookImage.Source = new BitmapImage(new Uri(selectedPhotoPath));
                             }
-
-                            MessageBox.Show("Фото вибрано успішно!");
                         }
+         }
+        private bool ValidateFields()
+        {
+            bool isValid = true;
+            var redBrush = new SolidColorBrush(Colors.Red);
+            var normalBrush = new SolidColorBrush(Color.FromRgb(171, 173, 179));
+
+            if (string.IsNullOrWhiteSpace(TitleTextBox.Text))
+            {
+                TitleTextBox.BorderBrush = redBrush;
+                TitleError.Visibility = Visibility.Visible;
+                isValid = false;
             }
+            else
+            {
+                TitleTextBox.BorderBrush = normalBrush;
+                TitleError.Visibility = Visibility.Collapsed;
+            }
+
+            if (string.IsNullOrWhiteSpace(AuthorTextBox.Text))
+            {
+                AuthorTextBox.BorderBrush = redBrush;
+                AuthorError.Visibility = Visibility.Visible;
+                isValid = false;
+            }
+            else
+            {
+                AuthorTextBox.BorderBrush = normalBrush;
+                AuthorError.Visibility = Visibility.Collapsed;
+            }
+
+            if (string.IsNullOrWhiteSpace(DescriptionTextBox.Text))
+            {
+                DescriptionTextBox.BorderBrush = redBrush;
+                DescriptionError.Visibility = Visibility.Visible;
+                isValid = false;
+            }
+            else
+            {
+                DescriptionTextBox.BorderBrush = normalBrush;
+                DescriptionError.Visibility = Visibility.Collapsed;
+            }
+
+
+            if (DealTypeComboBox.SelectedItem == null)
+            {
+                DealTypeComboBox.BorderBrush = redBrush;
+                DealTypeError.Visibility = Visibility.Visible;
+                isValid = false;
+            }
+            else
+            {
+                DealTypeComboBox.BorderBrush = normalBrush;
+                DealTypeError.Visibility = Visibility.Collapsed;
+            }
+
+            if (GenreComboBox.SelectedItem == null)
+            {
+                GenreComboBox.BorderBrush = redBrush;
+                GenreError.Visibility = Visibility.Visible;
+                isValid = false;
+            }
+            else
+            {
+                GenreComboBox.BorderBrush = normalBrush;
+                GenreError.Visibility = Visibility.Collapsed;
+            }
+
+          
+
+            return isValid;
+        }
+
+
+        private void Field_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            var textBox = sender as System.Windows.Controls.TextBox;
+            textBox.BorderBrush = new SolidColorBrush(Color.FromRgb(171, 173, 179));
+
+            if (textBox == TitleTextBox) TitleError.Visibility = Visibility.Collapsed;
+            else if (textBox == AuthorTextBox) AuthorError.Visibility = Visibility.Collapsed;
+            else if (textBox == DescriptionTextBox) DescriptionError.Visibility = Visibility.Collapsed;
+        }
+
+        private void Field_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            var comboBox = sender as System.Windows.Controls.ComboBox;
+            comboBox.BorderBrush = new SolidColorBrush(Color.FromRgb(171, 173, 179));
+
+            if (comboBox == GenreComboBox) GenreError.Visibility = Visibility.Collapsed;
+            else if (comboBox == DealTypeComboBox) DealTypeError.Visibility = Visibility.Collapsed;
+        }
+
     }
+
 }
 
 

@@ -75,7 +75,7 @@
             </Border>
 
             <!-- Область з книгами -->
-            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <ScrollViewer x:Name="BooksScrollViewer" Grid.Row="1" VerticalScrollBarVisibility="Auto">
                 <StackPanel Margin="15">
                     <TextBlock x:Name="ResultsCountText" Text="Знайдено: 16 книг" FontSize="12" Foreground="Gray" Margin="0,0,0,15"/>
 
