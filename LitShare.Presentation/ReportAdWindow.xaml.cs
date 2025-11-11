@@ -1,5 +1,7 @@
 ﻿using LitShare.BLL.Services;
+using System;
 using System.Windows;
+using System.Windows.Media;
 
 namespace LitShare.Presentation
 {
@@ -7,7 +9,11 @@ namespace LitShare.Presentation
     {
         private readonly int _adId;
         private readonly ComplaintsService _complaintService = new ComplaintsService();
+<<<<<<< HEAD
         private readonly int _currentUserId; 
+=======
+        private readonly int _currentUserId;
+>>>>>>> viktoria/wpf
 
         public ReportAdWindow(int adId, int userId)
         {
@@ -41,7 +47,7 @@ namespace LitShare.Presentation
 
             if (string.IsNullOrEmpty(selectedReason))
             {
-                MessageBox.Show("Будь ласка, оберіть причину скарги.", "Помилка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ShowStatus("Будь ласка, оберіть причину скарги.", Brushes.OrangeRed);
                 return;
             }
 
@@ -53,19 +59,25 @@ namespace LitShare.Presentation
             try
             {
                 _complaintService.AddComplaint(fullText, _adId, _currentUserId);
-                MessageBox.Show("Скаргу надіслано. Дякуємо!", "Успіх", MessageBoxButton.OK, MessageBoxImage.Information);
-                this.Close();
+
+                ShowStatus("Скаргу надіслано!", Brushes.Green);
+
+                FalseInfoRadio.IsChecked = false;
+                SpamRadio.IsChecked = false;
+                ExchangeRadio.IsChecked = false;
+                OtherRadio.IsChecked = false;
+                DetailsTextBox.Text = string.Empty;
             }
             catch (Exception ex)
             {
-                MessageBox.Show(
-                    $"Помилка: {ex.InnerException?.Message ?? ex.Message}",
-                    "Помилка при збереженні скарги",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error
-                );
+                ShowStatus($"Помилка: {ex.InnerException?.Message ?? ex.Message}", Brushes.Red);
             }
+        }
 
+        private void ShowStatus(string message, Brush color)
+        {
+            StatusMessage.Text = message;
+            StatusMessage.Foreground = color;
         }
 
         private void BackButton_Click(object sender, RoutedEventArgs e)
