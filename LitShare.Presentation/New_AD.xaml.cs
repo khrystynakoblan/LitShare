@@ -128,8 +128,6 @@ namespace LitShare
                             {
                                 BookImage.Source = new BitmapImage(new Uri(selectedPhotoPath));
                             }
-
-                            MessageBox.Show("Фото вибрано успішно!");
                         }
          }
         private bool ValidateFields()

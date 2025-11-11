@@ -165,10 +165,7 @@ namespace LitShare
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            if (MessageBox.Show("Скасувати зміни?", "Підтвердження", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
-            {
-                this.Close();
-            }
+            this.Close();
         }
 
         private void HomeButton_Click(object sender, RoutedEventArgs e)
