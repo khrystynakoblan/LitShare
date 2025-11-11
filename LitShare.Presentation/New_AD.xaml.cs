@@ -138,7 +138,6 @@ namespace LitShare
             var redBrush = new SolidColorBrush(Colors.Red);
             var normalBrush = new SolidColorBrush(Color.FromRgb(171, 173, 179));
 
-            // --- Назва ---
             if (string.IsNullOrWhiteSpace(TitleTextBox.Text))
             {
                 TitleTextBox.BorderBrush = redBrush;
@@ -151,7 +150,6 @@ namespace LitShare
                 TitleError.Visibility = Visibility.Collapsed;
             }
 
-            // --- Автор ---
             if (string.IsNullOrWhiteSpace(AuthorTextBox.Text))
             {
                 AuthorTextBox.BorderBrush = redBrush;
@@ -164,7 +162,6 @@ namespace LitShare
                 AuthorError.Visibility = Visibility.Collapsed;
             }
 
-            // --- Опис ---
             if (string.IsNullOrWhiteSpace(DescriptionTextBox.Text))
             {
                 DescriptionTextBox.BorderBrush = redBrush;
@@ -177,7 +174,7 @@ namespace LitShare
                 DescriptionError.Visibility = Visibility.Collapsed;
             }
 
-            // --- Тип угоди ---
+
             if (DealTypeComboBox.SelectedItem == null)
             {
                 DealTypeComboBox.BorderBrush = redBrush;
@@ -190,7 +187,6 @@ namespace LitShare
                 DealTypeError.Visibility = Visibility.Collapsed;
             }
 
-            // --- Жанр ---
             if (GenreComboBox.SelectedItem == null)
             {
                 GenreComboBox.BorderBrush = redBrush;

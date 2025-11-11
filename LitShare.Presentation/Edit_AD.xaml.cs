@@ -111,7 +111,7 @@ namespace LitShare
         private void AddAdButton_Click(object sender, RoutedEventArgs e)
         {
             if (!ValidateFields())
-                return; // якщо поля порожні, зупиняємося
+                return; 
 
             try
             {
@@ -121,13 +121,11 @@ namespace LitShare
                     return;
                 }
 
-                // Оновлюємо дані оголошення
                 _currentPost.title = TitleTextBox.Text;
                 _currentPost.author = AuthorTextBox.Text;
                 _currentPost.description = DescriptionTextBox.Text;
                 _currentPost.deal_type = (DealType)DealTypeComboBox.SelectedValue;
 
-                // Оновлюємо жанр
                 var existingGenre = _context.bookGenres.FirstOrDefault(bg => bg.post_id == _postId);
                 int selectedGenreId = (int)GenreComboBox.SelectedValue;
 
@@ -156,7 +154,6 @@ namespace LitShare
 
                 _context.SaveChanges();
 
-                MessageBox.Show("Оголошення успішно оновлено!", "Успіх", MessageBoxButton.OK, MessageBoxImage.Information);
                 Close();
             }
             catch (Exception ex)
@@ -187,7 +184,6 @@ namespace LitShare
             var redBrush = new SolidColorBrush(Colors.Red);
             var normalBrush = new SolidColorBrush(Color.FromRgb(171, 173, 179));
 
-            // --- Назва ---
             if (string.IsNullOrWhiteSpace(TitleTextBox.Text))
             {
                 TitleTextBox.BorderBrush = redBrush;
@@ -200,7 +196,6 @@ namespace LitShare
                 TitleError.Visibility = Visibility.Collapsed;
             }
 
-            // --- Автор ---
             if (string.IsNullOrWhiteSpace(AuthorTextBox.Text))
             {
                 AuthorTextBox.BorderBrush = redBrush;
@@ -213,7 +208,6 @@ namespace LitShare
                 AuthorError.Visibility = Visibility.Collapsed;
             }
 
-            // --- Опис ---
             if (string.IsNullOrWhiteSpace(DescriptionTextBox.Text))
             {
                 DescriptionTextBox.BorderBrush = redBrush;
@@ -226,7 +220,6 @@ namespace LitShare
                 DescriptionError.Visibility = Visibility.Collapsed;
             }
 
-            // --- Тип угоди ---
             if (DealTypeComboBox.SelectedItem == null)
             {
                 DealTypeComboBox.BorderBrush = redBrush;
@@ -239,7 +232,6 @@ namespace LitShare
                 DealTypeError.Visibility = Visibility.Collapsed;
             }
 
-            // --- Жанр ---
             if (GenreComboBox.SelectedItem == null)
             {
                 GenreComboBox.BorderBrush = redBrush;
