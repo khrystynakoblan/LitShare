@@ -76,6 +76,19 @@ namespace LitShare.Presentation
             StatusMessage.Foreground = color;
         }
 
+        private void MyProfileButton_Click(object sender, RoutedEventArgs e)
+        {
+            var profileWindow = new ProfileWindow(_currentUserId);
+            profileWindow.ShowDialog();
+        }
+
+        private void HomeButton_Click(object sender, RoutedEventArgs e)
+        {
+            var mainPage = new MainPage(_currentUserId);
+            mainPage.ShowDialog();
+            this.Close();
+        }
+
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
             this.Close();

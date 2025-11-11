@@ -6,14 +6,18 @@
         WindowStartupLocation="CenterScreen"
         Background="White">
 
-    <Grid Margin="0,40,0,40">
+    <Grid Margin="0,20,0,40">
         <Grid Margin="20,0,20,0" VerticalAlignment="Top">
-            <TextBlock Text="LitShare"
-                       FontSize="24"
-                       FontWeight="Bold"
-                       Foreground="#444"
-                       VerticalAlignment="Top"
-                       HorizontalAlignment="Left"/>
+            <Button Content="LitShare"
+                Background="Transparent"
+                BorderThickness="0"
+                Foreground="#444"
+                FontSize="24"
+                FontWeight="Bold"
+                Cursor="Hand"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Click="HomeButton_Click"/>
 
             <Button Content="Мій профіль"
                     Background="#555"
@@ -22,7 +26,9 @@
                     Width="110"
                     Height="40"
                     HorizontalAlignment="Right"
-                    VerticalAlignment="Top"/>
+                    VerticalAlignment="Top"
+                    Click="MyProfileButton_Click"/>
+
         </Grid>
 
         <Border Width="780"
