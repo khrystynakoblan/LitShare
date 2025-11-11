@@ -1,5 +1,5 @@
 using System;
-using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
@@ -12,26 +12,22 @@ namespace LitShare.Presentation
     public partial class EditProfileWindow : Window
     {
         private readonly UserService _userService = new UserService();
-        private Users _currentUser;   
-        private Users _originalUser; 
+        private Users _currentUser;
+        private Users _originalUser;
         private readonly int _userId;
 
         public EditProfileWindow(int userId)
         {
             InitializeComponent();
-
-            LoadUserData(userId); 
             _userId = userId;
+            LoadUserData(userId);
         }
 
         private void LoadUserData(int userId)
         {
             _currentUser = _userService.GetUserById(userId);
             if (_currentUser == null)
-            {
-                MessageBox.Show("Користувача не знайдено.", "Помилка");
                 return;
-            }
 
             txtFirstName.Text = _currentUser.name;
             txtRegion.Text = _currentUser.region;
@@ -41,15 +37,7 @@ namespace LitShare.Presentation
             txtAbout.Text = _currentUser.about ?? "";
 
             if (!string.IsNullOrEmpty(_currentUser.photo_url))
-            {
                 userPhotoEllipse.Fill = new ImageBrush(new BitmapImage(new Uri(_currentUser.photo_url)));
-            }
-            else
-            {
-                string randomUrl = $"https://randomuser.me/api/portraits/lego/{new Random().Next(0, 9)}.jpg";
-                _currentUser.photo_url = randomUrl;
-                userPhotoEllipse.Fill = new ImageBrush(new BitmapImage(new Uri(randomUrl)));
-            }
 
             _originalUser = new Users
             {
@@ -66,52 +54,55 @@ namespace LitShare.Presentation
             };
         }
 
-        private void ChangePhotoButton_Click(object sender, RoutedEventArgs e)
+        private void ValidateField(object sender, RoutedEventArgs e)
         {
-            string randomUrl = $"https://randomuser.me/api/portraits/lego/{new Random().Next(0, 9)}.jpg";
-            userPhotoEllipse.Fill = new ImageBrush(new BitmapImage(new Uri(randomUrl)));
+            if (sender == txtRegion)
+                errRegion.Text = string.IsNullOrWhiteSpace(txtRegion.Text) ? "Введіть область" : "";
 
-            if (_currentUser != null)
-                _currentUser.photo_url = randomUrl;
+            if (sender == txtDistrict)
+                errDistrict.Text = string.IsNullOrWhiteSpace(txtDistrict.Text) ? "Введіть район" : "";
+
+            if (sender == txtCity)
+                errCity.Text = string.IsNullOrWhiteSpace(txtCity.Text) ? "Введіть місто" : "";
+
+            if (sender == txtPhone)
+                errPhone.Text = Regex.IsMatch(txtPhone.Text, @"^\+?\d{10,13}$") ? "" : "Некоректний номер телефону";
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            if (_currentUser == null)
-            {
-                MessageBox.Show("Дані користувача не завантажено.", "Помилка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
+            ValidateField(txtRegion, null);
+            ValidateField(txtDistrict, null);
+            ValidateField(txtCity, null);
+            ValidateField(txtPhone, null);
 
-            _currentUser.name = txtFirstName.Text;
+            if (!string.IsNullOrEmpty(errRegion.Text) ||
+                !string.IsNullOrEmpty(errDistrict.Text) ||
+                !string.IsNullOrEmpty(errCity.Text) ||
+                !string.IsNullOrEmpty(errPhone.Text))
+                return;
+
             _currentUser.region = txtRegion.Text;
             _currentUser.district = txtDistrict.Text;
             _currentUser.city = txtCity.Text;
             _currentUser.phone = txtPhone.Text;
             _currentUser.about = txtAbout.Text;
 
-            if (string.IsNullOrEmpty(_currentUser.photo_url))
-                _currentUser.photo_url = $"https://randomuser.me/api/portraits/lego/{new Random().Next(0, 9)}.jpg";
-
             try
             {
                 _userService.UpdateUser(_currentUser);
-                MessageBox.Show("Зміни успішно збережено!", "LitShare", MessageBoxButton.OK, MessageBoxImage.Information);
             }
-            catch (Exception ex)
+            catch
             {
-                MessageBox.Show($"Помилка при збереженні: {ex.Message}", "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-            this.DialogResult = true; 
+
+            var profilePage = new ProfileWindow(_userId);
+            profilePage.Show();
             this.Close();
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            if (_originalUser == null)
-                return;
-
-            txtFirstName.Text = _originalUser.name;
             txtRegion.Text = _originalUser.region;
             txtDistrict.Text = _originalUser.district;
             txtCity.Text = _originalUser.city;
@@ -121,41 +112,44 @@ namespace LitShare.Presentation
             if (!string.IsNullOrEmpty(_originalUser.photo_url))
                 userPhotoEllipse.Fill = new ImageBrush(new BitmapImage(new Uri(_originalUser.photo_url)));
 
-            MessageBox.Show("Зміни скасовано. Дані відновлено.", "LitShare", MessageBoxButton.OK, MessageBoxImage.Information);
+            var profilePage = new ProfileWindow(_userId);
+            profilePage.Show();
+            this.Close();
+        }
+
+        private void ChangePhotoButton_Click(object sender, RoutedEventArgs e)
+        {
+            string randomUrl = $"https://randomuser.me/api/portraits/lego/{new Random().Next(0, 9)}.jpg";
+            userPhotoEllipse.Fill = new ImageBrush(new BitmapImage(new Uri(randomUrl)));
+            _currentUser.photo_url = randomUrl;
         }
 
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
-            if (_currentUser == null)
-            {
-                MessageBox.Show("Користувач не завантажений.", "Помилка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
+            if (_currentUser == null) return;
 
             var result = MessageBox.Show(
-                "Ви впевнені, що хочете видалити профіль?\nЦю дію не можна скасувати.",
+                "Ви дійсно хочете видалити профіль?",
                 "Підтвердження видалення",
                 MessageBoxButton.YesNo,
-                MessageBoxImage.Warning
-            );
+                MessageBoxImage.Warning);
 
             if (result == MessageBoxResult.Yes)
             {
                 try
                 {
                     _userService.DeleteUser(_currentUser.id);
-                    MessageBox.Show("Профіль успішно видалено!", "LitShare", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                    var authWindow = new AuthWindow();
+                    authWindow.Show();
+
                     this.Close();
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Помилка при видаленні: {ex.Message}", "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show($"Сталася помилка при видаленні профілю:\n{ex.Message}", "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
-
-            var authPage = new AuthWindow();
-            authPage.Show();
-            this.Close();
         }
 
         private async void HomeButton_Click(object sender, RoutedEventArgs e)
@@ -164,16 +158,14 @@ namespace LitShare.Presentation
             {
                 this.Hide();
                 await Task.Delay(150);
-                var mainPage = new MainPage(_userId);
-                mainPage.Show();
+                var profilePage = new ProfileWindow(_userId);
+                profilePage.Show();
                 this.Close();
             }
             catch
             {
                 this.Show();
-                MessageBox.Show("Головна сторінка ще не реалізована.", "LitShare");
             }
         }
-
     }
 }
