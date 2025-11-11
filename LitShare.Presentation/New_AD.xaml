@@ -83,46 +83,65 @@
                 </Grid.RowDefinitions>
 
                 <!-- Назва книги -->
-                <StackPanel Orientation="Horizontal" Margin="0,10">
-                    <TextBlock Text="Назва книги" Width="100" VerticalAlignment="Center"/>
-                    <TextBox x:Name="TitleTextBox" Width="350" Height="30"/>
+                <StackPanel Orientation="Vertical" Margin="0,10">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Назва книги" Width="100" VerticalAlignment="Center"/>
+                        <TextBox x:Name="TitleTextBox" Width="350" Height="30" TextChanged="Field_TextChanged"/>
+                    </StackPanel>
+                    <TextBlock x:Name="TitleError" Foreground="Red" FontSize="12" Visibility="Collapsed" Text="Введіть назву книги"/>
                 </StackPanel>
 
                 <!-- Автор книги -->
-                <StackPanel Orientation="Horizontal" Margin="0,10" Grid.Row="1">
-                    <TextBlock Text="Автор книги" Width="100" VerticalAlignment="Center"/>
-                    <TextBox x:Name="AuthorTextBox" Width="350" Height="30"/>
+                <StackPanel Orientation="Vertical" Margin="0,10" Grid.Row="1">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Автор книги" Width="100" VerticalAlignment="Center"/>
+                        <TextBox x:Name="AuthorTextBox" Width="350" Height="30" TextChanged="Field_TextChanged"/>
+                    </StackPanel>
+                    <TextBlock x:Name="AuthorError" Foreground="Red" FontSize="12" Visibility="Collapsed" Text="Введіть автора книги"/>
                 </StackPanel>
 
+
                 <!-- Жанр -->
-                <StackPanel Orientation="Horizontal" Margin="0,10" Grid.Row="2">
-                    <TextBlock Text="Жанр" Width="100" VerticalAlignment="Center"/>
-                    <ComboBox x:Name="GenreComboBox" Width="350" Height="30"/>
+                <StackPanel Orientation="Vertical" Margin="0,10" Grid.Row="2">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Жанр" Width="100" VerticalAlignment="Center"/>
+                        <ComboBox x:Name="GenreComboBox" Width="350" Height="30" SelectionChanged="Field_SelectionChanged"/>
+                    </StackPanel>
+                    <TextBlock x:Name="GenreError" Foreground="Red" FontSize="12" Visibility="Collapsed" Text="Оберіть жанр"/>
                 </StackPanel>
 
                 <!-- Тип угоди -->
-                <StackPanel Orientation="Horizontal" Margin="0,10" Grid.Row="3">
-                    <TextBlock Text="Тип угоди" Width="100" VerticalAlignment="Center"/>
-                    <ComboBox x:Name="DealTypeComboBox" Width="350" Height="30"/>
+                <StackPanel Orientation="Vertical" Margin="0,10" Grid.Row="3">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Тип угоди" Width="100" VerticalAlignment="Center"/>
+                        <ComboBox x:Name="DealTypeComboBox" Width="350" Height="30" SelectionChanged="Field_SelectionChanged"/>
+                    </StackPanel>
+                    <TextBlock x:Name="DealTypeError" Foreground="Red" FontSize="12" Visibility="Collapsed" Text="Оберіть тип угоди"/>
                 </StackPanel>
-                
-                
+
             </Grid>
 
             <!-- Опис -->
             <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Margin="0,40,0,0">
                 <TextBlock Text="Опис"
-                           FontSize="16"
-                           FontWeight="SemiBold"
-                           HorizontalAlignment="Center"
-                           Margin="0,10"/>
+               FontSize="16"
+               FontWeight="SemiBold"
+               HorizontalAlignment="Center"
+               Margin="0,10"/>
                 <TextBox x:Name="DescriptionTextBox"
-                         AcceptsReturn="True"
-                         TextWrapping="Wrap"
-                         Height="85"
-                         Margin="20,10,20,0"
-                         VerticalScrollBarVisibility="Auto"
-                         Width="796"/>
+             AcceptsReturn="True"
+             TextWrapping="Wrap"
+             Height="85"
+             Margin="20,10,20,0"
+             VerticalScrollBarVisibility="Auto"
+             Width="796"
+             TextChanged="Field_TextChanged"/>
+                <TextBlock x:Name="DescriptionError"
+               Foreground="Red"
+               FontSize="12"
+               HorizontalAlignment="Center"
+               Visibility="Collapsed"
+               Text="Введіть опис книги"/>
             </StackPanel>
 
             <!-- Кнопки -->

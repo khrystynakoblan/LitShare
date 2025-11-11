@@ -6,6 +6,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace LitShare
@@ -109,6 +110,9 @@ namespace LitShare
 
         private void AddAdButton_Click(object sender, RoutedEventArgs e)
         {
+            if (!ValidateFields())
+                return; // якщо поля порожні, зупиняємося
+
             try
             {
                 if (_currentPost == null)
@@ -117,11 +121,13 @@ namespace LitShare
                     return;
                 }
 
+                // Оновлюємо дані оголошення
                 _currentPost.title = TitleTextBox.Text;
                 _currentPost.author = AuthorTextBox.Text;
                 _currentPost.description = DescriptionTextBox.Text;
                 _currentPost.deal_type = (DealType)DealTypeComboBox.SelectedValue;
 
+                // Оновлюємо жанр
                 var existingGenre = _context.bookGenres.FirstOrDefault(bg => bg.post_id == _postId);
                 int selectedGenreId = (int)GenreComboBox.SelectedValue;
 
@@ -130,7 +136,7 @@ namespace LitShare
                     if (existingGenre.genre_id != selectedGenreId)
                     {
                         _context.bookGenres.Remove(existingGenre);
-                        _context.SaveChanges(); 
+                        _context.SaveChanges();
 
                         _context.bookGenres.Add(new BookGenres
                         {
@@ -159,6 +165,7 @@ namespace LitShare
             }
         }
 
+
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             if (MessageBox.Show("Скасувати зміни?", "Підтвердження", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
@@ -172,6 +179,101 @@ namespace LitShare
             MainPage mainWindow = new MainPage(_userId);
             mainWindow.Show();
             this.Close();
+        }
+
+        private bool ValidateFields()
+        {
+            bool isValid = true;
+            var redBrush = new SolidColorBrush(Colors.Red);
+            var normalBrush = new SolidColorBrush(Color.FromRgb(171, 173, 179));
+
+            // --- Назва ---
+            if (string.IsNullOrWhiteSpace(TitleTextBox.Text))
+            {
+                TitleTextBox.BorderBrush = redBrush;
+                TitleError.Visibility = Visibility.Visible;
+                isValid = false;
+            }
+            else
+            {
+                TitleTextBox.BorderBrush = normalBrush;
+                TitleError.Visibility = Visibility.Collapsed;
+            }
+
+            // --- Автор ---
+            if (string.IsNullOrWhiteSpace(AuthorTextBox.Text))
+            {
+                AuthorTextBox.BorderBrush = redBrush;
+                AuthorError.Visibility = Visibility.Visible;
+                isValid = false;
+            }
+            else
+            {
+                AuthorTextBox.BorderBrush = normalBrush;
+                AuthorError.Visibility = Visibility.Collapsed;
+            }
+
+            // --- Опис ---
+            if (string.IsNullOrWhiteSpace(DescriptionTextBox.Text))
+            {
+                DescriptionTextBox.BorderBrush = redBrush;
+                DescriptionError.Visibility = Visibility.Visible;
+                isValid = false;
+            }
+            else
+            {
+                DescriptionTextBox.BorderBrush = normalBrush;
+                DescriptionError.Visibility = Visibility.Collapsed;
+            }
+
+            // --- Тип угоди ---
+            if (DealTypeComboBox.SelectedItem == null)
+            {
+                DealTypeComboBox.BorderBrush = redBrush;
+                DealTypeError.Visibility = Visibility.Visible;
+                isValid = false;
+            }
+            else
+            {
+                DealTypeComboBox.BorderBrush = normalBrush;
+                DealTypeError.Visibility = Visibility.Collapsed;
+            }
+
+            // --- Жанр ---
+            if (GenreComboBox.SelectedItem == null)
+            {
+                GenreComboBox.BorderBrush = redBrush;
+                GenreError.Visibility = Visibility.Visible;
+                isValid = false;
+            }
+            else
+            {
+                GenreComboBox.BorderBrush = normalBrush;
+                GenreError.Visibility = Visibility.Collapsed;
+            }
+
+
+
+            return isValid;
+        }
+
+        private void Field_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            var textBox = sender as System.Windows.Controls.TextBox;
+            textBox.BorderBrush = new SolidColorBrush(Color.FromRgb(171, 173, 179));
+
+            if (textBox == TitleTextBox) TitleError.Visibility = Visibility.Collapsed;
+            else if (textBox == AuthorTextBox) AuthorError.Visibility = Visibility.Collapsed;
+            else if (textBox == DescriptionTextBox) DescriptionError.Visibility = Visibility.Collapsed;
+        }
+
+        private void Field_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            var comboBox = sender as System.Windows.Controls.ComboBox;
+            comboBox.BorderBrush = new SolidColorBrush(Color.FromRgb(171, 173, 179));
+
+            if (comboBox == GenreComboBox) GenreError.Visibility = Visibility.Collapsed;
+            else if (comboBox == DealTypeComboBox) DealTypeError.Visibility = Visibility.Collapsed;
         }
     }
 }
