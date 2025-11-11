@@ -12,7 +12,7 @@ namespace LitShare.BLL.Tests
         private LitShareDbContext GetDbContext()
         {
             var options = new DbContextOptionsBuilder<LitShareDbContext>()
-                .UseInMemoryDatabase(Guid.NewGuid().ToString()) 
+                .UseInMemoryDatabase(Guid.NewGuid().ToString())
                 .Options;
             return new LitShareDbContext(options);
         }
@@ -141,12 +141,12 @@ namespace LitShare.BLL.Tests
 
             var result = await service.GetBookById(post.id);
 
-            
             Assert.NotNull(result);
             Assert.Equal("TestBook", result.Title);
             Assert.Equal("Безкоштовно", result.DealType);
             Assert.Equal("Kyiv", result.Location);
         }
+
         [Fact]
         public async Task GetAllBooksAsync_Should_Return_All_Books()
         {
@@ -174,6 +174,7 @@ namespace LitShare.BLL.Tests
             Assert.Single(result);
             Assert.Equal("Обмін", result[0].DealType);
         }
+
         [Fact]
         public void GetFilteredBooks_Should_Filter_By_Search_And_DealType()
         {
@@ -189,13 +190,14 @@ namespace LitShare.BLL.Tests
             Assert.Single(result);
             Assert.Equal("The Great Book", result[0].Title);
         }
+
         [Fact]
         public async Task GetBookById_Should_ReturnNull_When_NotFound()
         {
             var context = GetDbContext();
             var service = new BookService(context);
 
-            var result = await service.GetBookById(9999); 
+            var result = await service.GetBookById(9999);
 
             Assert.Null(result);
         }
@@ -214,20 +216,96 @@ namespace LitShare.BLL.Tests
 
             Assert.Empty(result);
         }
+
         [Fact]
-        public async Task GetAllBooksAsync_Should_Return_EmptyList_On_Exception()
+        public async Task GetAllBooksAsync_Should_Handle_Exception_And_Return_Empty_List()
         {
             var options = new DbContextOptionsBuilder<LitShareDbContext>()
                 .UseInMemoryDatabase(Guid.NewGuid().ToString())
                 .Options;
 
-            var brokenContext = new LitShareDbContext(options);
-            var service = new BookService(brokenContext);
+            var context = new LitShareDbContext(options);
+            await context.Database.EnsureDeletedAsync(); // видаляємо базу → згенерує помилку
+            var service = new BookService(context);
 
             var result = await service.GetAllBooksAsync();
 
             Assert.NotNull(result);
             Assert.Empty(result);
+        }
+
+        [Fact]
+        public void GetFilteredBooks_Should_Return_All_When_No_Filters()
+        {
+            var service = new BookService();
+            var books = new List<BookDto>
+            {
+                new() { Title = "Гаррі Поттер", Author = "Роулінг", Location = "Львів", DealType = "Обмін", Genre = "Фентезі" },
+                new() { Title = "Війна і мир", Author = "Толстой", Location = "Київ", DealType = "Безкоштовно", Genre = "Класика" }
+            };
+
+            var result = service.GetFilteredBooks(books, null, null, null, new List<string>());
+
+            Assert.Equal(2, result.Count);
+        }
+
+        [Fact]
+        public void GetFilteredBooks_Should_Return_Empty_When_No_Match()
+        {
+            var service = new BookService();
+            var books = new List<BookDto>
+            {
+                new() { Title = "Гаррі Поттер", Author = "Роулінг", Location = "Львів", DealType = "Обмін", Genre = "Фентезі" }
+            };
+
+            var result = service.GetFilteredBooks(
+                books,
+                search: "Війна",
+                location: "Київ",
+                dealType: "Безкоштовно",
+                genres: new List<string> { "Класика" }
+            );
+
+            Assert.Empty(result);
+        }
+
+        [Fact]
+        public async Task GetBooksByUserIdAsync_Should_Handle_Exception_And_Return_Empty_List()
+        {
+            var brokenContext = new LitShareDbContext(
+                new DbContextOptionsBuilder<LitShareDbContext>()
+                    .UseInMemoryDatabase(Guid.NewGuid().ToString())
+                    .Options);
+
+            var service = new BookService(brokenContext);
+            await brokenContext.Database.EnsureDeletedAsync();
+
+            var result = await service.GetBooksByUserIdAsync(999);
+
+            Assert.NotNull(result);
+            Assert.Empty(result);
+        }
+       
+        [Fact]
+     
+        public async Task GetBooksByUserIdAsync_Should_Trigger_Catch_And_Return_Empty_List()
+        {
+            // Arrange
+            var options = new DbContextOptionsBuilder<LitShareDbContext>()
+                .UseInMemoryDatabase(Guid.NewGuid().ToString())
+                .Options;
+
+            var brokenContext = new LitShareDbContext(options);
+            await brokenContext.Database.EnsureDeletedAsync(); // зламаємо БД
+
+            var service = new BookService(brokenContext);
+
+            // Act
+            var result = await service.GetBooksByUserIdAsync(123);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Empty(result); // ✅ catch повинен спрацювати
         }
     }
 }

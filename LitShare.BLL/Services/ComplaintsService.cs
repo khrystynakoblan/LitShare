@@ -12,8 +12,7 @@ namespace LitShare.BLL.Services
     {
         private readonly LitShareDbContext _context;
 
-        // ✅ Якщо не передано контекст — створює реальний
-        //    Якщо передано — використовує тестовий in-memory
+       
         public ComplaintsService(LitShareDbContext? context = null)
         {
             _context = context ?? new LitShareDbContext();

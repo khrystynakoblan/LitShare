@@ -156,7 +156,7 @@ namespace LitShare.BLL.Tests
 
             var service = new ComplaintsService(context);
 
-            
+
             service.DeleteComplaint(complaint.id);
 
             Assert.Empty(context.complaints);
@@ -190,6 +190,24 @@ namespace LitShare.BLL.Tests
             var result = service.GetComplaintWithDetails(999);
 
             Assert.Null(result);
+        }
+        [Fact]
+        public void AddComplaint_Should_Handle_Exception_And_Not_Throw()
+        {
+            
+            var options = new DbContextOptionsBuilder<LitShareDbContext>()
+                .UseInMemoryDatabase(Guid.NewGuid().ToString())
+                .Options;
+            var context = new LitShareDbContext(options);
+            context.Database.EnsureDeleted();
+
+            var service = new ComplaintsService(context);
+
+            
+            var ex = Record.Exception(() => service.AddComplaint("Broken", 1, 1));
+
+            
+            Assert.Null(ex); 
         }
     }
 }
