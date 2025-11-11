@@ -9,11 +9,7 @@ namespace LitShare.Presentation
     {
         private readonly int _adId;
         private readonly ComplaintsService _complaintService = new ComplaintsService();
-<<<<<<< HEAD
-        private readonly int _currentUserId; 
-=======
         private readonly int _currentUserId;
->>>>>>> viktoria/wpf
 
         public ReportAdWindow(int adId, int userId)
         {
