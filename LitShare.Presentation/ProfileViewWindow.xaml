@@ -111,7 +111,6 @@
                    FontSize="15"
                    Margin="0,0,0,10"/>
 
-                        <!-- ScrollViewer для прокручування -->
                         <ScrollViewer VerticalScrollBarVisibility="Auto" Height="300">
                             <ItemsControl x:Name="BooksList">
                                 <ItemsControl.ItemsPanel>
@@ -122,30 +121,69 @@
 
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Border BorderBrush="Gray" BorderThickness="1" Padding="5" Margin="5">
-                                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <Border 
+                                            Background="#F3F3F3"
+                                            BorderBrush="Gray"
+                                            BorderThickness="1"
+                                            CornerRadius="5"
+                                            Padding="10"
+                                            Margin="6"
+                                            Cursor="Hand">
+
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="Effect">
+                                                        <Setter.Value>
+                                                            <DropShadowEffect Color="Gray" BlurRadius="5" Opacity="0.3"/>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                    <Style.Triggers>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter Property="Background" Value="#E8E8E8"/>
+                                                        </Trigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+
+                                            <Border.ContextMenu>
+                                                <ContextMenu>
+                                                    <MenuItem Header="Переглянути" Click="ContextMenu_View_Click"/>
+                                                    <MenuItem Header="Поскаржитися" Click="ContextMenu_Report_Click"/>
+                                                </ContextMenu>
+                                            </Border.ContextMenu>
+
+
+                                            <StackPanel HorizontalAlignment="Center">
+                                                <Image Source="{Binding ImagePath}"
+                                                   Height="150"
+                                                   Width="110"
+                                                   Stretch="UniformToFill"
+                                                   Margin="0,5,0,5"
+                                                   SnapsToDevicePixels="True"/>
+
                                                 <TextBlock Text="{Binding Title}"
                                                    FontWeight="Bold"
                                                    TextAlignment="Center"
-                                                   Margin="0,5,0,5"/>
-                                                <Image Source="{Binding ImagePath}"
-                                                   Height="150"
-                                                   Stretch="Uniform"
-                                                   Margin="0,5,0,5"
-                                                   SnapsToDevicePixels="True"/>
+                                                   TextWrapping="Wrap"
+                                                   Margin="0,5,0,3"/>
+
                                                 <TextBlock Text="{Binding Author}"
                                                    FontSize="13"
-                                                   TextAlignment="Center"/>
+                                                   TextAlignment="Center"
+                                                   Foreground="#444"/>
+
                                                 <TextBlock Text="{Binding DealType}"
                                                    Foreground="#2C3E50"
                                                    FontSize="12"
                                                    TextDecorations="Underline"
                                                    Cursor="Hand"
-                                                   TextAlignment="Center"/>
+                                                   TextAlignment="Center"
+                                                   Margin="0,3,0,0"/>
                                             </StackPanel>
                                         </Border>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
+
                             </ItemsControl>
                         </ScrollViewer>
 
