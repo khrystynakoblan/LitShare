@@ -107,7 +107,9 @@ namespace LitShare.Presentation
         }
         private void HomePage_Click(object sender, RoutedEventArgs e)
         {
-            Close();
+            var mainPage = new MainPage(_userId);
+            mainPage.Show();
+            this.Close();
         }
 
         private void ReportAd_Click(object sender, RoutedEventArgs e)

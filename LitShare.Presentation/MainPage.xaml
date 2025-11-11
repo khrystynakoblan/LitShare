@@ -86,9 +86,10 @@
                                 <UniformGrid Columns="4" HorizontalAlignment="Left"/>
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
+
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Background="White" BorderBrush="#E0E0E0" BorderThickness="1" 
+                                <Border Background="White" BorderBrush="#E0E0E0" BorderThickness="1"
                                     Margin="5" Width="220" Height="280" Cursor="Hand"
                                     Tag="{Binding Id}"
                                     PreviewMouseLeftButtonDown="BookCard_Click">
@@ -96,34 +97,43 @@
                                     <Border.Effect>
                                         <DropShadowEffect BlurRadius="5" ShadowDepth="2" Opacity="0.2"/>
                                     </Border.Effect>
+
+                                    <Border.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="Переглянути"
+                                                  Click="ContextMenu_View_Click"
+                                                  DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                            <MenuItem Header="Поскаржитись"
+                                                  Click="ContextMenu_Report_Click"
+                                                  DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                        </ContextMenu>
+                                    </Border.ContextMenu>
+                                    
                                     <StackPanel>
-                                        <!-- Зображення книги -->
                                         <Border Height="180" Background="#E8E8E8">
-                                            <!-- Зображення книги -->
                                             <Border Height="180" Background="#E8E8E8" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                                <Image Source="{Binding ImagePath}" 
-                                                   Stretch="Uniform" 
-                                                   HorizontalAlignment="Center" 
+                                                <Image Source="{Binding ImagePath}"
+                                                   Stretch="Uniform"
+                                                   HorizontalAlignment="Center"
                                                    VerticalAlignment="Center"
                                                    Margin="5"/>
                                             </Border>
-
                                         </Border>
 
-                                        <!-- Інформація про книгу -->
                                         <StackPanel Margin="10">
-                                            <TextBlock Text="{Binding Title}" FontWeight="Bold" 
-                                                       TextWrapping="Wrap" Margin="0,0,0,3"/>
-                                            <TextBlock Text="{Binding Author}" FontSize="11" 
-                                                       Foreground="Gray" Margin="0,0,0,3"/>
-                                            <TextBlock Text="{Binding Location}" FontSize="11" 
-                                                       Foreground="Gray"/>
+                                            <TextBlock Text="{Binding Title}" FontWeight="Bold"
+                                               TextWrapping="Wrap" Margin="0,0,0,3"/>
+                                            <TextBlock Text="{Binding Author}" FontSize="11"
+                                               Foreground="Gray" Margin="0,0,0,3"/>
+                                            <TextBlock Text="{Binding Location}" FontSize="11"
+                                               Foreground="Gray"/>
                                         </StackPanel>
                                     </StackPanel>
                                 </Border>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
+
                 </StackPanel>
             </ScrollViewer>
         </Grid>

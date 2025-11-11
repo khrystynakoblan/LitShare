@@ -168,6 +168,29 @@ namespace LitShare.Presentation
             };
             ResultsCountText.Text = $"Знайдено: {count} {booksWord}";
         }
+
+        private void ContextMenu_View_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuItem menuItem &&
+                menuItem.DataContext is BookDto book)
+            {
+                var viewWindow = new ViewAdWindow(book.Id, _userId);
+                viewWindow.Owner = this;
+                viewWindow.ShowDialog();
+            }
+        }
+
+        private void ContextMenu_Report_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuItem menuItem &&
+                menuItem.DataContext is BookDto book)
+            {
+                var reportWindow = new ReportAdWindow(book.Id, _userId);
+                reportWindow.Owner = this;
+                reportWindow.ShowDialog();
+            }
+        }
+
     }
 
 }
