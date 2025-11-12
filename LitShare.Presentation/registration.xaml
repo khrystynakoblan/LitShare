@@ -100,7 +100,7 @@
                     <TextBox x:Name="txtCity" Padding="6" Margin="0,2,0,1" FontSize="12"/>
                     <TextBlock x:Name="errorCity" Foreground="Red" FontSize="10" Visibility="Collapsed" Margin="0,0,0,2"/>
 
-                    <TextBlock Text="Створюючи профіль, ви погоджуєтеся з Умовами використання"
+                    <TextBlock Text=""
                                TextWrapping="Wrap" FontSize="9" Foreground="Gray" Margin="0,2,0,6"/>
 
                     <Button x:Name="RegisterButton" Content="Створити акаунт" Padding="8" 

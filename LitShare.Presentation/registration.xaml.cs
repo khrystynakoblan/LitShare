@@ -61,7 +61,7 @@ namespace LitShare.Presentation
             }
             else if (!IsValidPhone(phone))
             {
-                ShowError(txtPhone, errorPhone, "Номер телефону має бути у форматі +380XXXXXXXXX або 0XXXXXXXXX.");
+                ShowError(txtPhone, errorPhone, "Має бути у форматі +380XXXXXXXXX або 0XXXXXXXXX.");
                 hasError = true;
             }
             else if (IsPhoneExists(phone))
