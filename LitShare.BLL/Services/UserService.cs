@@ -9,26 +9,25 @@ namespace LitShare.BLL.Services
 {
     public class UserService
     {
-        public List<Users> GetAllUsers()
+        private readonly LitShareDbContext _context;
+
+        public UserService(LitShareDbContext context)
         {
-            using (var context = new LitShareDbContext())
-            {
-                return context.Users.ToList();
-            }
+            _context = context;
         }
 
-        public Users? GetUserById(int id)
+        public UserService()
         {
-            using (var context = new LitShareDbContext())
-            {
-                return context.Users.Find(id);
-            }
+            _context = new LitShareDbContext();
         }
+
+        public List<Users> GetAllUsers() => _context.Users.ToList();
+
+        public Users? GetUserById(int id) => _context.Users.Find(id);
 
         public void AddUser(string name, string email, string phone, string password, string region, string district, string city)
         {
             string hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
-
             var newUser = new Users
             {
                 name = name,
@@ -40,82 +39,60 @@ namespace LitShare.BLL.Services
                 city = city
             };
 
-            using (var context = new LitShareDbContext())
-            {
-                context.Users.Add(newUser);
-                context.SaveChanges();
-            }
+            _context.Users.Add(newUser);
+            _context.SaveChanges();
         }
 
-        // Перевірити користувача (логін)
         public async Task<bool> ValidateUser(string email, string password)
         {
-            using (var context = new LitShareDbContext())
-            {
-                var user = await context.Users.FirstOrDefaultAsync(u => u.email == email);
-
-                if (user == null)
-                    return false;
-
-                return await Task.Run(() => BCrypt.Net.BCrypt.Verify(password, user.password));
-            }
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.email == email);
+            return user != null && BCrypt.Net.BCrypt.Verify(password, user.password);
         }
+
         public Users? GetUserProfileById(int id)
         {
-            using (var context = new LitShareDbContext())
-            {
-                return context.Users
-                    .Include(u => u.posts)
-                    .FirstOrDefault(u => u.id == id);
-            }
+            return _context.Users
+                .Include(u => u.posts)
+                .FirstOrDefault(u => u.id == id);
         }
-         public void UpdateUserPhoto(int userId, string newPhotoUrl)
+
+        public void UpdateUserPhoto(int userId, string newPhotoUrl)
         {
-            using (var context = new LitShareDbContext())
+            var user = _context.Users.Find(userId);
+            if (user != null)
             {
-                var user = context.Users.Find(userId);
-                if (user != null)
-                {
-                    user.photo_url = newPhotoUrl;
-                    context.SaveChanges();
-                }
+                user.photo_url = newPhotoUrl;
+                _context.SaveChanges();
             }
         }
+
         public void UpdateUser(Users updatedUser)
         {
-            using (var context = new LitShareDbContext())
+            var existingUser = _context.Users.FirstOrDefault(u => u.id == updatedUser.id);
+            if (existingUser != null)
             {
-                var existingUser = context.Users.FirstOrDefault(u => u.id == updatedUser.id);
-
-                if (existingUser != null)
-                {
-                    existingUser.region = updatedUser.region;
-                    existingUser.district = updatedUser.district;
-                    existingUser.city = updatedUser.city;
-                    existingUser.phone = updatedUser.phone;
-                    existingUser.about = updatedUser.about;
-                    existingUser.photo_url = updatedUser.photo_url;
-
-                    context.SaveChanges();
-                }
+                existingUser.region = updatedUser.region;
+                existingUser.district = updatedUser.district;
+                existingUser.city = updatedUser.city;
+                existingUser.phone = updatedUser.phone;
+                existingUser.about = updatedUser.about;
+                existingUser.photo_url = updatedUser.photo_url;
+                _context.SaveChanges();
             }
         }
+
         public void DeleteUser(int id)
         {
-            using (var context = new LitShareDbContext())
-            {
-                var user = context.Users.FirstOrDefault(u => u.id == id);
-                if (user == null)
-                    throw new Exception("Користувача не знайдено.");
+            var user = _context.Users.FirstOrDefault(u => u.id == id);
+            if (user == null)
+                throw new Exception("Користувача не знайдено.");
 
-                var posts = context.posts.Where(p => p.user_id == id).ToList();
-                if (posts.Any())
-                    context.posts.RemoveRange(posts);
+            var posts = _context.posts.Where(p => p.user_id == id).ToList();
+            if (posts.Any())
+                _context.posts.RemoveRange(posts);
 
-                context.Users.Remove(user);
-                context.SaveChanges();
-            }
+            _context.Users.Remove(user);
+            _context.SaveChanges();
         }
     }
-
 }

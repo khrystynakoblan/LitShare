@@ -7,13 +7,18 @@ namespace LitShare.BLL.Services
 {
     public class BookService
     {
+        private readonly LitShareDbContext _context;
+
+                public BookService(LitShareDbContext? context = null)
+        {
+            _context = context ?? new LitShareDbContext();
+        }
+
         public async Task<List<BookDto>> GetAllBooksAsync()
         {
             try
             {
-                using var db = new LitShareDbContext();
-
-                var books = await db.posts
+                var books = await _context.posts
                     .Include(p => p.BookGenres)
                         .ThenInclude(bg => bg.Genre)
                     .Include(p => p.User)
@@ -43,8 +48,7 @@ namespace LitShare.BLL.Services
         {
             try
             {
-                using var db = new LitShareDbContext();
-                return await db.genres
+                return await _context.genres
                     .AsNoTracking()
                     .OrderBy(g => g.name)
                     .Select(g => g.name)
@@ -83,9 +87,7 @@ namespace LitShare.BLL.Services
         {
             try
             {
-                using var db = new LitShareDbContext();
-
-                var books = await db.posts
+                var books = await _context.posts
                     .Where(p => p.user_id == userId)
                     .Include(p => p.BookGenres)
                         .ThenInclude(bg => bg.Genre)
@@ -111,11 +113,10 @@ namespace LitShare.BLL.Services
                 return new List<BookDto>();
             }
         }
+
         public async Task<BookDto?> GetBookById(int id)
         {
-            using var db = new LitShareDbContext();
-
-            return await db.posts
+            return await _context.posts
                 .Include(p => p.BookGenres)
                     .ThenInclude(bg => bg.Genre)
                 .Include(p => p.User)
@@ -134,7 +135,5 @@ namespace LitShare.BLL.Services
                 })
                 .FirstOrDefaultAsync();
         }
-
-
     }
 }

@@ -36,21 +36,23 @@ namespace LitShare.Presentation
             {
                 ResultsCountText.Text = "Завантаження даних...";
 
-                var booksTask = _bookService.GetAllBooksAsync();
-                var genresTask = _bookService.GetGenresAsync();
+                var books = await _bookService.GetAllBooksAsync();
+                var genres = await _bookService.GetGenresAsync();
 
-                await Task.WhenAll(booksTask, genresTask);
-
-                AllBooks = new ObservableCollection<BookDto>(booksTask.Result);
-                FilteredBooks = new ObservableCollection<BookDto>(booksTask.Result);
+                AllBooks = new ObservableCollection<BookDto>(books);
+                FilteredBooks = new ObservableCollection<BookDto>(books);
                 BooksItemsControl.ItemsSource = FilteredBooks;
 
-                var genres = genresTask.Result;
                 GenresPanel.Children.Clear();
                 genreCheckBoxes.Clear();
+
                 foreach (var genre in genres)
                 {
-                    var checkBox = new CheckBox { Content = genre, Margin = new Thickness(0, 3, 0, 3) };
+                    var checkBox = new CheckBox
+                    {
+                        Content = genre,
+                        Margin = new Thickness(0, 3, 0, 3)
+                    };
                     checkBox.Checked += FilterChanged;
                     checkBox.Unchecked += FilterChanged;
                     GenresPanel.Children.Add(checkBox);

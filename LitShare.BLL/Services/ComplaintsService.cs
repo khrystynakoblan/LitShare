@@ -4,51 +4,50 @@ using System.Linq;
 using LitShare.DAL;
 using LitShare.BLL.DTOs;
 using LitShare.DAL.Models;
-using Microsoft.EntityFrameworkCore; 
+using Microsoft.EntityFrameworkCore;
 
 namespace LitShare.BLL.Services
 {
     public class ComplaintsService
     {
-        public List<ComplaintDto> GetAllComplaints()
-        {
-            using (var context = new LitShareDbContext())
-            {
-                var query = from c in context.complaints
-                            join p in context.posts on c.post_id equals p.id
-                            join u in context.Users on c.complainant_id equals u.id
-                            select new ComplaintDto
-                            {
-                                Text = c.text,
-                                BookTitle = p.title,
-                                UserName = u.name,
-                                Date = c.date
-                            };
+        private readonly LitShareDbContext _context;
 
-                return query.ToList();
-            }
+       
+        public ComplaintsService(LitShareDbContext? context = null)
+        {
+            _context = context ?? new LitShareDbContext();
         }
 
-        public Complaints GetComplaintWithDetails(int complaintId)
+        public List<ComplaintDto> GetAllComplaints()
         {
-            using (var context = new LitShareDbContext())
-            {
-                return context.complaints
-                    .Include(c => c.Post)
-                    .FirstOrDefault(c => c.id == complaintId);
-            }
+            var query = from c in _context.complaints
+                        join p in _context.posts on c.post_id equals p.id
+                        join u in _context.Users on c.complainant_id equals u.id
+                        select new ComplaintDto
+                        {
+                            Text = c.text,
+                            BookTitle = p.title,
+                            UserName = u.name,
+                            Date = c.date
+                        };
+
+            return query.ToList();
+        }
+
+        public Complaints? GetComplaintWithDetails(int complaintId)
+        {
+            return _context.complaints
+                .Include(c => c.Post)
+                .FirstOrDefault(c => c.id == complaintId);
         }
 
         public void DeleteComplaint(int complaintId)
         {
-            using (var context = new LitShareDbContext())
+            var complaint = _context.complaints.Find(complaintId);
+            if (complaint != null)
             {
-                var complaint = context.complaints.Find(complaintId);
-                if (complaint != null)
-                {
-                    context.complaints.Remove(complaint);
-                    context.SaveChanges();
-                }
+                _context.complaints.Remove(complaint);
+                _context.SaveChanges();
             }
         }
 
@@ -60,14 +59,10 @@ namespace LitShare.BLL.Services
                 post_id = postId,
                 complainant_id = complainantId,
                 date = DateTime.UtcNow
-
             };
 
-            using (var context = new LitShareDbContext())
-            {
-                context.complaints.Add(newComplaint);
-                context.SaveChanges();
-            }
+            _context.complaints.Add(newComplaint);
+            _context.SaveChanges();
         }
     }
 }
