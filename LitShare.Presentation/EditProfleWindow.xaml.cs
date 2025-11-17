@@ -1,11 +1,9 @@
-using System;
+using LitShare.BLL.Services;
+using LitShare.DAL.Models;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using LitShare.BLL.Services;
-using LitShare.DAL.Models;
 
 namespace LitShare.Presentation
 {

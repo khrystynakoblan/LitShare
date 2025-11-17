@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using LitShare.BLL.DTOs;
+using LitShare.BLL.Services;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using LitShare.BLL.DTOs;
-using LitShare.BLL.Services;
 
 namespace LitShare.Presentation
 {

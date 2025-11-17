@@ -1,8 +1,6 @@
-﻿using LitShare.BLL.Services; 
-using System.Threading.Tasks;  
+﻿using LitShare.BLL.Services;
 using System.Windows;
 using System.Windows.Media;
-using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
 
 namespace LitShare.Presentation
@@ -94,7 +92,7 @@ namespace LitShare.Presentation
         private void EditProfileButton_Click(object sender, RoutedEventArgs e)
         {
             var editProfileWindow = new EditProfileWindow(_userId);
-            bool? result = editProfileWindow.ShowDialog(); 
+            bool? result = editProfileWindow.ShowDialog();
 
             if (result == true)
             {

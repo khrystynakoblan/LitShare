@@ -1,6 +1,5 @@
-﻿using System;
+﻿using LitShare.BLL.Services;
 using System.Windows;
-using LitShare.BLL.Services; 
 
 namespace LitShare.Presentation
 {

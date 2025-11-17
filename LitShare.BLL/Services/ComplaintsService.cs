@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using LitShare.DAL;
+﻿
 using LitShare.BLL.DTOs;
+using LitShare.DAL;
+
 using LitShare.DAL.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,19 +9,19 @@ namespace LitShare.BLL.Services
 {
     public class ComplaintsService
     {
-        private readonly LitShareDbContext _context;
+        private readonly LitShareDbContext context;
 
-       
+
         public ComplaintsService(LitShareDbContext? context = null)
         {
-            _context = context ?? new LitShareDbContext();
+            this.context = context ?? new LitShareDbContext();
         }
 
         public List<ComplaintDto> GetAllComplaints()
         {
-            var query = from c in _context.complaints
-                        join p in _context.posts on c.post_id equals p.id
-                        join u in _context.Users on c.complainant_id equals u.id
+            var query = from c in context.complaints
+                        join p in context.posts on c.post_id equals p.id
+                        join u in context.Users on c.complainant_id equals u.id
                         select new ComplaintDto
                         {
                             Text = c.text,
@@ -36,18 +35,18 @@ namespace LitShare.BLL.Services
 
         public Complaints? GetComplaintWithDetails(int complaintId)
         {
-            return _context.complaints
+            return context.complaints
                 .Include(c => c.Post)
                 .FirstOrDefault(c => c.id == complaintId);
         }
 
         public void DeleteComplaint(int complaintId)
         {
-            var complaint = _context.complaints.Find(complaintId);
+            var complaint = context.complaints.Find(complaintId);
             if (complaint != null)
             {
-                _context.complaints.Remove(complaint);
-                _context.SaveChanges();
+                context.complaints.Remove(complaint);
+                context.SaveChanges();
             }
         }
 
@@ -61,8 +60,8 @@ namespace LitShare.BLL.Services
                 date = DateTime.UtcNow
             };
 
-            _context.complaints.Add(newComplaint);
-            _context.SaveChanges();
+            context.complaints.Add(newComplaint);
+            context.SaveChanges();
         }
     }
 }

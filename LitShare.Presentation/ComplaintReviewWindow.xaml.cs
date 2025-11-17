@@ -1,6 +1,4 @@
 ﻿using LitShare.BLL.Services;
-using LitShare.DAL.Models; 
-using System.Threading.Tasks;  
 using System.Windows;
 
 namespace LitShare.Presentation
@@ -8,7 +6,7 @@ namespace LitShare.Presentation
     public partial class ComplaintReviewWindow : Window
     {
         private readonly ComplaintsService _complaintsService = new ComplaintsService();
-        private readonly UserService _userService = new UserService(); 
+        private readonly UserService _userService = new UserService();
 
         private int _currentComplaintId;
 
@@ -16,9 +14,9 @@ namespace LitShare.Presentation
         {
             InitializeComponent();
 
-            int testComplaintId = 1; 
+            int testComplaintId = 1;
 
-            _currentComplaintId = testComplaintId; 
+            _currentComplaintId = testComplaintId;
 
             _ = LoadComplaintDataAsync(_currentComplaintId);
         }
@@ -55,7 +53,7 @@ namespace LitShare.Presentation
 
         private void ExitButton_Click(object sender, RoutedEventArgs e)
         {
-            this.Close(); 
+            this.Close();
         }
 
         private void ApproveButton_Click(object sender, RoutedEventArgs e)

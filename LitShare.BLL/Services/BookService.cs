@@ -1,24 +1,26 @@
-﻿using LitShare.DAL;
+﻿
 using LitShare.BLL.DTOs;
-using Microsoft.EntityFrameworkCore;
+using LitShare.DAL;
 using LitShare.DAL.Models;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace LitShare.BLL.Services
 {
     public class BookService
     {
-        private readonly LitShareDbContext _context;
+        private readonly LitShareDbContext context;
 
-                public BookService(LitShareDbContext? context = null)
+        public BookService(LitShareDbContext? context = null)
         {
-            _context = context ?? new LitShareDbContext();
+            this.context = context ?? new LitShareDbContext();
         }
 
         public async Task<List<BookDto>> GetAllBooksAsync()
         {
             try
             {
-                var books = await _context.posts
+                var books = await context.posts
                     .Include(p => p.BookGenres)
                         .ThenInclude(bg => bg.Genre)
                     .Include(p => p.User)
@@ -48,7 +50,7 @@ namespace LitShare.BLL.Services
         {
             try
             {
-                return await _context.genres
+                return await context.genres
                     .AsNoTracking()
                     .OrderBy(g => g.name)
                     .Select(g => g.name)
@@ -87,7 +89,7 @@ namespace LitShare.BLL.Services
         {
             try
             {
-                var books = await _context.posts
+                var books = await context.posts
                     .Where(p => p.user_id == userId)
                     .Include(p => p.BookGenres)
                         .ThenInclude(bg => bg.Genre)
@@ -116,7 +118,7 @@ namespace LitShare.BLL.Services
 
         public async Task<BookDto?> GetBookById(int id)
         {
-            return await _context.posts
+            return await context.posts
                 .Include(p => p.BookGenres)
                     .ThenInclude(bg => bg.Genre)
                 .Include(p => p.User)

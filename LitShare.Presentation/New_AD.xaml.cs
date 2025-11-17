@@ -2,7 +2,6 @@
 using LitShare.DAL.Models;
 using LitShare.Presentation;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -100,7 +99,7 @@ namespace LitShare
             profileWindow.ShowDialog();
         }
 
-        private string selectedPhotoPath; 
+        private string selectedPhotoPath;
 
         private void HomeButton_Click(object sender, RoutedEventArgs e)
         {
@@ -120,16 +119,16 @@ namespace LitShare
 
             bool? result = openFileDialog.ShowDialog();
 
-                        if (result == true)
-                        {
-                            selectedPhotoPath = openFileDialog.FileName;
+            if (result == true)
+            {
+                selectedPhotoPath = openFileDialog.FileName;
 
-                            if (BookImage != null)
-                            {
-                                BookImage.Source = new BitmapImage(new Uri(selectedPhotoPath));
-                            }
-                        }
-         }
+                if (BookImage != null)
+                {
+                    BookImage.Source = new BitmapImage(new Uri(selectedPhotoPath));
+                }
+            }
+        }
         private bool ValidateFields()
         {
             bool isValid = true;
@@ -197,7 +196,7 @@ namespace LitShare
                 GenreError.Visibility = Visibility.Collapsed;
             }
 
-          
+
 
             return isValid;
         }

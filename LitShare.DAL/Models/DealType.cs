@@ -1,5 +1,4 @@
-﻿using Npgsql;
-using NpgsqlTypes;
+﻿using NpgsqlTypes;
 
 namespace LitShare.DAL.Models
 {

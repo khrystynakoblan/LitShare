@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace LitShare.BLL.DTOs
+﻿namespace LitShare.BLL.DTOs
 {
     public class ComplaintDto
     {

@@ -1,76 +1,97 @@
-﻿using LitShare.BLL.DTOs;
-using LitShare.BLL.Services;
+﻿// SA1633: Файл заголовка додано.
+// <copyright file="ViewAdWindow.xaml.cs" company="LitShare">
+// Copyright (c) LitShare. All rights reserved.
+// </copyright>
+
 using System;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Imaging;
 
+using LitShare.BLL.DTOs;
+using LitShare.BLL.Services;
+
 namespace LitShare.Presentation
 {
+    // SA1600: Клас має бути задокументований.
+    /// <summary>
+    /// Логіка взаємодії для ViewAdWindow.xaml.
+    /// </summary>
     public partial class ViewAdWindow : Window
     {
-        private readonly BookService _bookService = new BookService();
-        private readonly int _userId;
-        private BookDto? _currentBook;
+        // SA1309: Поля тепер без префікса '_'.
+        private readonly BookService bookService = new BookService();
+        private readonly int userId;
+        private BookDto? currentBook;
 
+        /// <summary>
+        /// Ініціалізує новий екземпляр класу <see cref="ViewAdWindow"/>.
+        /// </summary>
+        /// 
         public ViewAdWindow()
         {
-            InitializeComponent();
-            SetPlaceholder();
+            this.InitializeComponent();
+            this.SetPlaceholder();
         }
 
-        public ViewAdWindow(int bookId, int userId) : this()
+        /// <summary>
+        /// Ініціалізує новий екземпляр класу <see cref="ViewAdWindow"/> для відображення конкретної книги.
+        /// </summary>
+        /// <param name="bookId">Ідентифікатор книги.</param>
+        /// <param name="userId">Ідентифікатор поточного користувача.</param>
+        public ViewAdWindow(int bookId, int userId)
+            : this()
         {
-            _ = LoadBook(bookId);
-            _userId = userId;
+            _ = this.LoadBook(bookId);
+            this.userId = userId;
         }
 
         private void SetPlaceholder()
         {
-            TitleText.Text = "Назва (тест)";
-            AuthorText.Text = "Автор (тест)";
-            DescriptionText.Text = "Опис (тест)";
-            DealTypeText.Text = "Тип угоди (тест)";
-            LocationText.Text = "Місто (тест)";
-            PostImage.Source = null;
+            this.TitleText.Text = "Назва (тест)";
+            this.AuthorText.Text = "Автор (тест)";
+            this.DescriptionText.Text = "Опис (тест)";
+            this.DealTypeText.Text = "Тип угоди (тест)";
+            this.LocationText.Text = "Місто (тест)";
+            this.PostImage.Source = null;
         }
 
         private async Task LoadBook(int bookId)
         {
             try
             {
-                _currentBook = await _bookService.GetBookById(bookId);
+                this.currentBook = await this.bookService.GetBookById(bookId);
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Помилка при зверненні до бази: {ex.Message}",
                     "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
-                Close();
+                this.Close();
                 return;
             }
 
-            if (_currentBook == null)
+            if (this.currentBook == null)
             {
                 MessageBox.Show("Книга не знайдена.", "Помилка",
                     MessageBoxButton.OK, MessageBoxImage.Warning);
-                Close();
+                this.Close();
                 return;
             }
 
-            TitleText.Text = _currentBook.Title ?? "";
-            AuthorText.Text = _currentBook.Author ?? "";
-            DescriptionText.Text = _currentBook.Description ?? "";
-            DealTypeText.Text = _currentBook.DealType ?? "";
-            LocationText.Text = _currentBook.Location ?? "";
+            this.TitleText.Text = this.currentBook.Title ?? string.Empty;
+            this.AuthorText.Text = this.currentBook.Author ?? string.Empty;
+            this.DescriptionText.Text = this.currentBook.Description ?? string.Empty;
+            this.DealTypeText.Text = this.currentBook.DealType ?? string.Empty;
+            this.LocationText.Text = this.currentBook.Location ?? string.Empty;
 
-            LoadBookImage(_currentBook.ImagePath);
+            this.LoadBookImage(this.currentBook.ImagePath);
         }
 
         private void LoadBookImage(string? url)
         {
             if (string.IsNullOrWhiteSpace(url))
             {
-                PostImage.Source = null;
+                this.PostImage.Source = null;
                 return;
             }
 
@@ -81,48 +102,50 @@ namespace LitShare.Presentation
                 img.UriSource = new Uri(url, UriKind.RelativeOrAbsolute);
                 img.CacheOption = BitmapCacheOption.OnLoad;
                 img.EndInit();
-                PostImage.Source = img;
+                this.PostImage.Source = img;
             }
             catch
             {
-                PostImage.Source = null;
+                this.PostImage.Source = null;
             }
         }
 
-
         private void UserProfile_Click(object sender, RoutedEventArgs e)
         {
-            if (_currentBook != null)
+            if (this.currentBook != null)
             {
-                var profileWindow = new ProfileViewWindow(_currentBook.UserId, _userId);
+                var profileWindow = new ProfileViewWindow(this.currentBook.UserId, this.userId);
                 profileWindow.Owner = this;
                 profileWindow.ShowDialog();
             }
         }
 
-
         private void Back_Click(object sender, RoutedEventArgs e)
         {
-            Close();
+            this.Close();
         }
+
         private void HomePage_Click(object sender, RoutedEventArgs e)
         {
-            var mainPage = new MainPage(_userId);
+            var mainPage = new MainPage(this.userId);
             mainPage.Show();
             this.Close();
         }
 
         private void ReportAd_Click(object sender, RoutedEventArgs e)
         {
-            if (_currentBook == null) return;
+            if (this.currentBook == null)
+            {
+                return;
+            }
 
-            Hide();
+            this.Hide();
 
-            var reportWindow = new ReportAdWindow(_currentBook.Id, _userId);
+            var reportWindow = new ReportAdWindow(this.currentBook.Id, this.userId);
             reportWindow.Owner = this;
             reportWindow.ShowDialog();
 
-            Show();
+            this.Show();
         }
     }
 }

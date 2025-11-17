@@ -9,7 +9,7 @@ namespace LitShare.DAL.Models
         [Key]
         public int id { get; set; }
 
-        [Column("user_id")] 
+        [Column("user_id")]
         public int user_id { get; set; }
 
         public string title { get; set; }
