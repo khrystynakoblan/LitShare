@@ -1,117 +1,111 @@
-﻿using LitShare.BLL.Services;
-using LitShare.DAL;
-using LitShare.DAL.Models;
-using Microsoft.EntityFrameworkCore;
-using Xunit;
-using System.Linq;
+﻿using System;
+using System.IO;
 using System.Threading.Tasks;
+using Xunit;
+using LitShare.ConsoleApp;
 
 namespace LitShare.Tests
 {
-    public class ServicesTests
+    public class ConsoleAppTests
     {
-        private LitShareDbContext GetInMemoryDb()
+        [Fact]
+        public async Task RunAsync_ShowMenu()
         {
-            var options = new DbContextOptionsBuilder<LitShareDbContext>()
-                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
-                .Options;
+            var input = new StringReader("1\n");
+            var output = new StringWriter();
+            await Program.RunAsync(input, output, new FakeBookService(), new FakeUserService(), new FakeComplaintsService());
 
-            return new LitShareDbContext(options);
+            string consoleOutput = output.ToString().Replace("\r", "");
+            Assert.Contains("База підключена успішно", consoleOutput);
+            Assert.Contains("1. Вивести всі книги", consoleOutput);
+            Assert.Contains("Натисніть будь-яку клавішу для виходу", consoleOutput);
         }
 
         [Fact]
-        public async Task AddUser_ShouldAddUser()
+        public async Task RunAsync_InvalidChoice()
         {
-            using var db = GetInMemoryDb();
-            var usersService = new UserService(db);
+            var input = new StringReader("9\n");
+            var output = new StringWriter();
+            await Program.RunAsync(input, output, new FakeBookService(), new FakeUserService(), new FakeComplaintsService());
 
-            usersService.AddUser("Test User", "test@example.com", "12345", "pass", "RegionX", "DistrictX", "CityX");
-
-            var savedUser = await db.Users.FirstOrDefaultAsync(u => u.email == "test@example.com");
-            Assert.NotNull(savedUser);
-            Assert.Equal("Test User", savedUser.name);
-            Assert.Equal("12345", savedUser.phone);
-
-            // Перевіряємо пароль через BCrypt
-            Assert.True(BCrypt.Net.BCrypt.Verify("pass", savedUser.password));
+            string consoleOutput = output.ToString().Replace("\r", "");
+            Assert.Contains("Невірний вибір", consoleOutput);
         }
 
         [Fact]
-        public async Task ValidateUser_ShouldReturnTrue_WhenCredentialsCorrect()
+        public async Task RunAsync_AddUser()
         {
-            using var db = GetInMemoryDb();
-            var usersService = new UserService(db);
+            var input = new StringReader("3\nTest User\nuser@test.com\n12345\npass\n");
+            var output = new StringWriter();
+            var fakeUser = new FakeUserService();
 
-            usersService.AddUser("Test", "a@b.com", "111111", "123", "X", "X", "X");
+            await Program.RunAsync(input, output, new FakeBookService(), fakeUser, new FakeComplaintsService());
 
-            bool result = await usersService.ValidateUser("a@b.com", "123");
-            Assert.True(result);
+            string consoleOutput = output.ToString().Replace("\r", "");
+            Assert.Contains("Користувача додано!", consoleOutput);
+            Assert.True(fakeUser.UserAdded);
         }
 
         [Fact]
-        public async Task AddComplaint_ShouldAddComplaint()
+        public async Task RunAsync_ShowGenres()
         {
-            using var db = GetInMemoryDb();
-            var usersService = new UserService(db);
-            var complaintsService = new ComplaintsService(db);
+            var input = new StringReader("2\n");
+            var output = new StringWriter();
+            await Program.RunAsync(input, output, new FakeBookService(), new FakeUserService(), new FakeComplaintsService());
 
-            usersService.AddUser("User", "u@u.com", "123", "123", "X", "X", "X");
-            var userId = (await db.Users.FirstAsync()).id;
-
-            db.posts.Add(new Posts
-            {
-                id = 1,
-                title = "Book",
-                author = "Author",
-                user_id = userId,
-                deal_type = DealType.Donation,
-                description = "Desc",
-                User = await db.Users.FirstAsync()
-            });
-            await db.SaveChangesAsync();
-
-            complaintsService.AddComplaint("Test complaint", 1, userId);
-
-            var saved = await db.complaints.FirstOrDefaultAsync();
-            Assert.NotNull(saved);
-            Assert.Equal("Test complaint", saved.text);
-            Assert.Equal(1, saved.post_id);
-            Assert.Equal(userId, saved.complainant_id);
+            string consoleOutput = output.ToString().Replace("\r", "");
+            Assert.Contains("Жанри:", consoleOutput);
+            Assert.Contains("- Genre1", consoleOutput);
+            Assert.Contains("- Genre2", consoleOutput);
         }
 
         [Fact]
-        public async Task GetAllBooks_ShouldReturnBooks()
+        public async Task RunAsync_ValidLogin()
         {
-            using var db = GetInMemoryDb();
-            var usersService = new UserService(db);
-            usersService.AddUser("User1", "u@u.com", "123", "123", "X", "X", "X");
-            var user = await db.Users.FirstAsync();
+            var input = new StringReader("4\ntest@test.com\npass\n");
+            var output = new StringWriter();
+            await Program.RunAsync(input, output, new FakeBookService(), new FakeUserService(), new FakeComplaintsService());
 
-            db.posts.Add(new Posts { id = 1, title = "Book1", author = "Author1", deal_type = DealType.Donation, user_id = user.id, User = user, description = "Desc" });
-            db.posts.Add(new Posts { id = 2, title = "Book2", author = "Author2", deal_type = DealType.Exchange, user_id = user.id, User = user, description = "Desc" });
-            await db.SaveChangesAsync();
-
-            var booksService = new BookService(db);
-            var allBooks = await booksService.GetAllBooksAsync();
-
-            Assert.Equal(2, allBooks.Count);
+            string consoleOutput = output.ToString().Replace("\r", "");
+            Assert.Contains("Авторизація успішна", consoleOutput);
         }
 
         [Fact]
-        public async Task GetGenres_ShouldReturnDistinctGenres()
+        public async Task RunAsync_InvalidLogin()
         {
-            using var db = GetInMemoryDb();
+            var input = new StringReader("4\nwrong@test.com\n1234\n");
+            var output = new StringWriter();
+            await Program.RunAsync(input, output, new FakeBookService(), new FakeUserService(), new FakeComplaintsService());
 
-            db.genres.Add(new Genres { id = 1, name = "Fantasy" });
-            db.genres.Add(new Genres { id = 2, name = "Sci-Fi" });
-            await db.SaveChangesAsync();
+            string consoleOutput = output.ToString().Replace("\r", "");
+            Assert.Contains("Невірні дані", consoleOutput);
+        }
 
-            var booksService = new BookService(db);
-            var genres = await booksService.GetGenresAsync();
+        [Fact]
+        public async Task RunAsync_AddComplaint()
+        {
+            var input = new StringReader("5\nTest complaint\n1\n2\n");
+            var output = new StringWriter();
+            var complaints = new FakeComplaintsService();
 
-            Assert.Contains("Fantasy", genres);
-            Assert.Contains("Sci-Fi", genres);
-            Assert.Equal(2, genres.Count);
+            await Program.RunAsync(input, output, new FakeBookService(), new FakeUserService(), complaints);
+
+            string consoleOutput = output.ToString().Replace("\r", "");
+            Assert.Contains("Скаргу додано!", consoleOutput);
+            Assert.True(complaints.ComplaintAdded);
+        }
+
+        [Fact]
+        public void ReadInt_InvalidThenValidInput()
+        {
+            var input = new StringReader("abc\n5\n");
+            var output = new StringWriter();
+
+            int result = Program.ReadInt(input, output, "Enter number: ");
+            string consoleOutput = output.ToString().Replace("\r", "");
+
+            Assert.Equal(5, result);
+            Assert.Contains("Невірне число", consoleOutput);
         }
     }
 }

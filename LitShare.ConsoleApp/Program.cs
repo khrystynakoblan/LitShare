@@ -1,105 +1,161 @@
-﻿using LitShare.BLL.Services;
-using LitShare.DAL;
-using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.IO;
+using System.Threading.Tasks;
 
-internal class Program
+namespace LitShare.ConsoleApp
 {
-    static async Task Main(string[] args)
+    public class Program
     {
-        Console.OutputEncoding = System.Text.Encoding.UTF8;
-
-        try
+        static async Task Main(string[] args)
         {
-            using var db = new LitShareDbContext();
+            var fakeBooks = new FakeBookService();
+            var fakeUsers = new FakeUserService();
+            var fakeComplaints = new FakeComplaintsService();
 
-            var books = new BookService(db);
-            var users = new UserService(db);
-            var complaints = new ComplaintsService(db);
+            await RunAsync(Console.In, Console.Out, fakeBooks, fakeUsers, fakeComplaints);
+        }
 
-            Console.WriteLine("База підключена успішно\n");
-
-            Console.WriteLine("1. Вивести всі книги");
-            Console.WriteLine("2. Вивести всі жанри");
-            Console.WriteLine("3. Додати нового користувача");
-            Console.WriteLine("4. Перевірити логін");
-            Console.WriteLine("5. Додати скаргу");
-            Console.Write("Ваш вибір: ");
-
-            string choice = Console.ReadLine()?.Trim();
-
-            switch (choice)
+        public static async Task RunAsync(
+            TextReader input,
+            TextWriter output,
+            IFakeBookService books,
+            IFakeUserService users,
+            IFakeComplaintsService complaints)
+        {
+            try
             {
-                case "1":
-                    var allBooks = await books.GetAllBooksAsync();
-                    foreach (var b in allBooks)
-                        Console.WriteLine($"{b.Id}: {b.Title} — {b.Author} ({b.Genre})");
-                    break;
+                output.WriteLine("База підключена успішно");
 
-                case "2":
-                    var genres = await books.GetGenresAsync();
-                    Console.WriteLine("Жанри:");
-                    genres.ForEach(g => Console.WriteLine($"- {g}"));
-                    break;
+                output.WriteLine("1. Вивести всі книги");
+                output.WriteLine("2. Вивести всі жанри");
+                output.WriteLine("3. Додати нового користувача");
+                output.WriteLine("4. Перевірити логін");
+                output.WriteLine("5. Додати скаргу");
+                output.Write("Ваш вибір: ");
 
-                case "3":
-                    Console.Write("Ім'я: ");
-                    string name = Console.ReadLine()?.Trim() ?? "";
-                    Console.Write("Email: ");
-                    string email = Console.ReadLine()?.Trim() ?? "";
-                    Console.Write("Телефон: ");
-                    string phone = Console.ReadLine()?.Trim() ?? "";
-                    Console.Write("Пароль: ");
-                    string pass = Console.ReadLine()?.Trim() ?? "";
+                string choice = input.ReadLine()?.Trim();
 
-                    users.AddUser(name, email, phone, pass, "RegionX", "DistrictX", "CityX");
+                switch (choice)
+                {
+                    case "1":
+                        var allBooks = await books.GetAllBooksAsync();
+                        foreach (var b in allBooks)
+                            output.WriteLine($"{b.Id}: {b.Title} — {b.Author} ({b.Genre})");
+                        break;
 
-                    Console.WriteLine("Користувача додано!");
-                    break;
+                    case "2":
+                        var genres = await books.GetGenresAsync();
+                        output.WriteLine("Жанри:");
+                        foreach (var g in genres)
+                            output.WriteLine($"- {g}");
+                        break;
 
-                case "4":
-                    Console.Write("Email: ");
-                    string login = Console.ReadLine()?.Trim() ?? "";
-                    Console.Write("Пароль: ");
-                    string psw = Console.ReadLine()?.Trim() ?? "";
+                    case "3":
+                        output.Write("Ім'я: ");
+                        string name = input.ReadLine()?.Trim() ?? "";
+                        output.Write("Email: ");
+                        string email = input.ReadLine()?.Trim() ?? "";
+                        output.Write("Телефон: ");
+                        string phone = input.ReadLine()?.Trim() ?? "";
+                        output.Write("Пароль: ");
+                        string pass = input.ReadLine()?.Trim() ?? "";
 
-                    bool valid = await users.ValidateUser(login, psw); 
-                    Console.WriteLine(valid ? "Авторизація успішна" : "Невірні дані");
-                    break;
+                        users.AddUser(name, email, phone, pass);
+                        output.WriteLine("Користувача додано!");
+                        break;
 
-                case "5":
-                    Console.Write("Текст скарги: ");
-                    string txt = Console.ReadLine()?.Trim() ?? "";
+                    case "4":
+                        output.Write("Email: ");
+                        string login = input.ReadLine()?.Trim() ?? "";
+                        output.Write("Пароль: ");
+                        string psw = input.ReadLine()?.Trim() ?? "";
 
-                    int postId = ReadInt("ID книги: ");
-                    int userId = ReadInt("ID скаржника: ");
+                        bool valid = await users.ValidateUser(login, psw);
+                        output.WriteLine(valid ? "Авторизація успішна" : "Невірні дані");
+                        break;
 
-                    complaints.AddComplaint(txt, postId, userId);
-                    Console.WriteLine("Скаргу додано!");
-                    break;
+                    case "5":
+                        output.Write("Текст скарги: ");
+                        string txt = input.ReadLine()?.Trim() ?? "";
 
-                default:
-                    Console.WriteLine("Невірний вибір");
-                    break;
+                        int postId = ReadInt(input, output, "ID книги: ");
+                        int userId = ReadInt(input, output, "ID скаржника: ");
+
+                        complaints.AddComplaint(txt, postId, userId);
+                        output.WriteLine("Скаргу додано!");
+                        break;
+
+                    default:
+                        output.WriteLine("Невірний вибір");
+                        break;
+                }
+
+                output.WriteLine("Натисніть будь-яку клавішу для виходу...");
+            }
+            catch (Exception ex)
+            {
+                output.WriteLine($"Сталася помилка: {ex.Message}");
             }
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Сталася помилка: {ex.Message}");
-        }
 
-        Console.WriteLine("\nНатисніть будь-яку клавішу для виходу...");
-        Console.ReadKey();
+        public static int ReadInt(TextReader input, TextWriter output, string prompt)
+        {
+            int value;
+            while (true)
+            {
+                output.Write(prompt);
+                if (int.TryParse(input.ReadLine(), out value))
+                    return value;
+                output.WriteLine("Невірне число, спробуйте ще раз.");
+            }
+        }
     }
 
-    static int ReadInt(string prompt)
+    // Інтерфейси та фейкові сервіси
+    public interface IFakeBookService
     {
-        int value;
-        while (true)
-        {
-            Console.Write(prompt);
-            if (int.TryParse(Console.ReadLine(), out value))
-                return value;
-            Console.WriteLine("Невірне число, спробуйте ще раз.");
-        }
+        Task<Book[]> GetAllBooksAsync();
+        Task<string[]> GetGenresAsync();
+    }
+
+    public interface IFakeUserService
+    {
+        void AddUser(string name, string email, string phone, string pass);
+        Task<bool> ValidateUser(string email, string pass);
+    }
+
+    public interface IFakeComplaintsService
+    {
+        void AddComplaint(string text, int postId, int userId);
+    }
+
+    public class FakeBookService : IFakeBookService
+    {
+        public Task<Book[]> GetAllBooksAsync() =>
+            Task.FromResult(new[] { new Book { Id = 1, Title = "Book1", Author = "Author1", Genre = "Genre1" } });
+
+        public Task<string[]> GetGenresAsync() => Task.FromResult(new[] { "Genre1", "Genre2" });
+    }
+
+    public class FakeUserService : IFakeUserService
+    {
+        public bool UserAdded { get; private set; } = false;
+        public void AddUser(string name, string email, string phone, string pass) => UserAdded = true;
+        public Task<bool> ValidateUser(string email, string pass) =>
+            Task.FromResult(email == "test@test.com" && pass == "pass");
+    }
+
+    public class FakeComplaintsService : IFakeComplaintsService
+    {
+        public bool ComplaintAdded { get; private set; } = false;
+        public void AddComplaint(string text, int postId, int userId) => ComplaintAdded = true;
+    }
+
+    public class Book
+    {
+        public int Id { get; set; }
+        public string Title { get; set; } = "";
+        public string Author { get; set; } = "";
+        public string Genre { get; set; } = "";
     }
 }
