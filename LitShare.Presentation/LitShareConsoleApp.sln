@@ -7,7 +7,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LitShare.DAL", "..\LitShare
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LitShare.BLL", "..\LitShare.BLL\LitShare.BLL.csproj", "{43F19014-E5D0-434C-8423-D1665776C5CC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LitShare.Presentation", "..\LitShare.Presentation\LitShare.Presentation.csproj", "{C8008CB8-1DE9-4988-8B39-4ACE4B9BF905}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LitShare.Presentation", "LitShare.Presentation.csproj", "{C8008CB8-1DE9-4988-8B39-4ACE4B9BF905}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LitShare.BLL.Tests", "..\LitShare.BLL.Tests\LitShare.BLL.Tests.csproj", "{E25ACD67-4B6B-9603-CFF3-048FFF450596}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LitShare.ConsoleApp", "..\LitShare.ConsoleApp\LitShare.ConsoleApp.csproj", "{261B5EE1-B98C-4668-8721-4FBE3FEA4CFC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LitShare.ConsoleApp.Tests", "..\LitShare.ConsoleApp.Tests\LitShare.ConsoleApp.Tests.csproj", "{ADBE5024-6425-4103-AB80-B7EE8FC44A04}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +33,18 @@ Global
 		{C8008CB8-1DE9-4988-8B39-4ACE4B9BF905}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C8008CB8-1DE9-4988-8B39-4ACE4B9BF905}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C8008CB8-1DE9-4988-8B39-4ACE4B9BF905}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E25ACD67-4B6B-9603-CFF3-048FFF450596}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E25ACD67-4B6B-9603-CFF3-048FFF450596}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E25ACD67-4B6B-9603-CFF3-048FFF450596}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E25ACD67-4B6B-9603-CFF3-048FFF450596}.Release|Any CPU.Build.0 = Release|Any CPU
+		{261B5EE1-B98C-4668-8721-4FBE3FEA4CFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{261B5EE1-B98C-4668-8721-4FBE3FEA4CFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{261B5EE1-B98C-4668-8721-4FBE3FEA4CFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{261B5EE1-B98C-4668-8721-4FBE3FEA4CFC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ADBE5024-6425-4103-AB80-B7EE8FC44A04}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ADBE5024-6425-4103-AB80-B7EE8FC44A04}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ADBE5024-6425-4103-AB80-B7EE8FC44A04}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ADBE5024-6425-4103-AB80-B7EE8FC44A04}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
