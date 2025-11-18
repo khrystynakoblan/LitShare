@@ -48,12 +48,12 @@ namespace LitShare.Presentation
 
                 if (user != null)
                 {
-                    this.txtName.Text = user.name;
-                    this.txtRegion.Text = user.region;
-                    this.txtDistrict.Text = user.district;
-                    this.txtCity.Text = user.city;
-                    this.txtPhone.Text = user.phone ?? "—";
-                    this.txtAbout.Text = user.about ?? "Користувач ще не заповнив інформацію про себе.";
+                    this.txtName.Text = user.Name;
+                    this.txtRegion.Text = user.Region;
+                    this.txtDistrict.Text = user.District;
+                    this.txtCity.Text = user.City;
+                    this.txtPhone.Text = user.Phone ?? "—";
+                    this.txtAbout.Text = user.About ?? "Користувач ще не заповнив інформацію про себе.";
 
                     var books = await this.bookService.GetBooksByUserIdAsync(userId);
                     this.BooksList.ItemsSource = books;

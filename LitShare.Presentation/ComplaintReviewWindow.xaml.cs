@@ -1,27 +1,36 @@
-﻿using LitShare.BLL.Services;
-using System.Windows;
+﻿// -----------------------------------------------------------------------
+// <copyright file="ComplaintReviewWindow.xaml.cs" company="LitShare">
+// Copyright (c) 2025 LitShare. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace LitShare.Presentation
 {
+    using System;
+    using System.Windows;
+    using LitShare.BLL.Services;
+
+    /// <summary>
+    /// Логіка взаємодії для вікна перегляду деталей скарги.
+    /// </summary>
     public partial class ComplaintReviewWindow : Window
     {
         private readonly ComplaintsService _complaintsService = new ComplaintsService();
         private readonly UserService _userService = new UserService();
+        private readonly int _currentComplaintId;
 
-        private int _currentComplaintId;
-
-        public ComplaintReviewWindow()
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ComplaintReviewWindow"/> class.
+        /// </summary>
+        /// <param name="complaintId">Ідентифікатор скарги для перегляду.</param>
+        public ComplaintReviewWindow(int complaintId)
         {
             InitializeComponent();
-
-            int testComplaintId = 1;
-
-            _currentComplaintId = testComplaintId;
-
-            _ = LoadComplaintDataAsync(_currentComplaintId);
+            _currentComplaintId = complaintId;
+            LoadComplaintData(_currentComplaintId);
         }
 
-        private async Task LoadComplaintDataAsync(int complaintId)
+        private void LoadComplaintData(int complaintId)
         {
             try
             {
@@ -29,43 +38,41 @@ namespace LitShare.Presentation
 
                 if (complaint != null && complaint.Post != null)
                 {
-                    txtComplaintReason.Text = complaint.text;
-                    txtPostTitle.Text = complaint.Post.title;
-                    txtPostDescription.Text = complaint.Post.description;
+                    txtComplaintReason.Text = complaint.Text;
+                    txtPostTitle.Text = complaint.Post.Title;
+                    txtPostDescription.Text = complaint.Post.Description;
 
-                    var author = _userService.GetUserById(complaint.Post.user_id);
-                    txtPostAuthor.Text = author?.name ?? "Невідомий автор";
+                    var author = _userService.GetUserById(complaint.Post.UserId);
+                    txtPostAuthor.Text = author?.Name ?? "Невідомий автор";
                 }
                 else
                 {
                     MessageBox.Show($"Не вдалося завантажити скаргу з ID {complaintId}.", "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
-                    this.Close();
+                    Close();
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Критична помилка: {ex.Message}", "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
-                this.Close();
+                Close();
             }
         }
 
-
-
         private void ExitButton_Click(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            Close();
         }
 
         private void ApproveButton_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("ТЕСТ: Скаргу 'Підтверджено' (нічого не зроблено)");
-            this.Close();
+            MessageBox.Show("Скаргу підтверджено. (Тут має бути логіка покарання)", "Інфо", MessageBoxButton.OK, MessageBoxImage.Information);
+            Close();
         }
 
         private void RejectButton_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("ТЕСТ: Скаргу 'Відхилено' (нічого не зроблено)");
-            this.Close();
+            MessageBox.Show("Скаргу відхилено.", "Інфо", MessageBoxButton.OK, MessageBoxImage.Information);
+            Close();
         }
     }
 }

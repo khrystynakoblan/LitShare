@@ -1,15 +1,30 @@
-﻿using LitShare.BLL.Services;
-using System.Windows;
-using System.Windows.Media;
+﻿// -----------------------------------------------------------------------
+// <copyright file="ReportAdWindow.xaml.cs" company="LitShare">
+// Copyright (c) 2025 LitShare. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace LitShare.Presentation
 {
+    using System;
+    using System.Windows;
+    using System.Windows.Media;
+    using LitShare.BLL.Services;
+
+    /// <summary>
+    /// Логіка взаємодії для вікна створення скарги на оголошення.
+    /// </summary>
     public partial class ReportAdWindow : Window
     {
         private readonly int _adId;
         private readonly ComplaintsService _complaintService = new ComplaintsService();
         private readonly int _currentUserId;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ReportAdWindow"/> class.
+        /// </summary>
+        /// <param name="adId">Ідентифікатор оголошення (книги), на яке подається скарга.</param>
+        /// <param name="userId">Ідентифікатор поточного користувача.</param>
         public ReportAdWindow(int adId, int userId)
         {
             InitializeComponent();
@@ -29,16 +44,24 @@ namespace LitShare.Presentation
 
         private void SubmitButton_Click(object sender, RoutedEventArgs e)
         {
-            string selectedReason = null;
+            string? selectedReason = null;
 
             if (FalseInfoRadio.IsChecked == true)
+            {
                 selectedReason = FalseInfoRadio.Content.ToString();
+            }
             else if (SpamRadio.IsChecked == true)
+            {
                 selectedReason = SpamRadio.Content.ToString();
+            }
             else if (ExchangeRadio.IsChecked == true)
+            {
                 selectedReason = ExchangeRadio.Content.ToString();
+            }
             else if (OtherRadio.IsChecked == true)
+            {
                 selectedReason = OtherRadio.Content.ToString();
+            }
 
             if (string.IsNullOrEmpty(selectedReason))
             {
@@ -48,8 +71,11 @@ namespace LitShare.Presentation
 
             string details = DetailsTextBox.Text.Trim();
             string fullText = selectedReason;
+
             if (!string.IsNullOrEmpty(details))
+            {
                 fullText += ": " + details;
+            }
 
             try
             {
@@ -57,6 +83,7 @@ namespace LitShare.Presentation
 
                 ShowStatus("Скаргу надіслано!", Brushes.Green);
 
+                // Скидання форми
                 FalseInfoRadio.IsChecked = false;
                 SpamRadio.IsChecked = false;
                 ExchangeRadio.IsChecked = false;
@@ -85,12 +112,12 @@ namespace LitShare.Presentation
         {
             var mainPage = new MainPage(_currentUserId);
             mainPage.ShowDialog();
-            this.Close();
+            Close(); // Виправлено SA1101: видалено 'this.'
         }
 
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            Close(); // Виправлено SA1101: видалено 'this.'
         }
     }
 }

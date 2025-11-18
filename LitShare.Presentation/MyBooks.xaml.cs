@@ -1,20 +1,39 @@
-﻿using LitShare.DAL;
-using System.Windows;
-using System.Windows.Controls;
+﻿// -----------------------------------------------------------------------
+// <copyright file="MyBook.xaml.cs" company="LitShare">
+// Copyright (c) 2025 LitShare. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace LitShare.Presentation
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Windows;
+    using System.Windows.Controls;
+    using LitShare; // Необхідно для доступу до MainPage та EditAdWindow, якщо вони в namespace LitShare
+    using LitShare.DAL;
+    using LitShare.DAL.Models;
+
+    /// <summary>
+    /// Логіка взаємодії для вікна "Мої книги".
+    /// </summary>
     public partial class MyBook : Window
     {
         private readonly LitShareDbContext _context;
-        private List<BookItem> _allBooks;
         private readonly int _userId;
+        private List<BookItem> _allBooks = new List<BookItem>(); // Ініціалізація для уникнення null
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MyBook"/> class.
+        /// </summary>
+        /// <param name="userId">Ідентифікатор поточного користувача.</param>
         public MyBook(int userId)
         {
             InitializeComponent();
             _context = new LitShareDbContext();
             _userId = userId;
+
             LoadBooks();
             SearchTextBox.TextChanged += SearchTextBox_TextChanged;
         }
@@ -23,25 +42,27 @@ namespace LitShare.Presentation
         {
             try
             {
-                int currentUserId = _userId;
-
-                _allBooks = _context.posts
-                    .Where(p => p.user_id == currentUserId)
-                    .Join(_context.Users, p => p.user_id, u => u.id, (p, u) => new BookItem
-                    {
-                        Id = p.id,
-                        Title = p.title,
-                        Author = p.author,
-                        City = u.city,
-                        PhotoUrl = p.photo_url
-                    })
+                _allBooks = _context.Posts
+                    .Where(p => p.UserId == _userId)
+                    .Join(
+                        _context.Users,
+                        p => p.UserId,
+                        u => u.Id,
+                        (p, u) => new BookItem
+                        {
+                            Id = p.Id,
+                            Title = p.Title,
+                            Author = p.Author,
+                            City = u.City,
+                            PhotoUrl = p.PhotoUrl
+                        })
                     .ToList();
 
                 DisplayBooks(_allBooks);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Помилка при завантаженні книг: {ex.Message}");
+                MessageBox.Show($"Помилка при завантаженні книг: {ex.Message}", "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -56,9 +77,9 @@ namespace LitShare.Presentation
             else
             {
                 var filteredBooks = _allBooks.Where(b =>
-                    b.Title.ToLower().Contains(searchText) ||
-                    b.Author.ToLower().Contains(searchText) ||
-                    b.City.ToLower().Contains(searchText)
+                    (b.Title?.ToLower().Contains(searchText) == true) ||
+                    (b.Author?.ToLower().Contains(searchText) == true) ||
+                    (b.City?.ToLower().Contains(searchText) == true)
                 ).ToList();
 
                 DisplayBooks(filteredBooks);
@@ -72,9 +93,9 @@ namespace LitShare.Presentation
 
         private void HomeButton_Click(object sender, RoutedEventArgs e)
         {
-            MainPage mainWindow = new MainPage(_userId);
+            var mainWindow = new MainPage(_userId);
             mainWindow.Show();
-            this.Close();
+            Close();
         }
 
         private void EditBookButton_Click(object sender, RoutedEventArgs e)
@@ -83,25 +104,47 @@ namespace LitShare.Presentation
             {
                 var editWindow = new EditAdWindow(selectedBook.Id, _userId);
                 editWindow.Owner = this;
+
                 editWindow.ShowDialog();
 
                 LoadBooks();
             }
         }
 
-
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            Close();
         }
 
+        /// <summary>
+        /// Внутрішній клас для відображення спрощеної інформації про книгу.
+        /// </summary>
         private class BookItem
         {
+            /// <summary>
+            /// Gets or sets the unique identifier of the book.
+            /// </summary>
             public int Id { get; set; }
-            public string Title { get; set; }
-            public string Author { get; set; }
-            public string City { get; set; }
-            public string PhotoUrl { get; set; }
+
+            /// <summary>
+            /// Gets or sets the title of the book.
+            /// </summary>
+            public string Title { get; set; } = string.Empty;
+
+            /// <summary>
+            /// Gets or sets the author of the book.
+            /// </summary>
+            public string Author { get; set; } = string.Empty;
+
+            /// <summary>
+            /// Gets or sets the city where the book is located.
+            /// </summary>
+            public string City { get; set; } = string.Empty;
+
+            /// <summary>
+            /// Gets or sets the URL of the book's photo.
+            /// </summary>
+            public string? PhotoUrl { get; set; }
         }
     }
 }

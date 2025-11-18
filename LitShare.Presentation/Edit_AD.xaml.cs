@@ -1,20 +1,39 @@
-﻿using LitShare.DAL;
-using LitShare.DAL.Models;
-using LitShare.Presentation;
-using Microsoft.Win32;
-using System.Windows;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
+﻿// -----------------------------------------------------------------------
+// <copyright file="EditAdWindow.xaml.cs" company="LitShare">
+// Copyright (c) 2025 LitShare. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace LitShare
 {
+    using System;
+    using System.Linq;
+    using System.Windows;
+    using System.Windows.Controls;
+    using System.Windows.Media;
+    using System.Windows.Media.Imaging;
+    using LitShare.DAL;
+    using LitShare.DAL.Models;
+    using LitShare.Presentation; // Додано, якщо MainPage знаходиться тут
+    using Microsoft.Win32;
+
+    /// <summary>
+    /// Логіка взаємодії для вікна редагування оголошення.
+    /// </summary>
     public partial class EditAdWindow : Window
     {
         private readonly LitShareDbContext _context;
         private readonly int _postId;
-        private Posts _currentPost;
         private readonly int _userId;
 
+        // Виправлення CS8618: nullable поле, бо ініціалізується в LoadPostData
+        private Posts? _currentPost;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EditAdWindow"/> class.
+        /// </summary>
+        /// <param name="postId">Ідентифікатор оголошення.</param>
+        /// <param name="userId">Ідентифікатор користувача.</param>
         public EditAdWindow(int postId, int userId)
         {
             InitializeComponent();
@@ -28,13 +47,12 @@ namespace LitShare
             LoadPostData();
         }
 
-
         private void LoadGenres()
         {
-            var genres = _context.genres.ToList();
+            var genres = _context.Genres.ToList();
             GenreComboBox.ItemsSource = genres;
-            GenreComboBox.DisplayMemberPath = "name";
-            GenreComboBox.SelectedValuePath = "id";
+            GenreComboBox.DisplayMemberPath = "Name"; // Переконайтесь, що у моделі Genres властивість Name з великої літери
+            GenreComboBox.SelectedValuePath = "Id";
         }
 
         private void LoadDealTypes()
@@ -50,10 +68,9 @@ namespace LitShare
             DealTypeComboBox.SelectedValuePath = "Value";
         }
 
-
         private void LoadPostData()
         {
-            _currentPost = _context.posts.FirstOrDefault(p => p.id == _postId);
+            _currentPost = _context.Posts.FirstOrDefault(p => p.Id == _postId);
 
             if (_currentPost == null)
             {
@@ -62,33 +79,37 @@ namespace LitShare
                 return;
             }
 
-            TitleTextBox.Text = _currentPost.title;
-            AuthorTextBox.Text = _currentPost.author;
-            DescriptionTextBox.Text = _currentPost.description;
-            DealTypeComboBox.SelectedValue = _currentPost.deal_type;
+            TitleTextBox.Text = _currentPost.Title;
+            AuthorTextBox.Text = _currentPost.Author;
+            DescriptionTextBox.Text = _currentPost.Description;
+            DealTypeComboBox.SelectedValue = _currentPost.DealType;
 
-
-            var bookGenre = _context.bookGenres.FirstOrDefault(bg => bg.post_id == _postId);
+            var bookGenre = _context.BookGenres.FirstOrDefault(bg => bg.PostId == _postId);
             if (bookGenre != null)
             {
-                GenreComboBox.SelectedValue = bookGenre.genre_id;
+                GenreComboBox.SelectedValue = bookGenre.GenreId;
             }
 
-            if (!string.IsNullOrEmpty(_currentPost.photo_url))
+            if (!string.IsNullOrEmpty(_currentPost.PhotoUrl))
             {
                 try
                 {
-                    BookImage.Source = new BitmapImage(new Uri(_currentPost.photo_url, UriKind.Absolute));
+                    BookImage.Source = new BitmapImage(new Uri(_currentPost.PhotoUrl, UriKind.Absolute));
                 }
                 catch
                 {
-                    // Якщо URL некоректний або файл відсутній — ігноруємо
+                    // Ігноруємо помилки відображення старого фото
                 }
             }
         }
 
         private void AddPhotoButton_Click(object sender, RoutedEventArgs e)
         {
+            if (_currentPost == null)
+            {
+                return;
+            }
+
             var openFileDialog = new OpenFileDialog
             {
                 Filter = "Зображення (*.jpg;*.png;*.jpeg)|*.jpg;*.png;*.jpeg"
@@ -98,59 +119,71 @@ namespace LitShare
             {
                 string selectedFile = openFileDialog.FileName;
 
-                BookImage.Source = new BitmapImage(new Uri(selectedFile));
-
-                // Зберігаємо шлях до фото (локальний шлях)
-                _currentPost.photo_url = selectedFile;
+                try
+                {
+                    BookImage.Source = new BitmapImage(new Uri(selectedFile));
+                    _currentPost.PhotoUrl = selectedFile;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Не вдалося завантажити фото: {ex.Message}", "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
         }
 
         private void AddAdButton_Click(object sender, RoutedEventArgs e)
         {
             if (!ValidateFields())
+            {
                 return;
+            }
 
             try
             {
                 if (_currentPost == null)
                 {
-                    MessageBox.Show("Оголошення не знайдено.", "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Дані втрачено.", "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
 
-                _currentPost.title = TitleTextBox.Text;
-                _currentPost.author = AuthorTextBox.Text;
-                _currentPost.description = DescriptionTextBox.Text;
-                _currentPost.deal_type = (DealType)DealTypeComboBox.SelectedValue;
+                _currentPost.Title = TitleTextBox.Text;
+                _currentPost.Author = AuthorTextBox.Text;
+                _currentPost.Description = DescriptionTextBox.Text;
 
-                var existingGenre = _context.bookGenres.FirstOrDefault(bg => bg.post_id == _postId);
-                int selectedGenreId = (int)GenreComboBox.SelectedValue;
-
-                if (existingGenre != null)
+                if (DealTypeComboBox.SelectedValue is DealType selectedDealType)
                 {
-                    if (existingGenre.genre_id != selectedGenreId)
-                    {
-                        _context.bookGenres.Remove(existingGenre);
-                        _context.SaveChanges();
+                    _currentPost.DealType = selectedDealType;
+                }
 
-                        _context.bookGenres.Add(new BookGenres
+                var existingGenre = _context.BookGenres.FirstOrDefault(bg => bg.PostId == _postId);
+
+                if (GenreComboBox.SelectedValue is int selectedGenreId)
+                {
+                    if (existingGenre != null)
+                    {
+                        if (existingGenre.GenreId != selectedGenreId)
                         {
-                            post_id = _postId,
-                            genre_id = selectedGenreId
+                            _context.BookGenres.Remove(existingGenre);
+                            _context.SaveChanges();
+
+                            _context.BookGenres.Add(new BookGenres
+                            {
+                                PostId = _postId,
+                                GenreId = selectedGenreId
+                            });
+                        }
+                    }
+                    else
+                    {
+                        _context.BookGenres.Add(new BookGenres
+                        {
+                            PostId = _postId,
+                            GenreId = selectedGenreId
                         });
                     }
                 }
-                else
-                {
-                    _context.bookGenres.Add(new BookGenres
-                    {
-                        post_id = _postId,
-                        genre_id = selectedGenreId
-                    });
-                }
 
                 _context.SaveChanges();
-
                 Close();
             }
             catch (Exception ex)
@@ -159,17 +192,17 @@ namespace LitShare
             }
         }
 
-
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            Close();
         }
 
         private void HomeButton_Click(object sender, RoutedEventArgs e)
         {
-            MainPage mainWindow = new MainPage(_userId);
+            // MainPage може бути в LitShare.Presentation
+            var mainWindow = new MainPage(_userId);
             mainWindow.Show();
-            this.Close();
+            Close();
         }
 
         private bool ValidateFields()
@@ -238,28 +271,45 @@ namespace LitShare
                 GenreError.Visibility = Visibility.Collapsed;
             }
 
-
-
             return isValid;
         }
 
-        private void Field_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        private void Field_TextChanged(object sender, TextChangedEventArgs e)
         {
-            var textBox = sender as System.Windows.Controls.TextBox;
-            textBox.BorderBrush = new SolidColorBrush(Color.FromRgb(171, 173, 179));
+            if (sender is TextBox textBox)
+            {
+                textBox.BorderBrush = new SolidColorBrush(Color.FromRgb(171, 173, 179));
 
-            if (textBox == TitleTextBox) TitleError.Visibility = Visibility.Collapsed;
-            else if (textBox == AuthorTextBox) AuthorError.Visibility = Visibility.Collapsed;
-            else if (textBox == DescriptionTextBox) DescriptionError.Visibility = Visibility.Collapsed;
+                if (textBox == TitleTextBox)
+                {
+                    TitleError.Visibility = Visibility.Collapsed;
+                }
+                else if (textBox == AuthorTextBox)
+                {
+                    AuthorError.Visibility = Visibility.Collapsed;
+                }
+                else if (textBox == DescriptionTextBox)
+                {
+                    DescriptionError.Visibility = Visibility.Collapsed;
+                }
+            }
         }
 
-        private void Field_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        private void Field_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var comboBox = sender as System.Windows.Controls.ComboBox;
-            comboBox.BorderBrush = new SolidColorBrush(Color.FromRgb(171, 173, 179));
+            if (sender is ComboBox comboBox)
+            {
+                comboBox.BorderBrush = new SolidColorBrush(Color.FromRgb(171, 173, 179));
 
-            if (comboBox == GenreComboBox) GenreError.Visibility = Visibility.Collapsed;
-            else if (comboBox == DealTypeComboBox) DealTypeError.Visibility = Visibility.Collapsed;
+                if (comboBox == GenreComboBox)
+                {
+                    GenreError.Visibility = Visibility.Collapsed;
+                }
+                else if (comboBox == DealTypeComboBox)
+                {
+                    DealTypeError.Visibility = Visibility.Collapsed;
+                }
+            }
         }
     }
 }
