@@ -1,161 +1,258 @@
 ﻿using System;
-using System.IO;
-using System.Threading.Tasks;
+using System.Collections.Generic;
+using Bogus;
 
 namespace LitShare.ConsoleApp
 {
-    public class Program
+    // --- 0. ІНТЕРФЕЙС ---
+    public interface IBookRepository
     {
-        static async Task Main(string[] args)
-        {
-            var fakeBooks = new FakeBookService();
-            var fakeUsers = new FakeUserService();
-            var fakeComplaints = new FakeComplaintsService();
+        void ClearAllData();
+        int AddUser(User user);
+        int AddPost(Post post);
+        int AddGenre(Genre genre);
+        void AddBookGenre(int postId, int genreId);
+        int AddComplaint(Complaint complaint);
+        List<Post> GetAllPosts();
+        List<User> GetAllUsers();
+        List<Genre> GetAllGenres();
+        List<Complaint> GetAllComplaints();
+    }
 
-            await RunAsync(Console.In, Console.Out, fakeBooks, fakeUsers, fakeComplaints);
+    // --- 1. IN-MEMORY БАЗА ---
+    public class InMemoryBookRepository : IBookRepository
+    {
+        private readonly List<User> _users = new();
+        private readonly List<Post> _posts = new();
+        private readonly List<Genre> _genres = new();
+        private readonly List<(int postId, int genreId)> _booksGenres = new();
+        private readonly List<Complaint> _complaints = new();
+
+        public void ClearAllData()
+        {
+            _users.Clear();
+            _posts.Clear();
+            _genres.Clear();
+            _booksGenres.Clear();
+            _complaints.Clear();
         }
 
-        public static async Task RunAsync(
-            TextReader input,
-            TextWriter output,
-            IFakeBookService books,
-            IFakeUserService users,
-            IFakeComplaintsService complaints)
+        public int AddUser(User user)
         {
-            try
+            user.Id = _users.Count + 1;
+            _users.Add(user);
+            return user.Id;
+        }
+
+        public int AddPost(Post post)
+        {
+            post.Id = _posts.Count + 1;
+            _posts.Add(post);
+            return post.Id;
+        }
+
+        public int AddGenre(Genre genre)
+        {
+            genre.Id = _genres.Count + 1;
+            _genres.Add(genre);
+            return genre.Id;
+        }
+
+        public void AddBookGenre(int postId, int genreId)
+        {
+            _booksGenres.Add((postId, genreId));
+        }
+
+        public int AddComplaint(Complaint complaint)
+        {
+            complaint.Id = _complaints.Count + 1;
+            _complaints.Add(complaint);
+            return complaint.Id;
+        }
+
+        public List<Post> GetAllPosts() => new(_posts);
+        public List<User> GetAllUsers() => new(_users);
+        public List<Genre> GetAllGenres() => new(_genres);
+        public List<Complaint> GetAllComplaints() => new(_complaints);
+    }
+
+    // --- 2. DATA SEEDER ---
+    public class DataSeeder
+    {
+        private readonly IBookRepository _repo;
+
+        public DataSeeder(IBookRepository repo)
+        {
+            _repo = repo;
+        }
+
+        public void SeedUsersAndPosts(int usersCount, int postsPerUser)
+        {
+            var userFaker = new Faker<User>()
+                .RuleFor(u => u.Name, f => f.Name.FullName())
+                .RuleFor(u => u.Email, f => f.Internet.Email())
+                .RuleFor(u => u.Password, f => f.Internet.Password())
+                .RuleFor(u => u.About, f => f.Lorem.Sentence())
+                .RuleFor(u => u.Role, f => f.PickRandom(new[] { "user", "admin" }))
+                .RuleFor(u => u.Region, f => f.Address.State())
+                .RuleFor(u => u.District, f => f.Address.County())
+                .RuleFor(u => u.City, f => f.Address.City());
+
+            var postFaker = new Faker<Post>()
+                .RuleFor(p => p.Title, f => f.Commerce.ProductName())
+                .RuleFor(p => p.Author, f => f.Name.FullName())
+                .RuleFor(p => p.DealType, f => f.PickRandom(new[] { "exchange", "donation" }))
+                .RuleFor(p => p.Description, f => f.Lorem.Sentence(10))
+                .RuleFor(p => p.PhotoUrl, f => f.Image.PicsumUrl());
+
+            for (int i = 0; i < usersCount; i++)
             {
-                output.WriteLine("База підключена успішно");
+                var user = userFaker.Generate();
+                int userId = _repo.AddUser(user);
 
-                output.WriteLine("1. Вивести всі книги");
-                output.WriteLine("2. Вивести всі жанри");
-                output.WriteLine("3. Додати нового користувача");
-                output.WriteLine("4. Перевірити логін");
-                output.WriteLine("5. Додати скаргу");
-                output.Write("Ваш вибір: ");
+                var posts = postFaker.Clone()
+                    .RuleFor(p => p.UserId, f => userId)
+                    .Generate(postsPerUser);
 
-                string choice = input.ReadLine()?.Trim();
+                foreach (var post in posts)
+                    _repo.AddPost(post);
+
+                Console.Write(".");
+            }
+
+            Console.WriteLine();
+        }
+
+        public void SeedGenres(int genresCount)
+        {
+            var genreFaker = new Faker<Genre>()
+                .RuleFor(g => g.Name, f => f.Commerce.Categories(1)[0]);
+
+            for (int i = 0; i < genresCount; i++)
+            {
+                _repo.AddGenre(genreFaker.Generate());
+                Console.Write(".");
+            }
+
+            Console.WriteLine();
+        }
+
+        public void SeedComplaints(int complaintsCount)
+        {
+            var complaintFaker = new Faker<Complaint>()
+                .RuleFor(c => c.Text, f => f.Lorem.Sentence())
+                .RuleFor(c => c.PostId, f => f.Random.Int(1, Math.Max(1, _repo.GetAllPosts().Count)))
+                .RuleFor(c => c.ComplainantId, f => f.Random.Int(1, Math.Max(1, _repo.GetAllUsers().Count)));
+
+            for (int i = 0; i < complaintsCount; i++)
+            {
+                _repo.AddComplaint(complaintFaker.Generate());
+                Console.Write(".");
+            }
+
+            Console.WriteLine();
+        }
+    }
+
+    // --- 3. МОДЕЛІ ---
+    public class User
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
+        public string About { get; set; }
+        public string Role { get; set; }
+        public string Region { get; set; }
+        public string District { get; set; }
+        public string City { get; set; }
+    }
+
+    public class Post
+    {
+        public int Id { get; set; }
+        public int UserId { get; set; }
+        public string Title { get; set; }
+        public string Author { get; set; }
+        public string DealType { get; set; }
+        public string Description { get; set; }
+        public string PhotoUrl { get; set; }
+    }
+
+    public class Genre
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
+
+    public class Complaint
+    {
+        public int Id { get; set; }
+        public string Text { get; set; }
+        public DateTime Date { get; set; } = DateTime.Now;
+        public int PostId { get; set; }
+        public int ComplainantId { get; set; }
+    }
+
+    // --- 4. MAIN ---
+    public class ConsoleApp
+    {
+        static void Main()
+        {
+            RunMenu(Console.In, Console.Out);
+        }
+
+        public static void RunMenu(System.IO.TextReader input, System.IO.TextWriter output)
+        {
+            IBookRepository repo = new InMemoryBookRepository();
+            var seeder = new DataSeeder(repo);
+
+            output.WriteLine("=== LitShare In-Memory Seeder ===");
+            repo.ClearAllData();
+
+            seeder.SeedUsersAndPosts(5, 2);
+            seeder.SeedGenres(3);
+            seeder.SeedComplaints(2);
+
+            output.WriteLine("Дані згенеровані.\n");
+
+            while (true)
+            {
+                output.WriteLine("Що показати?");
+                output.WriteLine("1 - Користувачі");
+                output.WriteLine("2 - Пости");
+                output.WriteLine("3 - Жанри");
+                output.WriteLine("4 - Скарги");
+                output.WriteLine("0 - Вихід");
+
+                var choice = input.ReadLine();
+                if (choice == "0") break;
 
                 switch (choice)
                 {
                     case "1":
-                        var allBooks = await books.GetAllBooksAsync();
-                        foreach (var b in allBooks)
-                            output.WriteLine($"{b.Id}: {b.Title} — {b.Author} ({b.Genre})");
+                        foreach (var u in repo.GetAllUsers())
+                            output.WriteLine($"UserID: {u.Id}, Name: {u.Name}, Role: {u.Role}");
                         break;
-
                     case "2":
-                        var genres = await books.GetGenresAsync();
-                        output.WriteLine("Жанри:");
-                        foreach (var g in genres)
-                            output.WriteLine($"- {g}");
+                        foreach (var p in repo.GetAllPosts())
+                            output.WriteLine($"PostID: {p.Id}, UserID: {p.UserId}, Title: {p.Title}, DealType: {p.DealType}");
                         break;
-
                     case "3":
-                        output.Write("Ім'я: ");
-                        string name = input.ReadLine()?.Trim() ?? "";
-                        output.Write("Email: ");
-                        string email = input.ReadLine()?.Trim() ?? "";
-                        output.Write("Телефон: ");
-                        string phone = input.ReadLine()?.Trim() ?? "";
-                        output.Write("Пароль: ");
-                        string pass = input.ReadLine()?.Trim() ?? "";
-
-                        users.AddUser(name, email, phone, pass);
-                        output.WriteLine("Користувача додано!");
+                        foreach (var g in repo.GetAllGenres())
+                            output.WriteLine($"GenreID: {g.Id}, Name: {g.Name}");
                         break;
-
                     case "4":
-                        output.Write("Email: ");
-                        string login = input.ReadLine()?.Trim() ?? "";
-                        output.Write("Пароль: ");
-                        string psw = input.ReadLine()?.Trim() ?? "";
-
-                        bool valid = await users.ValidateUser(login, psw);
-                        output.WriteLine(valid ? "Авторизація успішна" : "Невірні дані");
+                        foreach (var c in repo.GetAllComplaints())
+                            output.WriteLine($"ComplaintID: {c.Id}, PostID: {c.PostId}, ComplainantID: {c.ComplainantId}, Text: {c.Text}");
                         break;
-
-                    case "5":
-                        output.Write("Текст скарги: ");
-                        string txt = input.ReadLine()?.Trim() ?? "";
-
-                        int postId = ReadInt(input, output, "ID книги: ");
-                        int userId = ReadInt(input, output, "ID скаржника: ");
-
-                        complaints.AddComplaint(txt, postId, userId);
-                        output.WriteLine("Скаргу додано!");
-                        break;
-
                     default:
                         output.WriteLine("Невірний вибір");
                         break;
                 }
 
-                output.WriteLine("Натисніть будь-яку клавішу для виходу...");
-            }
-            catch (Exception ex)
-            {
-                output.WriteLine($"Сталася помилка: {ex.Message}");
+                output.WriteLine();
             }
         }
-
-        public static int ReadInt(TextReader input, TextWriter output, string prompt)
-        {
-            int value;
-            while (true)
-            {
-                output.Write(prompt);
-                if (int.TryParse(input.ReadLine(), out value))
-                    return value;
-                output.WriteLine("Невірне число, спробуйте ще раз.");
-            }
-        }
-    }
-
-    // Інтерфейси та фейкові сервіси
-    public interface IFakeBookService
-    {
-        Task<Book[]> GetAllBooksAsync();
-        Task<string[]> GetGenresAsync();
-    }
-
-    public interface IFakeUserService
-    {
-        void AddUser(string name, string email, string phone, string pass);
-        Task<bool> ValidateUser(string email, string pass);
-    }
-
-    public interface IFakeComplaintsService
-    {
-        void AddComplaint(string text, int postId, int userId);
-    }
-
-    public class FakeBookService : IFakeBookService
-    {
-        public Task<Book[]> GetAllBooksAsync() =>
-            Task.FromResult(new[] { new Book { Id = 1, Title = "Book1", Author = "Author1", Genre = "Genre1" } });
-
-        public Task<string[]> GetGenresAsync() => Task.FromResult(new[] { "Genre1", "Genre2" });
-    }
-
-    public class FakeUserService : IFakeUserService
-    {
-        public bool UserAdded { get; private set; } = false;
-        public void AddUser(string name, string email, string phone, string pass) => UserAdded = true;
-        public Task<bool> ValidateUser(string email, string pass) =>
-            Task.FromResult(email == "test@test.com" && pass == "pass");
-    }
-
-    public class FakeComplaintsService : IFakeComplaintsService
-    {
-        public bool ComplaintAdded { get; private set; } = false;
-        public void AddComplaint(string text, int postId, int userId) => ComplaintAdded = true;
-    }
-
-    public class Book
-    {
-        public int Id { get; set; }
-        public string Title { get; set; } = "";
-        public string Author { get; set; } = "";
-        public string Genre { get; set; } = "";
     }
 }

@@ -1,111 +1,128 @@
 ﻿using System;
 using System.IO;
-using System.Threading.Tasks;
 using Xunit;
 using LitShare.ConsoleApp;
 
-namespace LitShare.Tests
+namespace LitShare.ConsoleApp.Tests
 {
-    public class ConsoleAppTests
+    public class InMemoryBookRepositoryTests
     {
         [Fact]
-        public async Task RunAsync_ShowMenu()
+        public void AddUser_ShouldAssignIdAndStoreUser()
         {
-            var input = new StringReader("1\n");
-            var output = new StringWriter();
-            await Program.RunAsync(input, output, new FakeBookService(), new FakeUserService(), new FakeComplaintsService());
+            var repo = new InMemoryBookRepository();
+            var user = new User { Name = "Test" };
+            int id = repo.AddUser(user);
 
-            string consoleOutput = output.ToString().Replace("\r", "");
-            Assert.Contains("База підключена успішно", consoleOutput);
-            Assert.Contains("1. Вивести всі книги", consoleOutput);
-            Assert.Contains("Натисніть будь-яку клавішу для виходу", consoleOutput);
+            Assert.Equal(1, id);
+            Assert.Single(repo.GetAllUsers());
+            Assert.Equal("Test", repo.GetAllUsers()[0].Name);
         }
 
         [Fact]
-        public async Task RunAsync_InvalidChoice()
+        public void AddPost_ShouldAssignIdAndStorePost()
         {
-            var input = new StringReader("9\n");
-            var output = new StringWriter();
-            await Program.RunAsync(input, output, new FakeBookService(), new FakeUserService(), new FakeComplaintsService());
+            var repo = new InMemoryBookRepository();
+            var post = new Post { Title = "Book" };
+            int id = repo.AddPost(post);
 
-            string consoleOutput = output.ToString().Replace("\r", "");
-            Assert.Contains("Невірний вибір", consoleOutput);
+            Assert.Equal(1, id);
+            Assert.Single(repo.GetAllPosts());
+            Assert.Equal("Book", repo.GetAllPosts()[0].Title);
         }
 
         [Fact]
-        public async Task RunAsync_AddUser()
+        public void AddGenre_ShouldAssignIdAndStoreGenre()
         {
-            var input = new StringReader("3\nTest User\nuser@test.com\n12345\npass\n");
-            var output = new StringWriter();
-            var fakeUser = new FakeUserService();
+            var repo = new InMemoryBookRepository();
+            var genre = new Genre { Name = "Fiction" };
+            int id = repo.AddGenre(genre);
 
-            await Program.RunAsync(input, output, new FakeBookService(), fakeUser, new FakeComplaintsService());
-
-            string consoleOutput = output.ToString().Replace("\r", "");
-            Assert.Contains("Користувача додано!", consoleOutput);
-            Assert.True(fakeUser.UserAdded);
+            Assert.Equal(1, id);
+            Assert.Single(repo.GetAllGenres());
+            Assert.Equal("Fiction", repo.GetAllGenres()[0].Name);
         }
 
         [Fact]
-        public async Task RunAsync_ShowGenres()
+        public void AddComplaint_ShouldAssignIdAndStore()
         {
-            var input = new StringReader("2\n");
-            var output = new StringWriter();
-            await Program.RunAsync(input, output, new FakeBookService(), new FakeUserService(), new FakeComplaintsService());
+            var repo = new InMemoryBookRepository();
+            var complaint = new Complaint { Text = "Bad" };
+            int id = repo.AddComplaint(complaint);
 
-            string consoleOutput = output.ToString().Replace("\r", "");
-            Assert.Contains("Жанри:", consoleOutput);
-            Assert.Contains("- Genre1", consoleOutput);
-            Assert.Contains("- Genre2", consoleOutput);
+            Assert.Equal(1, id);
+            Assert.Single(repo.GetAllComplaints());
+            Assert.Equal("Bad", repo.GetAllComplaints()[0].Text);
         }
 
         [Fact]
-        public async Task RunAsync_ValidLogin()
+        public void ClearAllData_ShouldEmptyAllCollections()
         {
-            var input = new StringReader("4\ntest@test.com\npass\n");
-            var output = new StringWriter();
-            await Program.RunAsync(input, output, new FakeBookService(), new FakeUserService(), new FakeComplaintsService());
+            var repo = new InMemoryBookRepository();
+            repo.AddUser(new User());
+            repo.AddPost(new Post());
+            repo.AddGenre(new Genre());
+            repo.AddComplaint(new Complaint());
 
-            string consoleOutput = output.ToString().Replace("\r", "");
-            Assert.Contains("Авторизація успішна", consoleOutput);
+            repo.ClearAllData();
+
+            Assert.Empty(repo.GetAllUsers());
+            Assert.Empty(repo.GetAllPosts());
+            Assert.Empty(repo.GetAllGenres());
+            Assert.Empty(repo.GetAllComplaints());
+        }
+    }
+
+    public class DataSeederTests
+    {
+        [Fact]
+        public void SeedUsersAndPosts_ShouldAddCorrectNumber()
+        {
+            var repo = new InMemoryBookRepository();
+            var seeder = new DataSeeder(repo);
+
+            seeder.SeedUsersAndPosts(2, 3);
+
+            Assert.Equal(2, repo.GetAllUsers().Count);
+            Assert.Equal(6, repo.GetAllPosts().Count);
         }
 
         [Fact]
-        public async Task RunAsync_InvalidLogin()
+        public void SeedGenres_ShouldAddCorrectNumber()
         {
-            var input = new StringReader("4\nwrong@test.com\n1234\n");
-            var output = new StringWriter();
-            await Program.RunAsync(input, output, new FakeBookService(), new FakeUserService(), new FakeComplaintsService());
+            var repo = new InMemoryBookRepository();
+            var seeder = new DataSeeder(repo);
 
-            string consoleOutput = output.ToString().Replace("\r", "");
-            Assert.Contains("Невірні дані", consoleOutput);
+            seeder.SeedGenres(3);
+
+            Assert.Equal(3, repo.GetAllGenres().Count);
         }
 
         [Fact]
-        public async Task RunAsync_AddComplaint()
+        public void SeedComplaints_ShouldAddCorrectNumber()
         {
-            var input = new StringReader("5\nTest complaint\n1\n2\n");
-            var output = new StringWriter();
-            var complaints = new FakeComplaintsService();
+            var repo = new InMemoryBookRepository();
+            var seeder = new DataSeeder(repo);
 
-            await Program.RunAsync(input, output, new FakeBookService(), new FakeUserService(), complaints);
+            seeder.SeedUsersAndPosts(2, 2);
+            seeder.SeedComplaints(4);
 
-            string consoleOutput = output.ToString().Replace("\r", "");
-            Assert.Contains("Скаргу додано!", consoleOutput);
-            Assert.True(complaints.ComplaintAdded);
+            Assert.Equal(4, repo.GetAllComplaints().Count);
         }
 
         [Fact]
-        public void ReadInt_InvalidThenValidInput()
+        public void RunMenu_ShouldWorkWithoutErrors()
         {
-            var input = new StringReader("abc\n5\n");
+            var input = new StringReader("1\n2\n3\n4\n0\n");
             var output = new StringWriter();
 
-            int result = Program.ReadInt(input, output, "Enter number: ");
-            string consoleOutput = output.ToString().Replace("\r", "");
+            ConsoleApp.RunMenu(input, output);
 
-            Assert.Equal(5, result);
-            Assert.Contains("Невірне число", consoleOutput);
+            string consoleOutput = output.ToString();
+            Assert.Contains("UserID:", consoleOutput);
+            Assert.Contains("PostID:", consoleOutput);
+            Assert.Contains("GenreID:", consoleOutput);
+            Assert.Contains("ComplaintID:", consoleOutput);
         }
     }
 }
