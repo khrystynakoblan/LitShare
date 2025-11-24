@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using LitShare.DAL;
 using System.Windows;
 using System.Windows.Controls;
-using LitShare.DAL;
-using LitShare.DAL.Models;
 
 namespace LitShare.Presentation
 {

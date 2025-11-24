@@ -1,29 +1,30 @@
-﻿using LitShare.DAL;
-using LitShare.DAL.Models;
-using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿// <copyright file="UserService.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
 
 namespace LitShare.BLL.Services
 {
+    using LitShare.DAL;
+    using LitShare.DAL.Models;
+    using Microsoft.EntityFrameworkCore;
+
     public class UserService
     {
-        private readonly LitShareDbContext _context;
+        private readonly LitShareDbContext context;
 
         public UserService(LitShareDbContext context)
         {
-            _context = context;
+            this.context = context;
         }
 
         public UserService()
         {
-            _context = new LitShareDbContext();
+            this.context = new LitShareDbContext();
         }
 
-        public List<Users> GetAllUsers() => _context.Users.ToList();
+        public List<Users> GetAllUsers() => this.context.Users.ToList();
 
-        public Users? GetUserById(int id) => _context.Users.Find(id);
+        public Users? GetUserById(int id) => this.context.Users.Find(id);
 
         public void AddUser(string name, string email, string phone, string password, string region, string district, string city)
         {
@@ -37,39 +38,39 @@ namespace LitShare.BLL.Services
                 region = region,
                 district = district,
                 city = city,
-                role = RoleType.user
+                role = RoleType.user,
             };
 
-            _context.Users.Add(newUser);
-            _context.SaveChanges();
+            this.context.Users.Add(newUser);
+            this.context.SaveChanges();
         }
 
         public async Task<bool> ValidateUser(string email, string password)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.email == email);
+            var user = await this.context.Users.FirstOrDefaultAsync(u => u.email == email);
             return user != null && BCrypt.Net.BCrypt.Verify(password, user.password);
         }
 
         public Users? GetUserProfileById(int id)
         {
-            return _context.Users
+            return this.context.Users
                 .Include(u => u.posts)
                 .FirstOrDefault(u => u.id == id);
         }
 
         public void UpdateUserPhoto(int userId, string newPhotoUrl)
         {
-            var user = _context.Users.Find(userId);
+            var user = this.context.Users.Find(userId);
             if (user != null)
             {
                 user.photo_url = newPhotoUrl;
-                _context.SaveChanges();
+                this.context.SaveChanges();
             }
         }
 
         public void UpdateUser(Users updatedUser)
         {
-            var existingUser = _context.Users.FirstOrDefault(u => u.id == updatedUser.id);
+            var existingUser = this.context.Users.FirstOrDefault(u => u.id == updatedUser.id);
             if (existingUser != null)
             {
                 existingUser.region = updatedUser.region;
@@ -78,22 +79,26 @@ namespace LitShare.BLL.Services
                 existingUser.phone = updatedUser.phone;
                 existingUser.about = updatedUser.about;
                 existingUser.photo_url = updatedUser.photo_url;
-                _context.SaveChanges();
+                this.context.SaveChanges();
             }
         }
 
         public void DeleteUser(int id)
         {
-            var user = _context.Users.FirstOrDefault(u => u.id == id);
+            var user = this.context.Users.FirstOrDefault(u => u.id == id);
             if (user == null)
+            {
                 throw new Exception("Користувача не знайдено.");
+            }
 
-            var posts = _context.posts.Where(p => p.user_id == id).ToList();
+            var posts = this.context.posts.Where(p => p.user_id == id).ToList();
             if (posts.Any())
-                _context.posts.RemoveRange(posts);
+            {
+                this.context.posts.RemoveRange(posts);
+            }
 
-            _context.Users.Remove(user);
-            _context.SaveChanges();
+            this.context.Users.Remove(user);
+            this.context.SaveChanges();
         }
     }
 }

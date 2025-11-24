@@ -1,7 +1,4 @@
 ﻿using LitShare.BLL.Services;
-using LitShare.DAL.Models;
-using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;  
 using System.Windows;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
@@ -78,7 +75,7 @@ namespace LitShare.Presentation
 
         private void ExitButton_Click(object sender, RoutedEventArgs e)
         {
-            this.Close(); 
+            this.Close();
         }
 
         private async void ApproveButton_Click(object sender, RoutedEventArgs e)

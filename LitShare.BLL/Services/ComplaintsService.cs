@@ -1,35 +1,36 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using LitShare.DAL;
-using LitShare.BLL.DTOs;
-using LitShare.DAL.Models;
-using Microsoft.EntityFrameworkCore;
+﻿// <copyright file="ComplaintsService.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
 
 namespace LitShare.BLL.Services
 {
+    using LitShare.BLL.DTOs;
+    using LitShare.DAL;
+    using LitShare.DAL.Models;
+    using Microsoft.EntityFrameworkCore;
+
     public class ComplaintsService
     {
-        private readonly LitShareDbContext _context;
+        private readonly LitShareDbContext context;
 
-       
+
         public ComplaintsService(LitShareDbContext? context = null)
         {
-            _context = context ?? new LitShareDbContext();
+            this.context = context ?? new LitShareDbContext();
         }
 
         public List<ComplaintDto> GetAllComplaints()
         {
-            var query = from c in _context.complaints
-                        join p in _context.posts on c.post_id equals p.id
-                        join u in _context.Users on c.complainant_id equals u.id
+            var query = from c in context.complaints
+                        join p in context.posts on c.post_id equals p.id
+                        join u in context.Users on c.complainant_id equals u.id
                         select new ComplaintDto
                         {
                             Id = c.id,
                             Text = c.text,
                             BookTitle = p.title,
                             UserName = u.name,
-                            Date = c.date
+                            Date = c.date,
                         };
 
             return query.ToList();
@@ -37,18 +38,18 @@ namespace LitShare.BLL.Services
 
         public Complaints? GetComplaintWithDetails(int complaintId)
         {
-            return _context.complaints
+            return this.context.complaints
                 .Include(c => c.Post)
                 .FirstOrDefault(c => c.id == complaintId);
         }
 
         public void DeleteComplaint(int complaintId)
         {
-            var complaint = _context.complaints.Find(complaintId);
+            var complaint = this.context.complaints.Find(complaintId);
             if (complaint != null)
             {
-                _context.complaints.Remove(complaint);
-                _context.SaveChanges();
+                this.context.complaints.Remove(complaint);
+                this.context.SaveChanges();
             }
         }
 
@@ -59,34 +60,38 @@ namespace LitShare.BLL.Services
                 text = reasonText,
                 post_id = postId,
                 complainant_id = complainantId,
-                date = DateTime.UtcNow
+                date = DateTime.UtcNow,
             };
 
-            _context.complaints.Add(newComplaint);
-            _context.SaveChanges();
+            this.context.complaints.Add(newComplaint);
+            this.context.SaveChanges();
         }
 
         public void ApproveComplaint(int complaintId)
         {
-            var complaint = _context.complaints
+            var complaint = this.context.complaints
                 .Include(c => c.Post)
                     .ThenInclude(p => p.BookGenres)
                 .FirstOrDefault(c => c.id == complaintId);
 
             if (complaint == null)
+            {
                 throw new Exception("Скаргу не знайдено.");
+            }
 
             if (complaint.Post != null && complaint.Post.BookGenres.Any())
-                _context.bookGenres.RemoveRange(complaint.Post.BookGenres);
+            {
+                this.context.bookGenres.RemoveRange(complaint.Post.BookGenres);
+            }
 
             if (complaint.Post != null)
-                _context.posts.Remove(complaint.Post);
+            {
+                this.context.posts.Remove(complaint.Post);
+            }
 
-            _context.complaints.Remove(complaint);
+            this.context.complaints.Remove(complaint);
 
-            _context.SaveChanges();
+            this.context.SaveChanges();
         }
-
-
     }
 }

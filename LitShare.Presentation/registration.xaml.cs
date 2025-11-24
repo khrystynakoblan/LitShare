@@ -1,11 +1,9 @@
-﻿using System;
-using System.Linq;
+﻿using LitShare.BLL.Services;
+using LitShare.DAL.Models;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using LitShare.BLL.Services;
-using LitShare.DAL.Models;
 
 namespace LitShare.Presentation
 {
@@ -20,7 +18,7 @@ namespace LitShare.Presentation
 
         private void Button_Click_Register(object sender, RoutedEventArgs e)
         {
-            ClearValidation(); 
+            ClearValidation();
 
             string name = txtName.Text.Trim();
             string email = txtEmail.Text.Trim();
@@ -184,7 +182,7 @@ namespace LitShare.Presentation
 
                     if (user.role == RoleType.admin)
                     {
-                        var adminWindow = new ComplaintsPage(); 
+                        var adminWindow = new ComplaintsPage();
                         adminWindow.Show();
                         this.Close();
                     }

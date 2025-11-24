@@ -1,6 +1,4 @@
 using System.Windows;
-using Npgsql;
-using LitShare.DAL;
 
 namespace LitShare.Presentation
 {
@@ -8,7 +6,7 @@ namespace LitShare.Presentation
     {
         protected override void OnStartup(StartupEventArgs e)
         {
-            
+
             base.OnStartup(e);
         }
     }

@@ -1,7 +1,5 @@
 ﻿using LitShare.BLL.DTOs;
 using LitShare.BLL.Services;
-using System;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Imaging;
 
