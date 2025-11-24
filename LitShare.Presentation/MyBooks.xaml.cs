@@ -25,15 +25,15 @@ namespace LitShare.Presentation
             {
                 int currentUserId = _userId;
 
-                _allBooks = _context.posts
-                    .Where(p => p.user_id == currentUserId)
-                    .Join(_context.Users, p => p.user_id, u => u.id, (p, u) => new BookItem
+                _allBooks = _context.Posts
+                    .Where(p => p.UserId == currentUserId)
+                    .Join(_context.Users, p => p.UserId, u => u.Id, (p, u) => new BookItem
                     {
-                        Id = p.id,
-                        Title = p.title,
-                        Author = p.author,
-                        City = u.city,
-                        PhotoUrl = p.photo_url
+                        Id = p.Id,
+                        Title = p.Title,
+                        Author = p.Author,
+                        City = u.City,
+                        PhotoUrl = p.PhotoUrl
                     })
                     .ToList();
 

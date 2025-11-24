@@ -26,18 +26,18 @@ namespace LitShare.Presentation
 
                 if (user != null)
                 {
-                    txtNameSidebar.Text = user.name;
-                    txtNameMain.Text = user.name;
-                    txtRegion.Text = user.region ?? "—";
-                    txtDistrict.Text = user.district ?? "—";
-                    txtCity.Text = user.city ?? "—";
-                    txtPhone.Text = user.phone ?? "—";
-                    txtEmail.Text = user.email;
-                    txtAbout.Text = user.about ?? "Інформація про себе ще не заповнена.";
+                    txtNameSidebar.Text = user.Name;
+                    txtNameMain.Text = user.Name;
+                    txtRegion.Text = user.Region ?? "—";
+                    txtDistrict.Text = user.District ?? "—";
+                    txtCity.Text = user.City ?? "—";
+                    txtPhone.Text = user.Phone ?? "—";
+                    txtEmail.Text = user.Email;
+                    txtAbout.Text = user.About ?? "Інформація про себе ще не заповнена.";
 
-                    if (!string.IsNullOrEmpty(user.photo_url))
+                    if (!string.IsNullOrEmpty(user.PhotoUrl))
                     {
-                        userPhotoEllipse.Fill = new ImageBrush(new BitmapImage(new Uri(user.photo_url)));
+                        userPhotoEllipse.Fill = new ImageBrush(new BitmapImage(new Uri(user.PhotoUrl)));
                     }
                     else
                     {

@@ -9,33 +9,45 @@ namespace LitShare.BLL.Services
     using LitShare.DAL.Models;
     using Microsoft.EntityFrameworkCore;
 
+    /// <summary>
+    /// Provides services for retrieving, searching, and filtering book/post listings.
+    /// </summary>
     public class BookService
     {
         private readonly LitShareDbContext context;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BookService"/> class.
+        /// </summary>
+        /// <param name="context">The database context (optional, defaults to a new instance if null).</param>
         public BookService(LitShareDbContext? context = null)
         {
             this.context = context ?? new LitShareDbContext();
         }
 
+        /// <summary>
+        /// Retrieves a list of all book listings from the database.
+        /// </summary>
+        /// <returns>A list of <see cref="BookDto"/> objects.</returns>
         public async Task<List<BookDto>> GetAllBooksAsync()
         {
             try
             {
-                var books = await this.context.posts
+                var books = await this.context.Posts
                     .Include(p => p.BookGenres)
                         .ThenInclude(bg => bg.Genre)
                     .Include(p => p.User)
                     .AsNoTracking()
                     .Select(p => new BookDto
                     {
-                        Id = p.id,
-                        Title = p.title,
-                        Author = p.author,
-                        Location = p.User.city,
-                        Genre = string.Join(", ", p.BookGenres.Select(bg => bg.Genre.name)),
-                        DealType = p.deal_type == DealType.Exchange ? "Обмін" : "Безкоштовно",
-                        ImagePath = p.photo_url,
+                        Id = p.Id,
+                        Title = p.Title,
+                        Author = p.Author,
+                        Location = p.User.City,
+                        Genre = string.Join(", ", p.BookGenres.Select(bg => bg.Genre.Name)),
+                        DealType = p.DealType == DealType.Exchange ? "Обмін" : "Безкоштовно",
+                        ImagePath = p.PhotoUrl,
+                        UserId = p.UserId,
                     })
                     .ToListAsync();
 
@@ -48,15 +60,21 @@ namespace LitShare.BLL.Services
             }
         }
 
+        /// <summary>
+        /// Retrieves a list of all unique genres from the database.
+        /// </summary>
+        /// <returns>A list of genre names.</returns>
         public async Task<List<string>> GetGenresAsync()
         {
             try
             {
-                return await this.context.genres
+#pragma warning disable CS8619 // Nullability of reference types in value doesn't match target type.
+                return await this.context.Genres
                     .AsNoTracking()
-                    .OrderBy(g => g.name)
-                    .Select(g => g.name)
+                    .OrderBy(g => g.Name)
+                    .Select(g => g.Name)
                     .ToListAsync();
+#pragma warning restore CS8619 // Nullability of reference types in value doesn't match target type.
             }
             catch (Exception ex)
             {
@@ -65,6 +83,15 @@ namespace LitShare.BLL.Services
             }
         }
 
+        /// <summary>
+        /// Filters a given list of books based on search criteria, location, deal type, and genres.
+        /// </summary>
+        /// <param name="books">The initial list of books to filter.</param>
+        /// <param name="search">Text to search in Title or Author.</param>
+        /// <param name="location">Location filter.</param>
+        /// <param name="dealType">Deal type filter.</param>
+        /// <param name="genres">List of genres to filter by.</param>
+        /// <returns>A filtered list of <see cref="BookDto"/> objects.</returns>
         public List<BookDto> GetFilteredBooks(List<BookDto> books, string? search, string? location, string? dealType, List<string> genres)
         {
             var filtered = books.AsEnumerable();
@@ -95,25 +122,31 @@ namespace LitShare.BLL.Services
             return filtered.ToList();
         }
 
+        /// <summary>
+        /// Retrieves book listings associated with a specific user ID.
+        /// </summary>
+        /// <param name="userId">The ID of the user whose books to retrieve.</param>
+        /// <returns>A list of <see cref="BookDto"/> objects.</returns>
         public async Task<List<BookDto>> GetBooksByUserIdAsync(int userId)
         {
             try
             {
-                var books = await this.context.posts
-                    .Where(p => p.user_id == userId)
+                var books = await this.context.Posts
+                    .Where(p => p.UserId == userId)
                     .Include(p => p.BookGenres)
                         .ThenInclude(bg => bg.Genre)
                     .Include(p => p.User)
                     .AsNoTracking()
                     .Select(p => new BookDto
                     {
-                        Id = p.id,
-                        Title = p.title,
-                        Author = p.author,
-                        Location = p.User.city,
-                        Genre = string.Join(", ", p.BookGenres.Select(bg => bg.Genre.name)),
-                        DealType = p.deal_type == DealType.Exchange ? "Обмін" : "Безкоштовно",
-                        ImagePath = p.photo_url,
+                        Id = p.Id,
+                        Title = p.Title,
+                        Author = p.Author,
+                        Location = p.User.City,
+                        Genre = string.Join(", ", p.BookGenres.Select(bg => bg.Genre.Name)),
+                        DealType = p.DealType == DealType.Exchange ? "Обмін" : "Безкоштовно",
+                        ImagePath = p.PhotoUrl,
+                        UserId = p.UserId,
                     })
                     .ToListAsync();
 
@@ -126,24 +159,29 @@ namespace LitShare.BLL.Services
             }
         }
 
+        /// <summary>
+        /// Retrieves a single book listing by its ID.
+        /// </summary>
+        /// <param name="id">The ID of the book to retrieve.</param>
+        /// <returns>A single <see cref="BookDto"/> object or null if not found.</returns>
         public async Task<BookDto?> GetBookById(int id)
         {
-            return await this.context.posts
+            return await this.context.Posts
                 .Include(p => p.BookGenres)
                     .ThenInclude(bg => bg.Genre)
                 .Include(p => p.User)
                 .AsNoTracking()
-                .Where(p => p.id == id)
+                .Where(p => p.Id == id)
                 .Select(p => new BookDto
                 {
-                    Id = p.id,
-                    Title = p.title,
-                    Author = p.author,
-                    Location = p.User.city,
-                    Genre = string.Join(", ", p.BookGenres.Select(bg => bg.Genre.name)),
-                    DealType = p.deal_type == DealType.Exchange ? "Обмін" : "Безкоштовно",
-                    ImagePath = p.photo_url,
-                    UserId = p.user_id,
+                    Id = p.Id,
+                    Title = p.Title,
+                    Author = p.Author,
+                    Location = p.User.City,
+                    Genre = string.Join(", ", p.BookGenres.Select(bg => bg.Genre.Name)),
+                    DealType = p.DealType == DealType.Exchange ? "Обмін" : "Безкоштовно",
+                    ImagePath = p.PhotoUrl,
+                    UserId = p.UserId,
                 })
                 .FirstOrDefaultAsync();
         }

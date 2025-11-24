@@ -25,12 +25,12 @@ namespace LitShare.Presentation
 
             if (user != null)
             {
-                txtName.Text = user.name;
-                txtRegion.Text = user.region;
-                txtDistrict.Text = user.district;
-                txtCity.Text = user.city;
-                txtPhone.Text = user.phone ?? "—";
-                txtAbout.Text = user.about ?? "Користувач ще не заповнив інформацію про себе.";
+                txtName.Text = user.Name;
+                txtRegion.Text = user.Region;
+                txtDistrict.Text = user.District;
+                txtCity.Text = user.City;
+                txtPhone.Text = user.Phone ?? "—";
+                txtAbout.Text = user.About ?? "Користувач ще не заповнив інформацію про себе.";
 
                 var books = await _bookService.GetBooksByUserIdAsync(userId);
                 BooksList.ItemsSource = books;

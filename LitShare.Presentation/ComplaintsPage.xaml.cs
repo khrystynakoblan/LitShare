@@ -1,37 +1,41 @@
-﻿using LitShare.BLL.DTOs;
-using LitShare.BLL.Services;
-using System.Collections.ObjectModel;
-using System.Windows;
+﻿// <copyright file="ComplaintsPage.xaml.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
 
 namespace LitShare.Presentation
 {
+    using System.Collections.ObjectModel;
+    using System.Windows;
+    using LitShare.BLL.DTOs;
+    using LitShare.BLL.Services;
+
     public partial class ComplaintsPage : Window
     {
         public ObservableCollection<ComplaintDto> Complaints { get; set; }
 
         public ComplaintsPage()
         {
-            InitializeComponent();
-            LoadComplaints();
-            ComplaintsGrid.ItemsSource = Complaints;
+            this.InitializeComponent();
+            this.LoadComplaints();
+            this.ComplaintsGrid.ItemsSource = this.Complaints;
         }
 
         private void LoadComplaints()
         {
             var service = new ComplaintsService();
             var complaintsList = service.GetAllComplaints();
-            Complaints = new ObservableCollection<ComplaintDto>(complaintsList);
+            this.Complaints = new ObservableCollection<ComplaintDto>(complaintsList);
         }
 
         private void ComplaintsGrid_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            if (ComplaintsGrid.SelectedItem is ComplaintDto selectedComplaint)
+            if (this.ComplaintsGrid.SelectedItem is ComplaintDto selectedComplaint)
             {
                 var reviewWindow = new ComplaintReviewWindow(selectedComplaint.Id);
                 reviewWindow.ShowDialog();
 
-                LoadComplaints();
-                ComplaintsGrid.ItemsSource = Complaints;
+                this.LoadComplaints();
+                this.ComplaintsGrid.ItemsSource = this.Complaints;
             }
         }
 

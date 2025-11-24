@@ -1,40 +1,44 @@
-﻿using LitShare.DAL;
-using LitShare.DAL.Models;
-using LitShare.Presentation;
-using Microsoft.Win32;
-using System.Windows;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
+﻿// <copyright file="Edit_AD.xaml.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
 
 namespace LitShare
 {
+    using System.Windows;
+    using System.Windows.Media;
+    using System.Windows.Media.Imaging;
+    using LitShare.DAL;
+    using LitShare.DAL.Models;
+    using LitShare.Presentation;
+    using Microsoft.Win32;
+
     public partial class EditAdWindow : Window
     {
-        private readonly LitShareDbContext _context;
-        private readonly int _postId;
-        private Posts _currentPost;
-        private readonly int _userId;
+        private readonly LitShareDbContext context;
+        private readonly int postId;
+        private Posts currentPost;
+        private readonly int userId;
 
         public EditAdWindow(int postId, int userId)
         {
-            InitializeComponent();
-            _context = new LitShareDbContext();
+            this.InitializeComponent();
+            this.context = new LitShareDbContext();
 
-            _postId = postId;
-            _userId = userId;
+            this.postId = postId;
+            this.userId = userId;
 
-            LoadGenres();
-            LoadDealTypes();
-            LoadPostData();
+            this.LoadGenres();
+            this.LoadDealTypes();
+            this.LoadPostData();
         }
 
 
         private void LoadGenres()
         {
-            var genres = _context.genres.ToList();
-            GenreComboBox.ItemsSource = genres;
-            GenreComboBox.DisplayMemberPath = "name";
-            GenreComboBox.SelectedValuePath = "id";
+            var genres = this.context.Genres.ToList();
+            this.GenreComboBox.ItemsSource = genres;
+            this.GenreComboBox.DisplayMemberPath = "name";
+            this.GenreComboBox.SelectedValuePath = "id";
         }
 
         private void LoadDealTypes()
@@ -42,43 +46,43 @@ namespace LitShare
             var dealTypes = new[]
             {
                 new { Value = DealType.Exchange, Display = "Обмін" },
-                new { Value = DealType.Donation, Display = "Безкоштовно" }
+                new { Value = DealType.Donation, Display = "Безкоштовно" },
             };
 
-            DealTypeComboBox.ItemsSource = dealTypes;
-            DealTypeComboBox.DisplayMemberPath = "Display";
-            DealTypeComboBox.SelectedValuePath = "Value";
+            this.DealTypeComboBox.ItemsSource = dealTypes;
+            this.DealTypeComboBox.DisplayMemberPath = "Display";
+            this.DealTypeComboBox.SelectedValuePath = "Value";
         }
 
 
         private void LoadPostData()
         {
-            _currentPost = _context.posts.FirstOrDefault(p => p.id == _postId);
+            this.currentPost = this.context.Posts.FirstOrDefault(p => p.Id == postId);
 
-            if (_currentPost == null)
+            if (this.currentPost == null)
             {
                 MessageBox.Show("Оголошення не знайдено.", "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
                 Close();
                 return;
             }
 
-            TitleTextBox.Text = _currentPost.title;
-            AuthorTextBox.Text = _currentPost.author;
-            DescriptionTextBox.Text = _currentPost.description;
-            DealTypeComboBox.SelectedValue = _currentPost.deal_type;
+            this.TitleTextBox.Text = this.currentPost.Title;
+            this.AuthorTextBox.Text = this.currentPost.Author;
+            this.DescriptionTextBox.Text = this.currentPost.Description;
+            this.DealTypeComboBox.SelectedValue = this.currentPost.DealType;
 
 
-            var bookGenre = _context.bookGenres.FirstOrDefault(bg => bg.post_id == _postId);
+            var bookGenre = this.context.BookGenres.FirstOrDefault(bg => bg.PostId == this.postId);
             if (bookGenre != null)
             {
-                GenreComboBox.SelectedValue = bookGenre.genre_id;
+                this.GenreComboBox.SelectedValue = bookGenre.GenreId;
             }
 
-            if (!string.IsNullOrEmpty(_currentPost.photo_url))
+            if (!string.IsNullOrEmpty(this.currentPost.PhotoUrl))
             {
                 try
                 {
-                    BookImage.Source = new BitmapImage(new Uri(_currentPost.photo_url, UriKind.Absolute));
+                    this.BookImage.Source = new BitmapImage(new Uri(this.currentPost.PhotoUrl, UriKind.Absolute));
                 }
                 catch
                 {
@@ -91,17 +95,17 @@ namespace LitShare
         {
             var openFileDialog = new OpenFileDialog
             {
-                Filter = "Зображення (*.jpg;*.png;*.jpeg)|*.jpg;*.png;*.jpeg"
+                Filter = "Зображення (*.jpg;*.png;*.jpeg)|*.jpg;*.png;*.jpeg",
             };
 
             if (openFileDialog.ShowDialog() == true)
             {
                 string selectedFile = openFileDialog.FileName;
 
-                BookImage.Source = new BitmapImage(new Uri(selectedFile));
+                this.BookImage.Source = new BitmapImage(new Uri(selectedFile));
 
                 // Зберігаємо шлях до фото (локальний шлях)
-                _currentPost.photo_url = selectedFile;
+                currentPost.PhotoUrl = selectedFile;
             }
         }
 
@@ -112,44 +116,44 @@ namespace LitShare
 
             try
             {
-                if (_currentPost == null)
+                if (currentPost == null)
                 {
                     MessageBox.Show("Оголошення не знайдено.", "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
 
-                _currentPost.title = TitleTextBox.Text;
-                _currentPost.author = AuthorTextBox.Text;
-                _currentPost.description = DescriptionTextBox.Text;
-                _currentPost.deal_type = (DealType)DealTypeComboBox.SelectedValue;
+                currentPost.Title = TitleTextBox.Text;
+                currentPost.Author = AuthorTextBox.Text;
+                currentPost.Description = DescriptionTextBox.Text;
+                currentPost.DealType = (DealType)DealTypeComboBox.SelectedValue;
 
-                var existingGenre = _context.bookGenres.FirstOrDefault(bg => bg.post_id == _postId);
+                var existingGenre = context.BookGenres.FirstOrDefault(bg => bg.PostId == postId);
                 int selectedGenreId = (int)GenreComboBox.SelectedValue;
 
                 if (existingGenre != null)
                 {
-                    if (existingGenre.genre_id != selectedGenreId)
+                    if (existingGenre.GenreId != selectedGenreId)
                     {
-                        _context.bookGenres.Remove(existingGenre);
-                        _context.SaveChanges();
+                        context.BookGenres.Remove(existingGenre);
+                        context.SaveChanges();
 
-                        _context.bookGenres.Add(new BookGenres
+                        context.BookGenres.Add(new BookGenres
                         {
-                            post_id = _postId,
-                            genre_id = selectedGenreId
+                            PostId = postId,
+                            GenreId = selectedGenreId
                         });
                     }
                 }
                 else
                 {
-                    _context.bookGenres.Add(new BookGenres
+                    context.BookGenres.Add(new BookGenres
                     {
-                        post_id = _postId,
-                        genre_id = selectedGenreId
+                        PostId = postId,
+                        GenreId = selectedGenreId
                     });
                 }
 
-                _context.SaveChanges();
+                this.context.SaveChanges();
 
                 Close();
             }
@@ -167,7 +171,7 @@ namespace LitShare
 
         private void HomeButton_Click(object sender, RoutedEventArgs e)
         {
-            MainPage mainWindow = new MainPage(_userId);
+            MainPage mainWindow = new MainPage(userId);
             mainWindow.Show();
             this.Close();
         }

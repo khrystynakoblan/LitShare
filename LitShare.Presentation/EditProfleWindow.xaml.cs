@@ -27,28 +27,28 @@ namespace LitShare.Presentation
             if (_currentUser == null)
                 return;
 
-            txtFirstName.Text = _currentUser.name;
-            txtRegion.Text = _currentUser.region;
-            txtDistrict.Text = _currentUser.district;
-            txtCity.Text = _currentUser.city;
-            txtPhone.Text = _currentUser.phone;
-            txtAbout.Text = _currentUser.about ?? "";
+            txtFirstName.Text = _currentUser.Name;
+            txtRegion.Text = _currentUser.Region;
+            txtDistrict.Text = _currentUser.District;
+            txtCity.Text = _currentUser.City;
+            txtPhone.Text = _currentUser.Phone;
+            txtAbout.Text = _currentUser.About ?? "";
 
-            if (!string.IsNullOrEmpty(_currentUser.photo_url))
-                userPhotoEllipse.Fill = new ImageBrush(new BitmapImage(new Uri(_currentUser.photo_url)));
+            if (!string.IsNullOrEmpty(_currentUser.PhotoUrl))
+                userPhotoEllipse.Fill = new ImageBrush(new BitmapImage(new Uri(_currentUser.PhotoUrl)));
 
             _originalUser = new Users
             {
-                id = _currentUser.id,
-                name = _currentUser.name,
-                email = _currentUser.email,
-                phone = _currentUser.phone,
-                password = _currentUser.password,
-                region = _currentUser.region,
-                district = _currentUser.district,
-                city = _currentUser.city,
-                about = _currentUser.about,
-                photo_url = _currentUser.photo_url
+                Id = _currentUser.Id,
+                Name = _currentUser.Name,
+                Email = _currentUser.Email,
+                Phone = _currentUser.Phone,
+                Password = _currentUser.Password,
+                Region = _currentUser.Region,
+                District = _currentUser.District,
+                City = _currentUser.City,
+                About = _currentUser.About,
+                PhotoUrl = _currentUser.PhotoUrl
             };
         }
 
@@ -80,11 +80,11 @@ namespace LitShare.Presentation
                 !string.IsNullOrEmpty(errPhone.Text))
                 return;
 
-            _currentUser.region = txtRegion.Text;
-            _currentUser.district = txtDistrict.Text;
-            _currentUser.city = txtCity.Text;
-            _currentUser.phone = txtPhone.Text;
-            _currentUser.about = txtAbout.Text;
+            _currentUser.Region = txtRegion.Text;
+            _currentUser.District = txtDistrict.Text;
+            _currentUser.City = txtCity.Text;
+            _currentUser.Phone = txtPhone.Text;
+            _currentUser.About = txtAbout.Text;
 
             try
             {
@@ -101,14 +101,14 @@ namespace LitShare.Presentation
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            txtRegion.Text = _originalUser.region;
-            txtDistrict.Text = _originalUser.district;
-            txtCity.Text = _originalUser.city;
-            txtPhone.Text = _originalUser.phone;
-            txtAbout.Text = _originalUser.about ?? "";
+            txtRegion.Text = _originalUser.Region;
+            txtDistrict.Text = _originalUser.District;
+            txtCity.Text = _originalUser.City;
+            txtPhone.Text = _originalUser.Phone;
+            txtAbout.Text = _originalUser.About ?? "";
 
-            if (!string.IsNullOrEmpty(_originalUser.photo_url))
-                userPhotoEllipse.Fill = new ImageBrush(new BitmapImage(new Uri(_originalUser.photo_url)));
+            if (!string.IsNullOrEmpty(_originalUser.PhotoUrl))
+                userPhotoEllipse.Fill = new ImageBrush(new BitmapImage(new Uri(_originalUser.PhotoUrl)));
 
             var profilePage = new ProfileWindow(_userId);
             profilePage.Show();
@@ -119,7 +119,7 @@ namespace LitShare.Presentation
         {
             string randomUrl = $"https://randomuser.me/api/portraits/lego/{new Random().Next(0, 9)}.jpg";
             userPhotoEllipse.Fill = new ImageBrush(new BitmapImage(new Uri(randomUrl)));
-            _currentUser.photo_url = randomUrl;
+            _currentUser.PhotoUrl = randomUrl;
         }
 
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
@@ -136,7 +136,7 @@ namespace LitShare.Presentation
             {
                 try
                 {
-                    _userService.DeleteUser(_currentUser.id);
+                    _userService.DeleteUser(_currentUser.Id);
 
                     var authWindow = new AuthWindow();
                     authWindow.Show();

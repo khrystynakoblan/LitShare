@@ -1,40 +1,40 @@
-﻿using LitShare.BLL.Services;
-using System.Windows;
-using System.Windows.Media.Animation;
-using System.Windows.Media.Imaging;
-
-namespace LitShare.Presentation
+﻿namespace LitShare.Presentation
 {
+    using System.Windows;
+    using System.Windows.Media.Animation;
+    using System.Windows.Media.Imaging;
+    using LitShare.BLL.Services;
+
     public partial class ComplaintReviewWindow : Window
     {
-        private readonly ComplaintsService _complaintsService = new ComplaintsService();
-        private readonly UserService _userService = new UserService();
+        private readonly ComplaintsService complaintsService = new ComplaintsService();
+        private readonly UserService userService = new UserService();
 
-        private int _currentComplaintId;
+        private int currentComplaintId;
 
         public ComplaintReviewWindow(int complaintId)
         {
-            InitializeComponent();
-            _currentComplaintId = complaintId;
-            _ = LoadComplaintDataAsync(_currentComplaintId);
+            this.InitializeComponent();
+            this.currentComplaintId = complaintId;
+            _ = this.LoadComplaintDataAsync(this.currentComplaintId);
         }
 
         private async Task LoadComplaintDataAsync(int complaintId)
         {
             try
             {
-                var complaint = _complaintsService.GetComplaintWithDetails(complaintId);
+                var complaint = this.complaintsService.GetComplaintWithDetails(complaintId);
 
                 if (complaint != null && complaint.Post != null)
                 {
-                    txtComplaintReason.Text = complaint.text;
-                    txtPostTitle.Text = complaint.Post.title;
-                    txtPostDescription.Text = complaint.Post.description;
+                    this.txtComplaintReason.Text = complaint.Text;
+                    this.txtPostTitle.Text = complaint.Post.Title;
+                    this.txtPostDescription.Text = complaint.Post.Description;
 
-                    var author = _userService.GetUserById(complaint.Post.user_id);
-                    txtPostAuthor.Text = author?.name ?? "Невідомий автор";
+                    var author = this.userService.GetUserById(complaint.Post.UserId);
+                    this.txtPostAuthor.Text = author?.Name ?? "Невідомий автор";
 
-                    LoadImage(complaint.Post.photo_url);
+                    this.LoadImage(complaint.Post.PhotoUrl);
                 }
                 else
                 {
@@ -53,7 +53,7 @@ namespace LitShare.Presentation
         {
             if (string.IsNullOrWhiteSpace(url))
             {
-                postImage.Source = null;
+                this.postImage.Source = null;
                 return;
             }
 
@@ -65,11 +65,11 @@ namespace LitShare.Presentation
                 bitmap.CacheOption = BitmapCacheOption.OnLoad;
                 bitmap.EndInit();
 
-                postImage.Source = bitmap;
+                this.postImage.Source = bitmap;
             }
             catch
             {
-                postImage.Source = null;
+                this.postImage.Source = null;
             }
         }
 
@@ -82,9 +82,9 @@ namespace LitShare.Presentation
         {
             try
             {
-                _complaintsService.ApproveComplaint(_currentComplaintId);
+                this.complaintsService.ApproveComplaint(this.currentComplaintId);
 
-                await ShowToast("✔ Скаргу підтверджено");
+                await this.ShowToast("✔ Скаргу підтверджено");
 
                 this.Close();
             }
@@ -98,9 +98,9 @@ namespace LitShare.Presentation
         {
             try
             {
-                _complaintsService.DeleteComplaint(_currentComplaintId);
+                this.complaintsService.DeleteComplaint(this.currentComplaintId);
 
-                await ShowToast("✖ Скаргу відхилено");
+                await this.ShowToast("✖ Скаргу відхилено");
 
                 this.Close();
             }
@@ -112,18 +112,18 @@ namespace LitShare.Presentation
 
         private async Task ShowToast(string text)
         {
-            ToastText.Text = text;
-            Toast.Visibility = Visibility.Visible;
+            this.ToastText.Text = text;
+            this.Toast.Visibility = Visibility.Visible;
 
             var fadeIn = new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(250));
-            Toast.BeginAnimation(OpacityProperty, fadeIn);
+            this.Toast.BeginAnimation(OpacityProperty, fadeIn);
 
             await Task.Delay(1500);
 
             var fadeOut = new DoubleAnimation(1, 0, TimeSpan.FromMilliseconds(250));
-            fadeOut.Completed += (s, e) => Toast.Visibility = Visibility.Collapsed;
+            fadeOut.Completed += (s, e) => this.Toast.Visibility = Visibility.Collapsed;
 
-            Toast.BeginAnimation(OpacityProperty, fadeOut);
+            this.Toast.BeginAnimation(OpacityProperty, fadeOut);
         }
 
         private void BackButton_Click(object sender, RoutedEventArgs e)

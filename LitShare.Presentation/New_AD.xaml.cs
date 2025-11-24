@@ -37,7 +37,7 @@ namespace LitShare
         private void LoadGenres()
         {
             using var db = new LitShareDbContext();
-            var genres = db.genres.ToList();
+            var genres = db.Genres.ToList();
             GenreComboBox.ItemsSource = genres;
             GenreComboBox.DisplayMemberPath = "name";
             GenreComboBox.SelectedValuePath = "id";
@@ -54,25 +54,27 @@ namespace LitShare
 
                 var post = new Posts
                 {
-                    title = TitleTextBox.Text,
-                    author = AuthorTextBox.Text,
-                    description = DescriptionTextBox.Text,
-                    deal_type = (DealType)DealTypeComboBox.SelectedValue,
-                    user_id = _userId,
-                    photo_url = selectedPhotoPath
+                    Title = TitleTextBox.Text,
+                    Author = AuthorTextBox.Text,
+                    Description = DescriptionTextBox.Text,
+                    DealType = (DealType)DealTypeComboBox.SelectedValue,
+                    UserId = _userId,
+                    PhotoUrl = selectedPhotoPath,
+                    // ADD THIS LINE: Initialize the required navigation property to null
+                    User = null
                 };
 
-                db.posts.Add(post);
+                db.Posts.Add(post);
                 db.SaveChanges();
 
                 var selectedGenre = (Genres)GenreComboBox.SelectedItem;
                 var bookGenre = new BookGenres
                 {
-                    post_id = post.id,
-                    genre_id = selectedGenre.id
+                    PostId = post.Id,
+                    GenreId = selectedGenre.Id
                 };
 
-                db.bookGenres.Add(bookGenre);
+                db.BookGenres.Add(bookGenre);
                 db.SaveChanges();
 
                 var mainWindow = new MainPage(_userId);
