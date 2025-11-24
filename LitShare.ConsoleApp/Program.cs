@@ -4,7 +4,6 @@ using Bogus;
 
 namespace LitShare.ConsoleApp
 {
-    // --- 0. ІНТЕРФЕЙС ---
     public interface IBookRepository
     {
         void ClearAllData();
@@ -19,7 +18,6 @@ namespace LitShare.ConsoleApp
         List<Complaint> GetAllComplaints();
     }
 
-    // --- 1. IN-MEMORY БАЗА ---
     public class InMemoryBookRepository : IBookRepository
     {
         private readonly List<User> _users = new();
@@ -76,7 +74,6 @@ namespace LitShare.ConsoleApp
         public List<Complaint> GetAllComplaints() => new(_complaints);
     }
 
-    // --- 2. DATA SEEDER ---
     public class DataSeeder
     {
         private readonly IBookRepository _repo;
@@ -154,7 +151,6 @@ namespace LitShare.ConsoleApp
         }
     }
 
-    // --- 3. МОДЕЛІ ---
     public class User
     {
         public int Id { get; set; }
@@ -194,7 +190,6 @@ namespace LitShare.ConsoleApp
         public int ComplainantId { get; set; }
     }
 
-    // --- 4. MAIN ---
     public class ConsoleApp
     {
         static void Main()
