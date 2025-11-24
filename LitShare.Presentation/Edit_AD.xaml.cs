@@ -56,7 +56,7 @@ namespace LitShare
 
         private void LoadPostData()
         {
-            _currentPost = _context.posts.FirstOrDefault(p => p.id == _postId);
+            _currentPost = _context.posts.FirstOrDefault(p => p.Id == _postId);
 
             if (_currentPost == null)
             {
@@ -65,23 +65,23 @@ namespace LitShare
                 return;
             }
 
-            TitleTextBox.Text = _currentPost.title;
-            AuthorTextBox.Text = _currentPost.author;
-            DescriptionTextBox.Text = _currentPost.description;
-            DealTypeComboBox.SelectedValue = _currentPost.deal_type;
+            TitleTextBox.Text = _currentPost.Title;
+            AuthorTextBox.Text = _currentPost.Author;
+            DescriptionTextBox.Text = _currentPost.Description;
+            DealTypeComboBox.SelectedValue = _currentPost.DealType;
 
 
-            var bookGenre = _context.bookGenres.FirstOrDefault(bg => bg.post_id == _postId);
+            var bookGenre = _context.bookGenres.FirstOrDefault(bg => bg.PostId == _postId);
             if (bookGenre != null)
             {
-                GenreComboBox.SelectedValue = bookGenre.genre_id;
+                GenreComboBox.SelectedValue = bookGenre.GenreId;
             }
 
-            if (!string.IsNullOrEmpty(_currentPost.photo_url))
+            if (!string.IsNullOrEmpty(_currentPost.PhotoUrl))
             {
                 try
                 {
-                    BookImage.Source = new BitmapImage(new Uri(_currentPost.photo_url, UriKind.Absolute));
+                    BookImage.Source = new BitmapImage(new Uri(_currentPost.PhotoUrl, UriKind.Absolute));
                 }
                 catch
                 {
@@ -104,7 +104,7 @@ namespace LitShare
                 BookImage.Source = new BitmapImage(new Uri(selectedFile));
 
                 // Зберігаємо шлях до фото (локальний шлях)
-                _currentPost.photo_url = selectedFile;
+                _currentPost.PhotoUrl = selectedFile;
             }
         }
 
@@ -121,25 +121,25 @@ namespace LitShare
                     return;
                 }
 
-                _currentPost.title = TitleTextBox.Text;
-                _currentPost.author = AuthorTextBox.Text;
-                _currentPost.description = DescriptionTextBox.Text;
-                _currentPost.deal_type = (DealType)DealTypeComboBox.SelectedValue;
+                _currentPost.Title = TitleTextBox.Text;
+                _currentPost.Author = AuthorTextBox.Text;
+                _currentPost.Description = DescriptionTextBox.Text;
+                _currentPost.DealType = (DealType)DealTypeComboBox.SelectedValue;
 
-                var existingGenre = _context.bookGenres.FirstOrDefault(bg => bg.post_id == _postId);
+                var existingGenre = _context.bookGenres.FirstOrDefault(bg => bg.PostId == _postId);
                 int selectedGenreId = (int)GenreComboBox.SelectedValue;
 
                 if (existingGenre != null)
                 {
-                    if (existingGenre.genre_id != selectedGenreId)
+                    if (existingGenre.GenreId != selectedGenreId)
                     {
                         _context.bookGenres.Remove(existingGenre);
                         _context.SaveChanges();
 
                         _context.bookGenres.Add(new BookGenres
                         {
-                            post_id = _postId,
-                            genre_id = selectedGenreId
+                            PostId = _postId,
+                            GenreId = selectedGenreId
                         });
                     }
                 }
@@ -147,8 +147,8 @@ namespace LitShare
                 {
                     _context.bookGenres.Add(new BookGenres
                     {
-                        post_id = _postId,
-                        genre_id = selectedGenreId
+                        PostId = _postId,
+                        GenreId = selectedGenreId
                     });
                 }
 

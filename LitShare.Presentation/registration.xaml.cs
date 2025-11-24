@@ -171,10 +171,10 @@ namespace LitShare.Presentation
                 bool isValid = await _userService.ValidateUser(email, password);
                 if (isValid)
                 {
-                    var user = _userService.GetAllUsers().FirstOrDefault(u => u.email == email);
+                    var user = _userService.GetAllUsers().FirstOrDefault(u => u.Email == email);
                     if (user != null)
                     {
-                        var mainPage = new MainPage(user.id);
+                        var mainPage = new MainPage(user.Id);
                         mainPage.Show();
                         this.Close();
                     }
@@ -255,7 +255,7 @@ namespace LitShare.Presentation
             try
             {
                 var users = _userService.GetAllUsers();
-                return users.Any(u => u.email.Equals(email, StringComparison.OrdinalIgnoreCase));
+                return users.Any(u => u.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
             }
             catch
             {
@@ -268,7 +268,7 @@ namespace LitShare.Presentation
             try
             {
                 var users = _userService.GetAllUsers();
-                return users.Any(u => u.phone == phone);
+                return users.Any(u => u.Phone == phone);
             }
             catch
             {

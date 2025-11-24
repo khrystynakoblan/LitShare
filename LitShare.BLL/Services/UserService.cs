@@ -30,13 +30,13 @@ namespace LitShare.BLL.Services
             string hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
             var newUser = new Users
             {
-                name = name,
-                email = email,
-                phone = phone,
-                password = hashedPassword,
-                region = region,
-                district = district,
-                city = city
+                Name = name,
+                Email = email,
+                Phone = phone,
+                Password = hashedPassword,
+                Region = region,
+                District = district,
+                City = city
             };
 
             _context.Users.Add(newUser);
@@ -45,15 +45,15 @@ namespace LitShare.BLL.Services
 
         public async Task<bool> ValidateUser(string email, string password)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.email == email);
-            return user != null && BCrypt.Net.BCrypt.Verify(password, user.password);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            return user != null && BCrypt.Net.BCrypt.Verify(password, user.Password);
         }
 
         public Users? GetUserProfileById(int id)
         {
             return _context.Users
-                .Include(u => u.posts)
-                .FirstOrDefault(u => u.id == id);
+                .Include(u => u.Posts)
+                .FirstOrDefault(u => u.Id == id);
         }
 
         public void UpdateUserPhoto(int userId, string newPhotoUrl)
@@ -61,33 +61,33 @@ namespace LitShare.BLL.Services
             var user = _context.Users.Find(userId);
             if (user != null)
             {
-                user.photo_url = newPhotoUrl;
+                user.PhotoUrl = newPhotoUrl;
                 _context.SaveChanges();
             }
         }
 
         public void UpdateUser(Users updatedUser)
         {
-            var existingUser = _context.Users.FirstOrDefault(u => u.id == updatedUser.id);
+            var existingUser = _context.Users.FirstOrDefault(u => u.Id == updatedUser.Id);
             if (existingUser != null)
             {
-                existingUser.region = updatedUser.region;
-                existingUser.district = updatedUser.district;
-                existingUser.city = updatedUser.city;
-                existingUser.phone = updatedUser.phone;
-                existingUser.about = updatedUser.about;
-                existingUser.photo_url = updatedUser.photo_url;
+                existingUser.Region = updatedUser.Region;
+                existingUser.District = updatedUser.District;
+                existingUser.City = updatedUser.City;
+                existingUser.Phone = updatedUser.Phone;
+                existingUser.About = updatedUser.About;
+                existingUser.PhotoUrl = updatedUser.PhotoUrl;
                 _context.SaveChanges();
             }
         }
 
         public void DeleteUser(int id)
         {
-            var user = _context.Users.FirstOrDefault(u => u.id == id);
+            var user = _context.Users.FirstOrDefault(u => u.Id == id);
             if (user == null)
                 throw new Exception("Користувача не знайдено.");
 
-            var posts = _context.posts.Where(p => p.user_id == id).ToList();
+            var posts = _context.posts.Where(p => p.UserId == id).ToList();
             if (posts.Any())
                 _context.posts.RemoveRange(posts);
 

@@ -55,7 +55,7 @@ namespace LitShare.DAL
             modelBuilder.HasPostgresEnum<DealType>("deal_type_t");
 
             modelBuilder.Entity<BookGenres>()
-                .HasKey(bg => new { bg.post_id, bg.genre_id });
+                .HasKey(bg => new { bg.PostId, bg.GenreId });
         }
     }
 }

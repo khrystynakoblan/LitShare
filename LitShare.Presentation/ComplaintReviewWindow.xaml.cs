@@ -31,12 +31,12 @@ namespace LitShare.Presentation
 
                 if (complaint != null && complaint.Post != null)
                 {
-                    txtComplaintReason.Text = complaint.text;
-                    txtPostTitle.Text = complaint.Post.title;
-                    txtPostDescription.Text = complaint.Post.description;
+                    txtComplaintReason.Text = complaint.Text;
+                    txtPostTitle.Text = complaint.Post.Title;
+                    txtPostDescription.Text = complaint.Post.Description;
 
-                    var author = _userService.GetUserById(complaint.Post.user_id);
-                    txtPostAuthor.Text = author?.name ?? "Невідомий автор";
+                    var author = _userService.GetUserById(complaint.Post.UserId);
+                    txtPostAuthor.Text = author?.Name ?? "Невідомий автор";
                 }
                 else
                 {

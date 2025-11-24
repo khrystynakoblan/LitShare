@@ -21,14 +21,14 @@ namespace LitShare.BLL.Services
         public List<ComplaintDto> GetAllComplaints()
         {
             var query = from c in _context.complaints
-                        join p in _context.posts on c.post_id equals p.id
-                        join u in _context.Users on c.complainant_id equals u.id
+                        join p in _context.posts on c.PostId equals p.Id
+                        join u in _context.Users on c.ComplainantId equals u.Id
                         select new ComplaintDto
                         {
-                            Text = c.text,
-                            BookTitle = p.title,
-                            UserName = u.name,
-                            Date = c.date
+                            Text = c.Text,
+                            BookTitle = p.Title,
+                            UserName = u.Name,
+                            Date = c.Date
                         };
 
             return query.ToList();
@@ -38,7 +38,7 @@ namespace LitShare.BLL.Services
         {
             return _context.complaints
                 .Include(c => c.Post)
-                .FirstOrDefault(c => c.id == complaintId);
+                .FirstOrDefault(c => c.Id == complaintId);
         }
 
         public void DeleteComplaint(int complaintId)
@@ -55,10 +55,10 @@ namespace LitShare.BLL.Services
         {
             var newComplaint = new Complaints
             {
-                text = reasonText,
-                post_id = postId,
-                complainant_id = complainantId,
-                date = DateTime.UtcNow
+                Text = reasonText,
+                PostId = postId,
+                ComplainantId = complainantId,
+                Date = DateTime.UtcNow
             };
 
             _context.complaints.Add(newComplaint);

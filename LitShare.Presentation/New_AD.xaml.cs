@@ -55,12 +55,12 @@ namespace LitShare
 
                 var post = new Posts
                 {
-                    title = TitleTextBox.Text,
-                    author = AuthorTextBox.Text,
-                    description = DescriptionTextBox.Text,
-                    deal_type = (DealType)DealTypeComboBox.SelectedValue,
-                    user_id = _userId,
-                    photo_url = selectedPhotoPath
+                    Title = TitleTextBox.Text,
+                    Author = AuthorTextBox.Text,
+                    Description = DescriptionTextBox.Text,
+                    DealType = (DealType)DealTypeComboBox.SelectedValue,
+                    UserId = _userId,
+                    PhotoUrl = selectedPhotoPath
                 };
 
                 db.posts.Add(post);
@@ -69,8 +69,8 @@ namespace LitShare
                 var selectedGenre = (Genres)GenreComboBox.SelectedItem;
                 var bookGenre = new BookGenres
                 {
-                    post_id = post.id,
-                    genre_id = selectedGenre.id
+                    PostId = post.Id,
+                    GenreId = selectedGenre.Id
                 };
 
                 db.bookGenres.Add(bookGenre);
