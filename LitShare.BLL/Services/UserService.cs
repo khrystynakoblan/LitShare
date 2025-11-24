@@ -36,7 +36,8 @@ namespace LitShare.BLL.Services
                 password = hashedPassword,
                 region = region,
                 district = district,
-                city = city
+                city = city,
+                role = RoleType.user
             };
 
             _context.Users.Add(newUser);

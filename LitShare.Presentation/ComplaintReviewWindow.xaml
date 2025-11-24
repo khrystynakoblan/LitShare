@@ -5,9 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LitShare.Presentation"
         mc:Ignorable="d"
-        
+        WindowState="Maximized"
         Title="Розгляд скарги" Height="650" Width="800"
-        
         WindowStartupLocation="CenterScreen"
         Background="#F0F0F0">
 
@@ -25,18 +24,33 @@
     </Window.Resources>
 
     <Grid>
-        <Button Content="Вийти" 
+        <Border x:Name="Toast"
+        Background="#323232"
+        CornerRadius="6"
+        Padding="12 8"
+        HorizontalAlignment="Center"
+        VerticalAlignment="Bottom"
+        Margin="0 0 0 40"
+        Opacity="0"
+        Visibility="Collapsed">
+
+            <TextBlock x:Name="ToastText"
+               Foreground="White"
+               FontSize="16"/>
+        </Border>
+
+        <!-- Кнопка Назад -->
+        <Button Content="← Назад" 
                 Style="{StaticResource AppButtonStyle}"
-                HorizontalAlignment="Right" 
+                HorizontalAlignment="Left" 
                 VerticalAlignment="Top" 
-                Margin="0,20,20,0"
-                Click="ExitButton_Click"/>
+                Margin="20,20,0,0"
+                Click="BackButton_Click"/>
 
         <Border BorderBrush="#CCC" BorderThickness="1" Background="White"
                 HorizontalAlignment="Center" VerticalAlignment="Center"
                 Padding="20" 
                 Width="700" 
-                
                 CornerRadius="5" >
 
             <StackPanel>
@@ -58,13 +72,13 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Скарга:" FontWeight="Bold" Margin="0,5,10,5"/>
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Скарга:" FontWeight="Bold" Margin="0,5,10,5" FontSize="16"/>
                     <TextBlock x:Name="txtComplaintReason" Grid.Row="0" Grid.Column="1" Text="..." TextWrapping="Wrap" Margin="0,5,0,5" FontSize="16"/>
 
-                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Назва:" FontWeight="Bold" Margin="0,5,10,5"/>
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Назва:" FontWeight="Bold" Margin="0,5,10,5" FontSize="16"/>
                     <TextBlock x:Name="txtPostTitle" Grid.Row="1" Grid.Column="1" Text="..." TextWrapping="Wrap" Margin="0,5,0,5" FontSize="16"/>
 
-                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Автор:" FontWeight="Bold" Margin="0,5,10,5"/>
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Автор:" FontWeight="Bold" Margin="0,5,10,5" FontSize="16"/>
                     <TextBlock x:Name="txtPostAuthor" Grid.Row="2" Grid.Column="1" Text="..." TextWrapping="Wrap" Margin="0,5,0,5" FontSize="16"/>
                 </Grid>
 
@@ -75,15 +89,17 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
+                    <!-- Контейнер для зображення з бази даних -->
                     <Border Grid.Column="0" 
                             Width="150" Height="150" Background="#EEE" 
                             BorderBrush="#DDD" 
                             BorderThickness="1"
                             VerticalAlignment="Top"
                             Margin="0,0,20,0">
-                        <Viewbox Width="70" Height="70" Opacity="0.3">
-                            <Path Fill="Black" Data="M19,19H5V5H19M19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M13.96,12.29L11.21,15.83L9.25,13.47L6.5,17H17.5L13.96,12.29Z" />
-                        </Viewbox>
+                        <Image x:Name="postImage"
+                               Stretch="Uniform"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"/>
                     </Border>
 
                     <StackPanel Grid.Column="1">

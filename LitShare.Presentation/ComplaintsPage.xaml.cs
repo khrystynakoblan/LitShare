@@ -27,11 +27,13 @@ namespace LitShare.Presentation
         {
             if (ComplaintsGrid.SelectedItem is ComplaintDto selectedComplaint)
             {
-                MessageBox.Show("Тут буде реалізовано вікно для перегляду скарги",
-                                "Перегляд скарги",
-                                MessageBoxButton.OK,
-                                MessageBoxImage.Information);
+                var reviewWindow = new ComplaintReviewWindow(selectedComplaint.Id);
+                reviewWindow.ShowDialog();
+
+                LoadComplaints();
+                ComplaintsGrid.ItemsSource = Complaints;
             }
         }
+
     }
 }

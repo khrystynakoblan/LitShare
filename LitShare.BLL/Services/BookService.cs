@@ -131,7 +131,7 @@ namespace LitShare.BLL.Services
                     Genre = string.Join(", ", p.BookGenres.Select(bg => bg.Genre.name)),
                     DealType = p.deal_type == DealType.Exchange ? "Обмін" : "Безкоштовно",
                     ImagePath = p.photo_url,
-                    UserId = p.id
+                    UserId = p.user_id
                 })
                 .FirstOrDefaultAsync();
         }

@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using LitShare.BLL.Services;
+using LitShare.DAL.Models;
 
 namespace LitShare.Presentation
 {
@@ -19,7 +20,7 @@ namespace LitShare.Presentation
 
         private void Button_Click_Register(object sender, RoutedEventArgs e)
         {
-            ClearValidation(); // очистимо старі помилки
+            ClearValidation(); 
 
             string name = txtName.Text.Trim();
             string email = txtEmail.Text.Trim();
@@ -120,7 +121,9 @@ namespace LitShare.Presentation
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Помилка реєстрації: {ex.Message}", "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(
+                    $"Помилка реєстрації: {ex.Message}\n\n{ex.InnerException?.Message}",
+                    "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -172,15 +175,24 @@ namespace LitShare.Presentation
                 if (isValid)
                 {
                     var user = _userService.GetAllUsers().FirstOrDefault(u => u.email == email);
-                    if (user != null)
+
+                    if (user == null)
                     {
-                        var mainPage = new MainPage(user.id);
-                        mainPage.Show();
+                        MessageBox.Show("Користувача не знайдено.");
+                        return;
+                    }
+
+                    if (user.role == RoleType.admin)
+                    {
+                        var adminWindow = new ComplaintsPage(); 
+                        adminWindow.Show();
                         this.Close();
                     }
                     else
                     {
-                        MessageBox.Show("Користувача не знайдено після входу.");
+                        var mainPage = new MainPage(user.id);
+                        mainPage.Show();
+                        this.Close();
                     }
                 }
                 else

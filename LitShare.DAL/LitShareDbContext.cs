@@ -46,6 +46,7 @@ namespace LitShare.DAL
                         maxRetryDelay: TimeSpan.FromSeconds(5),
                         errorCodesToAdd: null);
                     o.MapEnum<DealType>("deal_type_t");
+                    o.MapEnum<RoleType>("role_t");
                 });
             }
         }
@@ -53,6 +54,12 @@ namespace LitShare.DAL
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasPostgresEnum<DealType>("deal_type_t");
+            modelBuilder.HasPostgresEnum<RoleType>("role_t");
+
+            modelBuilder.Entity<Users>()
+                .Property(u => u.role)
+                .HasColumnType("role_t");
+
 
             modelBuilder.Entity<BookGenres>()
                 .HasKey(bg => new { bg.post_id, bg.genre_id });
