@@ -1,178 +1,211 @@
-﻿using LitShare.BLL.Services;
-using LitShare.DAL.Models;
-using System.Text.RegularExpressions;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media;
+﻿// <copyright file="registration.xaml.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
 
 namespace LitShare.Presentation
 {
+    using System;
+    using System.Linq;
+    using System.Text.RegularExpressions;
+    using System.Threading.Tasks;
+    using System.Windows;
+    using System.Windows.Controls;
+    using System.Windows.Media;
+    using LitShare.BLL.Services;
+    using LitShare.DAL.Models;
+
+    /// <summary>
+    /// Interaction logic for AuthWindow.xaml. This window handles user registration and login.
+    /// </summary>
     public partial class AuthWindow : Window
     {
-        private readonly UserService _userService = new UserService();
+        // SA1309: Private fields should not begin with an underscore.
+        private readonly UserService userService = new UserService();
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AuthWindow"/> class.
+        /// </summary>
         public AuthWindow()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
 
+        /// <summary>
+        /// Handles the click event for the registration button. Validates user input and attempts to register a new user.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The event data.</param>
         private void Button_Click_Register(object sender, RoutedEventArgs e)
         {
-            ClearValidation();
+            this.ClearValidation();
 
-            string name = txtName.Text.Trim();
-            string email = txtEmail.Text.Trim();
-            string phone = txtPhone.Text.Trim();
-            string password = txtPassword.Password;
-            string confirmPassword = txtConfirmPassword.Password;
-            string region = txtRegion.Text.Trim();
-            string district = txtDistrict.Text.Trim();
-            string city = txtCity.Text.Trim();
+            string name = this.txtName.Text.Trim();
+            string email = this.txtEmail.Text.Trim();
+            string phone = this.txtPhone.Text.Trim();
+            string password = this.txtPassword.Password;
+            string confirmPassword = this.txtConfirmPassword.Password;
+            string region = this.txtRegion.Text.Trim();
+            string district = this.txtDistrict.Text.Trim();
+            string city = this.txtCity.Text.Trim();
 
             bool hasError = false;
 
             if (string.IsNullOrEmpty(name))
             {
-                ShowError(txtName, errorName, "Це поле обов'язкове для заповнення.");
+                this.ShowError(this.txtName, this.errorName, "Це поле обов'язкове для заповнення.");
                 hasError = true;
             }
 
             if (string.IsNullOrEmpty(email))
             {
-                ShowError(txtEmail, errorEmail, "Це поле обов'язкове для заповнення.");
+                this.ShowError(this.txtEmail, this.errorEmail, "Це поле обов'язкове для заповнення.");
                 hasError = true;
             }
-            else if (!IsValidEmail(email))
+            else if (!this.IsValidEmail(email))
             {
-                ShowError(txtEmail, errorEmail, "Некоректний формат E-mail.");
+                this.ShowError(this.txtEmail, this.errorEmail, "Некоректний формат E-mail.");
                 hasError = true;
             }
-            else if (IsEmailExists(email))
+            else if (this.IsEmailExists(email))
             {
-                ShowError(txtEmail, errorEmail, "Користувач з такою поштою вже зареєстрований.");
+                this.ShowError(this.txtEmail, this.errorEmail, "Користувач з такою поштою вже зареєстрований.");
                 hasError = true;
             }
 
             if (string.IsNullOrEmpty(phone))
             {
-                ShowError(txtPhone, errorPhone, "Це поле обов'язкове для заповнення.");
+                this.ShowError(this.txtPhone, this.errorPhone, "Це поле обов'язкове для заповнення.");
                 hasError = true;
             }
-            else if (!IsValidPhone(phone))
+            else if (!this.IsValidPhone(phone))
             {
-                ShowError(txtPhone, errorPhone, "Має бути у форматі +380XXXXXXXXX або 0XXXXXXXXX.");
+                this.ShowError(this.txtPhone, this.errorPhone, "Має бути у форматі +380XXXXXXXXX або 0XXXXXXXXX.");
                 hasError = true;
             }
-            else if (IsPhoneExists(phone))
+            else if (this.IsPhoneExists(phone))
             {
-                ShowError(txtPhone, errorPhone, "Користувач з таким номером вже зареєстрований.");
+                this.ShowError(this.txtPhone, this.errorPhone, "Користувач з таким номером вже зареєстрований.");
                 hasError = true;
             }
 
             if (string.IsNullOrEmpty(password))
             {
-                ShowError(txtPassword, errorPassword, "Це поле обов'язкове для заповнення.");
+                this.ShowError(this.txtPassword, this.errorPassword, "Це поле обов'язкове для заповнення.");
                 hasError = true;
             }
-            else if (!IsValidPassword(password, out string passwordError))
+            else if (!this.IsValidPassword(password, out string passwordError))
             {
-                ShowError(txtPassword, errorPassword, passwordError);
+                this.ShowError(this.txtPassword, this.errorPassword, passwordError);
                 hasError = true;
             }
 
             if (string.IsNullOrEmpty(confirmPassword))
             {
-                ShowError(txtConfirmPassword, errorConfirmPassword, "Це поле обов'язкове для заповнення.");
+                this.ShowError(this.txtConfirmPassword, this.errorConfirmPassword, "Це поле обов'язкове для заповнення.");
                 hasError = true;
             }
             else if (password != confirmPassword)
             {
-                ShowError(txtConfirmPassword, errorConfirmPassword, "Паролі не збігаються.");
+                this.ShowError(this.txtConfirmPassword, this.errorConfirmPassword, "Паролі не збігаються.");
                 hasError = true;
             }
 
             if (string.IsNullOrEmpty(region))
             {
-                ShowError(txtRegion, errorRegion, "Це поле обов'язкове для заповнення.");
+                this.ShowError(this.txtRegion, this.errorRegion, "Це поле обов'язкове для заповнення.");
                 hasError = true;
             }
 
             if (string.IsNullOrEmpty(district))
             {
-                ShowError(txtDistrict, errorDistrict, "Це поле обов'язкове для заповнення.");
+                this.ShowError(this.txtDistrict, this.errorDistrict, "Це поле обов'язкове для заповнення.");
                 hasError = true;
             }
 
             if (string.IsNullOrEmpty(city))
             {
-                ShowError(txtCity, errorCity, "Це поле обов'язкове для заповнення.");
+                this.ShowError(this.txtCity, this.errorCity, "Це поле обов'язкове для заповнення.");
                 hasError = true;
             }
 
             if (hasError)
+            {
                 return;
+            }
 
             try
             {
-                _userService.AddUser(name, email, phone, password, region, district, city);
-                mainTabs.SelectedItem = loginTab;
+                this.userService.AddUser(name, email, phone, password, region, district, city);
+                this.mainTabs.SelectedItem = this.loginTab;
             }
             catch (Exception ex)
             {
-                MessageBox.Show(
+                _ = MessageBox.Show(
                     $"Помилка реєстрації: {ex.Message}\n\n{ex.InnerException?.Message}",
                     "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
+        /// <summary>
+        /// Handles the click event for the login button. Validates user input and attempts to log in the user.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The event data.</param>
         private async void Button_Click_Login(object sender, RoutedEventArgs e)
         {
-            ClearLoginValidation(); // очистимо старі помилки
+            this.ClearLoginValidation(); // очистимо старі помилки
 
             var button = sender as Button;
-            button.IsEnabled = false;
+            if (button != null)
+            {
+                button.IsEnabled = false;
+            }
 
             try
             {
-                string email = txtLoginEmail.Text.Trim();
-                string password = txtLoginPassword.Password;
+                string email = this.txtLoginEmail.Text.Trim();
+                string password = this.txtLoginPassword.Password;
 
                 bool hasError = false;
 
                 // Валідація електронної пошти
                 if (string.IsNullOrEmpty(email))
                 {
-                    ShowError(txtLoginEmail, errorLoginEmail, "Це поле обов'язкове для заповнення.");
+                    this.ShowError(this.txtLoginEmail, this.errorLoginEmail, "Це поле обов'язкове для заповнення.");
                     hasError = true;
                 }
-                else if (!IsValidEmail(email))
+                else if (!this.IsValidEmail(email))
                 {
-                    ShowError(txtLoginEmail, errorLoginEmail, "Некоректний формат E-mail.");
+                    this.ShowError(this.txtLoginEmail, this.errorLoginEmail, "Некоректний формат E-mail.");
                     hasError = true;
                 }
 
                 // Валідація пароля
                 if (string.IsNullOrEmpty(password))
                 {
-                    ShowError(txtLoginPassword, errorLoginPassword, "Це поле обов'язкове для заповнення.");
+                    this.ShowError(this.txtLoginPassword, this.errorLoginPassword, "Це поле обов'язкове для заповнення.");
                     hasError = true;
                 }
                 else if (password.Length < 8)
                 {
-                    ShowError(txtLoginPassword, errorLoginPassword, "Пароль має бути не менше 8 символів.");
+                    this.ShowError(this.txtLoginPassword, this.errorLoginPassword, "Пароль має бути не менше 8 символів.");
                     hasError = true;
                 }
 
                 if (hasError)
                 {
-                    button.IsEnabled = true;
+                    if (button != null)
+                    {
+                        button.IsEnabled = true;
+                    }
+
                     return;
                 }
 
-                bool isValid = await _userService.ValidateUser(email, password);
+                bool isValid = await this.userService.ValidateUser(email, password);
                 if (isValid)
                 {
-                    var user = _userService.GetAllUsers().FirstOrDefault(u => u.Email == email);
+                    var user = this.userService.GetAllUsers().FirstOrDefault(u => u.Email == email);
 
                     if (user == null)
                     {
@@ -195,8 +228,8 @@ namespace LitShare.Presentation
                 }
                 else
                 {
-                    ShowError(txtLoginEmail, errorLoginEmail, "Невірна пошта або пароль.");
-                    ShowError(txtLoginPassword, errorLoginPassword, "Невірна пошта або пароль.");
+                    this.ShowError(this.txtLoginEmail, this.errorLoginEmail, "Невірна пошта або пароль.");
+                    this.ShowError(this.txtLoginPassword, this.errorLoginPassword, "Невірна пошта або пароль.");
                 }
             }
             catch (Exception ex)
@@ -205,24 +238,51 @@ namespace LitShare.Presentation
             }
             finally
             {
-                button.IsEnabled = true;
+                if (button != null)
+                {
+                    button.IsEnabled = true;
+                }
             }
         }
 
+        /// <summary>
+        /// Checks if the provided string is a valid email format.
+        /// </summary>
+        /// <param name="email">The email string to validate.</param>
+        /// <returns>True if the email is valid, false otherwise.</returns>
         private bool IsValidEmail(string email)
         {
-            if (string.IsNullOrWhiteSpace(email)) return false;
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                return false;
+            }
+
             string emailPattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
             return Regex.IsMatch(email, emailPattern);
         }
 
+        /// <summary>
+        /// Checks if the provided string is a valid Ukrainian phone number format (+380XXXXXXXXX or 0XXXXXXXXX).
+        /// </summary>
+        /// <param name="phone">The phone number string to validate.</param>
+        /// <returns>True if the phone number is valid, false otherwise.</returns>
         private bool IsValidPhone(string phone)
         {
-            if (string.IsNullOrWhiteSpace(phone)) return false;
+            if (string.IsNullOrWhiteSpace(phone))
+            {
+                return false;
+            }
+
             string phonePattern = @"^(\+380\d{9}|0\d{9})$";
             return Regex.IsMatch(phone, phonePattern);
         }
 
+        /// <summary>
+        /// Checks if the provided password meets security requirements (length, case, digit).
+        /// </summary>
+        /// <param name="password">The password string to validate.</param>
+        /// <param name="errorMessage">Output parameter for the specific error message if validation fails.</param>
+        /// <returns>True if the password is valid, false otherwise.</returns>
         private bool IsValidPassword(string password, out string errorMessage)
         {
             errorMessage = string.Empty;
@@ -260,11 +320,16 @@ namespace LitShare.Presentation
             return true;
         }
 
+        /// <summary>
+        /// Checks the database to see if a user with the given email already exists.
+        /// </summary>
+        /// <param name="email">The email to check.</param>
+        /// <returns>True if the email exists, false otherwise.</returns>
         private bool IsEmailExists(string email)
         {
             try
             {
-                var users = _userService.GetAllUsers();
+                var users = this.userService.GetAllUsers();
                 return users.Any(u => u.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
             }
             catch
@@ -273,11 +338,16 @@ namespace LitShare.Presentation
             }
         }
 
+        /// <summary>
+        /// Checks the database to see if a user with the given phone number already exists.
+        /// </summary>
+        /// <param name="phone">The phone number to check.</param>
+        /// <returns>True if the phone number exists, false otherwise.</returns>
         private bool IsPhoneExists(string phone)
         {
             try
             {
-                var users = _userService.GetAllUsers();
+                var users = this.userService.GetAllUsers();
                 return users.Any(u => u.Phone == phone);
             }
             catch
@@ -286,6 +356,12 @@ namespace LitShare.Presentation
             }
         }
 
+        /// <summary>
+        /// Displays an error message and highlights the corresponding control in red.
+        /// </summary>
+        /// <param name="control">The control to highlight.</param>
+        /// <param name="errorBlock">The TextBlock to display the error message in.</param>
+        /// <param name="message">The error message.</param>
         private void ShowError(Control control, TextBlock errorBlock, string message)
         {
             control.BorderBrush = Brushes.Red;
@@ -294,24 +370,35 @@ namespace LitShare.Presentation
             errorBlock.Visibility = Visibility.Visible;
         }
 
+        /// <summary>
+        /// Clears validation errors and resets the appearance for all registration fields.
+        /// </summary>
         private void ClearValidation()
         {
-            ResetField(txtName, errorName);
-            ResetField(txtEmail, errorEmail);
-            ResetField(txtPhone, errorPhone);
-            ResetField(txtPassword, errorPassword);
-            ResetField(txtConfirmPassword, errorConfirmPassword);
-            ResetField(txtRegion, errorRegion);
-            ResetField(txtDistrict, errorDistrict);
-            ResetField(txtCity, errorCity);
+            this.ResetField(this.txtName, this.errorName);
+            this.ResetField(this.txtEmail, this.errorEmail);
+            this.ResetField(this.txtPhone, this.errorPhone);
+            this.ResetField(this.txtPassword, this.errorPassword);
+            this.ResetField(this.txtConfirmPassword, this.errorConfirmPassword);
+            this.ResetField(this.txtRegion, this.errorRegion);
+            this.ResetField(this.txtDistrict, this.errorDistrict);
+            this.ResetField(this.txtCity, this.errorCity);
         }
 
+        /// <summary>
+        /// Clears validation errors and resets the appearance for all login fields.
+        /// </summary>
         private void ClearLoginValidation()
         {
-            ResetField(txtLoginEmail, errorLoginEmail);
-            ResetField(txtLoginPassword, errorLoginPassword);
+            this.ResetField(this.txtLoginEmail, this.errorLoginEmail);
+            this.ResetField(this.txtLoginPassword, this.errorLoginPassword);
         }
 
+        /// <summary>
+        /// Resets the appearance of a control and clears its associated error message.
+        /// </summary>
+        /// <param name="control">The control to reset.</param>
+        /// <param name="errorBlock">The TextBlock associated with the error.</param>
         private void ResetField(Control control, TextBlock errorBlock)
         {
             control.BorderBrush = Brushes.Gray;

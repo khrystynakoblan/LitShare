@@ -1,62 +1,92 @@
-﻿using LitShare.BLL.DTOs;
-using LitShare.BLL.Services;
-using System.Collections.ObjectModel;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media;
+﻿// <copyright file="MainPage.xaml.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
 
 namespace LitShare.Presentation
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+    using System.Linq;
+    using System.Windows;
+    using System.Windows.Controls;
+    using System.Windows.Media;
+    using LitShare.BLL.DTOs;
+    using LitShare.BLL.Services;
+
+    /// <summary>
+    /// Represents the main window for browsing books and applying filters in the LitShare application.
+    /// </summary>
     public partial class MainPage : Window
     {
-        public ObservableCollection<BookDto> AllBooks { get; set; } = new();
-        public ObservableCollection<BookDto> FilteredBooks { get; set; } = new();
+        /// <summary>
+        /// Gets or sets the collection of all books loaded from the database.
+        /// </summary>
+        public ObservableCollection<BookDto> AllBooks { get; set; } = new ObservableCollection<BookDto>();
 
-        private readonly BookService _bookService = new();
+        /// <summary>
+        /// Gets or sets the collection of books currently displayed after filtering.
+        /// </summary>
+        public ObservableCollection<BookDto> FilteredBooks { get; set; } = new ObservableCollection<BookDto>();
+
+        private static readonly BookService bookService1 = new BookService();
+
+        // SA1214 - Readonly fields first (SA1309 - fields should not begin with an underscore)
+        private readonly BookService bookService = bookService1;
+        private readonly int userId;
+
+        // SA1214 - Non-readonly fields
         private bool isSearchPlaceholder = true;
-        private readonly List<CheckBox> genreCheckBoxes = new();
+        private readonly List<CheckBox> genreCheckBoxes = new List<CheckBox>();
 
-        private readonly int _userId;
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MainPage"/> class.
+        /// </summary>
+        /// <param name="userId">The ID of the currently logged-in user.</param>
         public MainPage(int userId)
         {
-            InitializeComponent();
-            _userId = userId; // зберігаємо ID користувача
-            Loaded += MainPage_Loaded;
+            this.InitializeComponent();
+            this.userId = userId; // зберігаємо ID користувача
+            this.Loaded += this.MainPage_Loaded;
         }
 
-
+        /// <summary>
+        /// Handles the Loaded event of the main page, asynchronously loads books and genres, and sets up the UI.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The event data.</param>
         private async void MainPage_Loaded(object sender, RoutedEventArgs e)
         {
             try
             {
-                ResultsCountText.Text = "Завантаження даних...";
+                this.ResultsCountText.Text = "Завантаження даних...";
 
-                var books = await _bookService.GetAllBooksAsync();
-                var genres = await _bookService.GetGenresAsync();
+                var books = await this.bookService.GetAllBooksAsync();
+                var genres = await this.bookService.GetGenresAsync();
 
-                AllBooks = new ObservableCollection<BookDto>(books);
-                FilteredBooks = new ObservableCollection<BookDto>(books);
-                BooksItemsControl.ItemsSource = FilteredBooks;
+                // IDE0028 - Collection initialization can be simplified (new(books))
+                this.AllBooks = new ObservableCollection<BookDto>(books);
+                this.FilteredBooks = new ObservableCollection<BookDto>(books);
+                this.BooksItemsControl.ItemsSource = this.FilteredBooks;
 
-                GenresPanel.Children.Clear();
-                genreCheckBoxes.Clear();
+                this.GenresPanel.Children.Clear();
+                this.genreCheckBoxes.Clear();
 
                 foreach (var genre in genres)
                 {
                     var checkBox = new CheckBox
                     {
                         Content = genre,
-                        Margin = new Thickness(0, 3, 0, 3)
+                        Margin = new Thickness(0, 3, 0, 3),
                     };
-                    checkBox.Checked += FilterChanged;
-                    checkBox.Unchecked += FilterChanged;
-                    GenresPanel.Children.Add(checkBox);
-                    genreCheckBoxes.Add(checkBox);
+                    checkBox.Checked += this.FilterChanged;
+                    checkBox.Unchecked += this.FilterChanged;
+                    this.GenresPanel.Children.Add(checkBox);
+                    this.genreCheckBoxes.Add(checkBox);
                 }
 
-                UpdateResultsCount();
-                SetupSearchPlaceholder();
+                this.UpdateResultsCount();
+                this.SetupSearchPlaceholder();
             }
             catch (Exception ex)
             {
@@ -64,88 +94,113 @@ namespace LitShare.Presentation
             }
         }
 
-
-        private void FilterChanged(object sender, RoutedEventArgs e) => ApplyFilters();
+        private void FilterChanged(object sender, RoutedEventArgs e) => this.ApplyFilters();
 
         private List<string> GetSelectedGenres() =>
-            genreCheckBoxes
+            this.genreCheckBoxes
                 .Where(cb => cb.IsChecked == true && cb.Content != null)
                 .Select(cb => cb.Content!.ToString()!)
                 .ToList();
 
         private void ApplyFilters()
         {
-            if (AllBooks == null) return;
+            if (this.AllBooks == null)
+            {
+                return;
+            }
 
-            string? location = LocationTextBox?.Text?.Trim();
-            string? search = isSearchPlaceholder ? null : SearchTextBox?.Text?.Trim();
-            string? dealType = ExchangeRadio?.IsChecked == true ? "Обмін" :
-                              FreeRadio?.IsChecked == true ? "Безкоштовно" : null;
-            var selectedGenres = GetSelectedGenres();
+            string? location = this.LocationTextBox?.Text?.Trim();
+            string? search = this.isSearchPlaceholder ? null : this.SearchTextBox?.Text?.Trim();
+            string? dealType = this.ExchangeRadio?.IsChecked == true ? "Обмін" :
+                                 this.FreeRadio?.IsChecked == true ? "Безкоштовно" : null;
+            var selectedGenres = this.GetSelectedGenres();
 
-            var filtered = _bookService.GetFilteredBooks(AllBooks.ToList(), search, location, dealType, selectedGenres);
+            var filtered = this.bookService.GetFilteredBooks(this.AllBooks.ToList(), search, location, dealType, selectedGenres);
 
-            FilteredBooks.Clear();
+            this.FilteredBooks.Clear();
             foreach (var book in filtered)
-                FilteredBooks.Add(book);
+            {
+                this.FilteredBooks.Add(book);
+            }
 
-            UpdateResultsCount();
+            this.UpdateResultsCount();
         }
 
         private void SetupSearchPlaceholder()
         {
-            SearchTextBox.Text = "Пошук...";
-            SearchTextBox.Foreground = new SolidColorBrush(Colors.Gray);
-            isSearchPlaceholder = true;
+            this.SearchTextBox.Text = "Пошук...";
+            this.SearchTextBox.Foreground = new SolidColorBrush(Colors.Gray);
+            this.isSearchPlaceholder = true;
         }
 
         private void SearchTextBox_GotFocus(object sender, RoutedEventArgs e)
         {
-            if (isSearchPlaceholder)
+            if (this.isSearchPlaceholder)
             {
-                SearchTextBox.Text = "";
-                SearchTextBox.Foreground = new SolidColorBrush(Colors.Black);
-                isSearchPlaceholder = false;
+                // SA1122: Use string.Empty for empty strings
+                this.SearchTextBox.Text = string.Empty;
+                this.SearchTextBox.Foreground = new SolidColorBrush(Colors.Black);
+                this.isSearchPlaceholder = false;
             }
         }
 
         private void SearchTextBox_LostFocus(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(SearchTextBox.Text))
-                SetupSearchPlaceholder();
+            if (string.IsNullOrWhiteSpace(this.SearchTextBox.Text))
+            {
+                this.SetupSearchPlaceholder();
+            }
         }
 
         private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (!isSearchPlaceholder)
-                ApplyFilters();
+            if (!this.isSearchPlaceholder)
+            {
+                this.ApplyFilters();
+            }
         }
 
+        /// <summary>
+        /// Handles the click event for the MyProfile button, opening the profile window.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The event data.</param>
         private void MyProfile_Click(object sender, RoutedEventArgs e)
         {
-            var profileWindow = new ProfileWindow(_userId);
+            var profileWindow = new ProfileWindow(this.userId);
             profileWindow.ShowDialog();
         }
 
+        /// <summary>
+        /// Handles the click event for the AddBook button, opening the new ad window and refreshing the book list if an ad is added.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The event data.</param>
         private async void AddBook_Click(object sender, RoutedEventArgs e)
         {
-            var newAdWindow = new NewAdWindow(_userId);
+            var newAdWindow = new NewAdWindow(this.userId);
             bool? result = newAdWindow.ShowDialog();
 
             if (result == true)
             {
-                var books = await _bookService.GetAllBooksAsync();
-                AllBooks = new ObservableCollection<BookDto>(books);
-                FilteredBooks = new ObservableCollection<BookDto>(books);
-                BooksItemsControl.ItemsSource = FilteredBooks;
-                UpdateResultsCount();
+                var books = await this.bookService.GetAllBooksAsync();
+                this.AllBooks = new ObservableCollection<BookDto>(books);
+                this.FilteredBooks = new ObservableCollection<BookDto>(books);
+                this.BooksItemsControl.ItemsSource = this.FilteredBooks;
+                this.UpdateResultsCount();
             }
         }
+
+        /// <summary>
+        /// Handles the click event on a book card, opening the ad view window for the selected book.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The event data.</param>
         private void BookCard_Click(object sender, RoutedEventArgs e)
         {
             if (sender is FrameworkElement element && element.Tag is int bookId && bookId > 0)
             {
-                var viewWindow = new ViewAdWindow(bookId, _userId);
+                var viewWindow = new ViewAdWindow(bookId, this.userId);
                 viewWindow.Owner = this;
                 viewWindow.ShowDialog();
             }
@@ -157,14 +212,14 @@ namespace LitShare.Presentation
 
         private void UpdateResultsCount()
         {
-            int count = FilteredBooks?.Count ?? 0;
+            int count = this.FilteredBooks?.Count ?? 0;
             string booksWord = count switch
             {
                 1 => "книга",
                 >= 2 and <= 4 => "книги",
                 _ => "книг"
             };
-            ResultsCountText.Text = $"Знайдено: {count} {booksWord}";
+            this.ResultsCountText.Text = $"Знайдено: {count} {booksWord}";
         }
 
         private void ContextMenu_View_Click(object sender, RoutedEventArgs e)
@@ -172,7 +227,7 @@ namespace LitShare.Presentation
             if (sender is MenuItem menuItem &&
                 menuItem.DataContext is BookDto book)
             {
-                var viewWindow = new ViewAdWindow(book.Id, _userId);
+                var viewWindow = new ViewAdWindow(book.Id, this.userId);
                 viewWindow.Owner = this;
                 viewWindow.ShowDialog();
             }
@@ -183,20 +238,20 @@ namespace LitShare.Presentation
             if (sender is MenuItem menuItem &&
                 menuItem.DataContext is BookDto book)
             {
-                var reportWindow = new ReportAdWindow(book.Id, _userId);
+                var reportWindow = new ReportAdWindow(book.Id, this.userId);
                 reportWindow.Owner = this;
                 reportWindow.ShowDialog();
             }
         }
 
+        /// <summary>
+        /// Scrolls the BooksScrollViewer to the bottom.
+        /// </summary>
         public void ScrollToBottom()
         {
             // Якщо є ScrollViewer — просто прокручуємо його вниз
-            BooksScrollViewer?.UpdateLayout();
-            BooksScrollViewer?.ScrollToEnd();
+            this.BooksScrollViewer?.UpdateLayout();
+            this.BooksScrollViewer?.ScrollToEnd();
         }
-
     }
-
 }
-

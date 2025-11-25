@@ -1,33 +1,51 @@
-﻿using LitShare.DAL;
-using System.Windows;
-using System.Windows.Controls;
+﻿// <copyright file="MyBooks.xaml.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
 
 namespace LitShare.Presentation
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Windows;
+    using System.Windows.Controls;
+    using LitShare.DAL;
+
+    /// <summary>
+    /// Interaction logic for MyBook.xaml. This window displays all books posted by the current user.
+    /// </summary>
     public partial class MyBook : Window
     {
-        private readonly LitShareDbContext _context;
-        private List<BookItem> _allBooks;
-        private readonly int _userId;
+        private readonly LitShareDbContext context;
+        private readonly int userId;
 
+        private List<BookItem> allBooks;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MyBook"/> class.
+        /// </summary>
+        /// <param name="userId">The ID of the currently logged-in user.</param>
         public MyBook(int userId)
         {
-            InitializeComponent();
-            _context = new LitShareDbContext();
-            _userId = userId;
-            LoadBooks();
-            SearchTextBox.TextChanged += SearchTextBox_TextChanged;
+            this.InitializeComponent();
+            this.context = new LitShareDbContext();
+            this.userId = userId;
+            this.LoadBooks();
+            this.SearchTextBox.TextChanged += this.SearchTextBox_TextChanged;
         }
 
+        /// <summary>
+        /// Loads the list of books posted by the current user from the database.
+        /// </summary>
         private void LoadBooks()
         {
             try
             {
-                int currentUserId = _userId;
+                int currentUserId = this.userId;
 
-                _allBooks = _context.Posts
+                this.allBooks = this.context.Posts
                     .Where(p => p.UserId == currentUserId)
-                    .Join(_context.Users, p => p.UserId, u => u.Id, (p, u) => new BookItem
+                    .Join(this.context.Users, p => p.UserId, u => u.Id, (p, u) => new BookItem
                     {
                         Id = p.Id,
                         Title = p.Title,
@@ -37,7 +55,7 @@ namespace LitShare.Presentation
                     })
                     .ToList();
 
-                DisplayBooks(_allBooks);
+                this.DisplayBooks(this.allBooks);
             }
             catch (Exception ex)
             {
@@ -47,32 +65,36 @@ namespace LitShare.Presentation
 
         private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            var searchText = SearchTextBox.Text.ToLower().Trim();
+            var searchText = this.SearchTextBox.Text.ToLower().Trim();
 
             if (string.IsNullOrEmpty(searchText))
             {
-                DisplayBooks(_allBooks);
+                this.DisplayBooks(this.allBooks);
             }
             else
             {
-                var filteredBooks = _allBooks.Where(b =>
+                var filteredBooks = this.allBooks.Where(b =>
                     b.Title.ToLower().Contains(searchText) ||
                     b.Author.ToLower().Contains(searchText) ||
                     b.City.ToLower().Contains(searchText)
                 ).ToList();
 
-                DisplayBooks(filteredBooks);
+                this.DisplayBooks(filteredBooks);
             }
         }
 
+        /// <summary>
+        /// Sets the ItemsSource for the BooksItemsControl.
+        /// </summary>
+        /// <param name="books">The list of books to display.</param>
         private void DisplayBooks(List<BookItem> books)
         {
-            BooksItemsControl.ItemsSource = books;
+            this.BooksItemsControl.ItemsSource = books;
         }
 
         private void HomeButton_Click(object sender, RoutedEventArgs e)
         {
-            MainPage mainWindow = new MainPage(_userId);
+            MainPage mainWindow = new MainPage(this.userId);
             mainWindow.Show();
             this.Close();
         }
@@ -81,26 +103,47 @@ namespace LitShare.Presentation
         {
             if (sender is Button button && button.DataContext is BookItem selectedBook)
             {
-                var editWindow = new EditAdWindow(selectedBook.Id, _userId);
+                var editWindow = new EditAdWindow(selectedBook.Id, this.userId);
                 editWindow.Owner = this;
                 editWindow.ShowDialog();
 
-                LoadBooks();
+                this.LoadBooks();
             }
         }
-
 
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
         }
 
+        /// <summary>
+        /// Represents a simplified data structure for displaying a book item in the list.
+        /// </summary>
         private class BookItem
         {
+            /// <summary>
+            /// Gets or sets the book ID.
+            /// </summary>
             public int Id { get; set; }
+
+            /// <summary>
+            /// Gets or sets the book title.
+            /// </summary>
             public string Title { get; set; }
+
+            /// <summary>
+            /// Gets or sets the book author.
+            /// </summary>
             public string Author { get; set; }
+
+            /// <summary>
+            /// Gets or sets the city where the book is located.
+            /// </summary>
             public string City { get; set; }
+
+            /// <summary>
+            /// Gets or sets the URL of the book's photo.
+            /// </summary>
             public string PhotoUrl { get; set; }
         }
     }

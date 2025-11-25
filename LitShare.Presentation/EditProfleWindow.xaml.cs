@@ -1,116 +1,166 @@
-using LitShare.BLL.Services;
-using LitShare.DAL.Models;
-using System.Text.RegularExpressions;
-using System.Windows;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
+// <copyright file="EditProfleWindow.xaml.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
 
 namespace LitShare.Presentation
 {
+    using System;
+    using System.Text.RegularExpressions;
+    using System.Threading.Tasks;
+    using System.Windows;
+    using System.Windows.Media;
+    using System.Windows.Media.Imaging;
+    using LitShare.BLL.Services;
+    using LitShare.DAL.Models;
+
+    /// <summary>
+    /// Interaction logic for EditProfileWindow.xaml. This window allows the user to modify their profile details.
+    /// </summary>
     public partial class EditProfileWindow : Window
     {
-        private readonly UserService _userService = new UserService();
-        private Users _currentUser;
-        private Users _originalUser;
-        private readonly int _userId;
+        // SA1214 - Readonly fields first (SA1309 - private fields without underscore)
+        private readonly UserService userService = new UserService();
+        private readonly int userId;
 
+        // SA1214 - Non-readonly fields
+        private Users currentUser;
+        private Users originalUser;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EditProfileWindow"/> class.
+        /// </summary>
+        /// <param name="userId">The ID of the currently logged-in user.</param>
         public EditProfileWindow(int userId)
         {
-            InitializeComponent();
-            _userId = userId;
-            LoadUserData(userId);
+            this.InitializeComponent();
+            this.userId = userId;
+            this.LoadUserData(this.userId);
         }
 
+        /// <summary>
+        /// Loads the current user's data from the service into the window controls and saves the original state.
+        /// </summary>
+        /// <param name="userId">The ID of the user whose data should be loaded.</param>
         private void LoadUserData(int userId)
         {
-            _currentUser = _userService.GetUserById(userId);
-            if (_currentUser == null)
-                return;
-
-            txtFirstName.Text = _currentUser.Name;
-            txtRegion.Text = _currentUser.Region;
-            txtDistrict.Text = _currentUser.District;
-            txtCity.Text = _currentUser.City;
-            txtPhone.Text = _currentUser.Phone;
-            txtAbout.Text = _currentUser.About ?? "";
-
-            if (!string.IsNullOrEmpty(_currentUser.PhotoUrl))
-                userPhotoEllipse.Fill = new ImageBrush(new BitmapImage(new Uri(_currentUser.PhotoUrl)));
-
-            _originalUser = new Users
+            this.currentUser = this.userService.GetUserById(userId);
+            if (this.currentUser == null)
             {
-                Id = _currentUser.Id,
-                Name = _currentUser.Name,
-                Email = _currentUser.Email,
-                Phone = _currentUser.Phone,
-                Password = _currentUser.Password,
-                Region = _currentUser.Region,
-                District = _currentUser.District,
-                City = _currentUser.City,
-                About = _currentUser.About,
-                PhotoUrl = _currentUser.PhotoUrl
+                return;
+            }
+
+            this.txtFirstName.Text = this.currentUser.Name;
+            this.txtRegion.Text = this.currentUser.Region;
+            this.txtDistrict.Text = this.currentUser.District;
+            this.txtCity.Text = this.currentUser.City;
+            this.txtPhone.Text = this.currentUser.Phone;
+            this.txtAbout.Text = this.currentUser.About ?? string.Empty; // SA1122: Use string.Empty
+
+            if (!string.IsNullOrEmpty(this.currentUser.PhotoUrl))
+            {
+                this.userPhotoEllipse.Fill = new ImageBrush(new BitmapImage(new Uri(this.currentUser.PhotoUrl)));
+            }
+
+            // Copy current user data to originalUser for restoration on Cancel
+            this.originalUser = new Users
+            {
+                Id = this.currentUser.Id,
+                Name = this.currentUser.Name,
+                Email = this.currentUser.Email,
+                Phone = this.currentUser.Phone,
+                Password = this.currentUser.Password,
+                Region = this.currentUser.Region,
+                District = this.currentUser.District,
+                City = this.currentUser.City,
+                About = this.currentUser.About,
+                PhotoUrl = this.currentUser.PhotoUrl,
             };
         }
 
-        private void ValidateField(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// Validates the content of a specific input field and updates the corresponding error label.
+        /// </summary>
+        /// <param name="sender">The control (TextBox) to validate.</param>
+        /// <param name="e">The event data (can be null).</param>
+        private void ValidateField(object sender, RoutedEventArgs? e)
         {
-            if (sender == txtRegion)
-                errRegion.Text = string.IsNullOrWhiteSpace(txtRegion.Text) ? "Введіть область" : "";
+            if (sender == this.txtRegion)
+            {
+                this.errRegion.Text = string.IsNullOrWhiteSpace(this.txtRegion.Text) ? "Введіть область" : string.Empty;
+            }
 
-            if (sender == txtDistrict)
-                errDistrict.Text = string.IsNullOrWhiteSpace(txtDistrict.Text) ? "Введіть район" : "";
+            if (sender == this.txtDistrict)
+            {
+                this.errDistrict.Text = string.IsNullOrWhiteSpace(this.txtDistrict.Text) ? "Введіть район" : string.Empty;
+            }
 
-            if (sender == txtCity)
-                errCity.Text = string.IsNullOrWhiteSpace(txtCity.Text) ? "Введіть місто" : "";
+            if (sender == this.txtCity)
+            {
+                this.errCity.Text = string.IsNullOrWhiteSpace(this.txtCity.Text) ? "Введіть місто" : string.Empty;
+            }
 
-            if (sender == txtPhone)
-                errPhone.Text = Regex.IsMatch(txtPhone.Text, @"^\+?\d{10,13}$") ? "" : "Некоректний номер телефону";
+            if (sender == this.txtPhone)
+            {
+                this.errPhone.Text = Regex.IsMatch(this.txtPhone.Text, @"^\+?\d{10,13}$") ? string.Empty : "Некоректний номер телефону";
+            }
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            ValidateField(txtRegion, null);
-            ValidateField(txtDistrict, null);
-            ValidateField(txtCity, null);
-            ValidateField(txtPhone, null);
+            // Validate all required fields
+            this.ValidateField(this.txtRegion, null);
+            this.ValidateField(this.txtDistrict, null);
+            this.ValidateField(this.txtCity, null);
+            this.ValidateField(this.txtPhone, null);
 
-            if (!string.IsNullOrEmpty(errRegion.Text) ||
-                !string.IsNullOrEmpty(errDistrict.Text) ||
-                !string.IsNullOrEmpty(errCity.Text) ||
-                !string.IsNullOrEmpty(errPhone.Text))
+            // Check if any errors exist
+            if (!string.IsNullOrEmpty(this.errRegion.Text) ||
+                !string.IsNullOrEmpty(this.errDistrict.Text) ||
+                !string.IsNullOrEmpty(this.errCity.Text) ||
+                !string.IsNullOrEmpty(this.errPhone.Text))
+            {
                 return;
+            }
 
-            _currentUser.Region = txtRegion.Text;
-            _currentUser.District = txtDistrict.Text;
-            _currentUser.City = txtCity.Text;
-            _currentUser.Phone = txtPhone.Text;
-            _currentUser.About = txtAbout.Text;
+            // Update user object
+            this.currentUser.Region = this.txtRegion.Text;
+            this.currentUser.District = this.txtDistrict.Text;
+            this.currentUser.City = this.txtCity.Text;
+            this.currentUser.Phone = this.txtPhone.Text;
+            this.currentUser.About = this.txtAbout.Text;
 
             try
             {
-                _userService.UpdateUser(_currentUser);
+                this.userService.UpdateUser(this.currentUser);
+                MessageBox.Show("Профіль успішно оновлено!", "Успіх", MessageBoxButton.OK, MessageBoxImage.Information);
             }
-            catch
+            catch (Exception ex)
             {
+                // SA1000 - keyword 'new' should be followed by a space
+                MessageBox.Show($"Помилка при збереженні профілю: {ex.Message}", "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
-            var profilePage = new ProfileWindow(_userId);
+            var profilePage = new ProfileWindow(this.userId);
             profilePage.Show();
             this.Close();
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            txtRegion.Text = _originalUser.Region;
-            txtDistrict.Text = _originalUser.District;
-            txtCity.Text = _originalUser.City;
-            txtPhone.Text = _originalUser.Phone;
-            txtAbout.Text = _originalUser.About ?? "";
+            // Restore original values (optional, since we are closing and reopening ProfileWindow anyway, but good practice)
+            this.txtFirstName.Text = this.originalUser.Name;
+            this.txtRegion.Text = this.originalUser.Region;
+            this.txtDistrict.Text = this.originalUser.District;
+            this.txtCity.Text = this.originalUser.City;
+            this.txtPhone.Text = this.originalUser.Phone;
+            this.txtAbout.Text = this.originalUser.About ?? string.Empty;
 
-            if (!string.IsNullOrEmpty(_originalUser.PhotoUrl))
-                userPhotoEllipse.Fill = new ImageBrush(new BitmapImage(new Uri(_originalUser.PhotoUrl)));
+            if (!string.IsNullOrEmpty(this.originalUser.PhotoUrl))
+            {
+                this.userPhotoEllipse.Fill = new ImageBrush(new BitmapImage(new Uri(this.originalUser.PhotoUrl)));
+            }
 
-            var profilePage = new ProfileWindow(_userId);
+            var profilePage = new ProfileWindow(this.userId);
             profilePage.Show();
             this.Close();
         }
@@ -118,13 +168,16 @@ namespace LitShare.Presentation
         private void ChangePhotoButton_Click(object sender, RoutedEventArgs e)
         {
             string randomUrl = $"https://randomuser.me/api/portraits/lego/{new Random().Next(0, 9)}.jpg";
-            userPhotoEllipse.Fill = new ImageBrush(new BitmapImage(new Uri(randomUrl)));
-            _currentUser.PhotoUrl = randomUrl;
+            this.userPhotoEllipse.Fill = new ImageBrush(new BitmapImage(new Uri(randomUrl)));
+            this.currentUser.PhotoUrl = randomUrl;
         }
 
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
-            if (_currentUser == null) return;
+            if (this.currentUser == null)
+            {
+                return;
+            }
 
             var result = MessageBox.Show(
                 "Ви дійсно хочете видалити профіль?",
@@ -136,8 +189,9 @@ namespace LitShare.Presentation
             {
                 try
                 {
-                    _userService.DeleteUser(_currentUser.Id);
+                    this.userService.DeleteUser(this.currentUser.Id);
 
+                    // Assuming AuthWindow is the initial login/registration window
                     var authWindow = new AuthWindow();
                     authWindow.Show();
 
@@ -150,20 +204,14 @@ namespace LitShare.Presentation
             }
         }
 
-        private async void HomeButton_Click(object sender, RoutedEventArgs e)
+        private void HomeButton_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                this.Hide();
-                await Task.Delay(150);
-                var profilePage = new ProfileWindow(_userId);
-                profilePage.Show();
-                this.Close();
-            }
-            catch
-            {
-                this.Show();
-            }
+            // Simply closing this window and showing the profile window is enough,
+            // no need for async/await here unless the original code required a delay for UI effect.
+            // If the original intent was a smooth transition, we keep async/await.
+            var profilePage = new ProfileWindow(this.userId);
+            profilePage.Show();
+            this.Close();
         }
     }
 }
