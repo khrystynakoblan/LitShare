@@ -4,9 +4,9 @@
 
 namespace LitShare.DAL
 {
+    using System;
     using LitShare.DAL.Models;
     using Microsoft.EntityFrameworkCore;
-    using System;
 
     /// <summary>
     /// Represents the Entity Framework Core database session for the LitShare application.
@@ -14,7 +14,44 @@ namespace LitShare.DAL
     /// </summary>
     public class LitShareDbContext : DbContext
     {
-        private static bool _mapperConfigured = false;
+        // ------------------------------
+        // 1. ПОЛЯ (Fields)
+        // ------------------------------
+
+        /// <summary>
+        /// Flag to track if the static PostgreSQL Npgsql mapper has been configured.
+        /// </summary>
+        // Примітка: StyleCop SA1309 для статичних полів часто вимагає CamelCase або PascalCase.
+        private static bool mapperConfigured = false;
+
+        // ------------------------------
+        // 2. КОНСТРУКТОРИ (Constructors) - Виправлення SA1201
+        // ------------------------------
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LitShareDbContext"/> class.
+        /// Used for manual creation or local configuration fallback.
+        /// </summary>
+        // Виклик тепер статичний
+        public LitShareDbContext() => ConfigureMapper();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LitShareDbContext"/> class.
+        /// Used for Dependency Injection (DI) with provided options.
+        /// </summary>
+        /// <param name="options">The options for this context.</param>
+        public LitShareDbContext(DbContextOptions<LitShareDbContext> options)
+            : base(options)
+        {
+            // Виклик тепер статичний
+            ConfigureMapper();
+        }
+
+        // ------------------------------
+        // 3. ВЛАСТИВОСТІ (Properties)
+        // ------------------------------
+
+        // 3.1. Публічні властивості DbSet (Public Properties)
 
         /// <summary>
         /// Gets or sets the DbSet for managing User entities.
@@ -41,37 +78,11 @@ namespace LitShare.DAL
         /// </summary>
         public DbSet<BookGenres> BookGenres { get; set; }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="LitShareDbContext"/> class.
-        /// Used for manual creation or local configuration fallback.
-        /// </summary>
-        public LitShareDbContext()
-        {
-            this.ConfigureMapper();
-        }
+        // ------------------------------
+        // 4. МЕТОДИ (Methods)
+        // ------------------------------
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="LitShareDbContext"/> class.
-        /// Used for Dependency Injection (DI) with provided options.
-        /// </summary>
-        /// <param name="options">The options for this context.</param>
-        public LitShareDbContext(DbContextOptions<LitShareDbContext> options)
-            : base(options)
-        {
-            this.ConfigureMapper();
-        }
-
-        /// <summary>
-        /// Configures the PostgreSQL Npgsql timestamp legacy switch if not already set.
-        /// </summary>
-        private void ConfigureMapper()
-        {
-            if (_mapperConfigured) return;
-            _mapperConfigured = true;
-
-            // Ensures compatibility with older PostgreSQL DateTime types (Npgsql V6/V7 requirement)
-            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-        }
+        // 4.1. Protected методи (Protected Methods) - Виправлення SA1202
 
         /// <summary>
         /// Configures the database connection options if options were not passed via the constructor.
@@ -119,6 +130,25 @@ namespace LitShare.DAL
             // Defines the composite primary key for the many-to-many join table
             modelBuilder.Entity<BookGenres>()
                 .HasKey(bg => new { bg.PostId, bg.GenreId });
+        }
+
+        // 4.2. Private методи (Private Methods)
+
+        /// <summary>
+        /// Configures the PostgreSQL Npgsql timestamp legacy switch if not already set.
+        /// </summary>
+        // Зроблено статичним для виправлення CA1822
+        private static void ConfigureMapper()
+        {
+            if (mapperConfigured)
+            {
+                return;
+            }
+
+            mapperConfigured = true;
+
+            // Ensures compatibility with older PostgreSQL DateTime types (Npgsql V6/V7 requirement)
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
         }
     }
 }

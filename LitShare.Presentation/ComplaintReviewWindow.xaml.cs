@@ -38,7 +38,7 @@ namespace LitShare.Presentation
         /// </summary>
         /// <param name="complaintId">The ID of the complaint to load.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
-        private async Task LoadComplaintDataAsync(int complaintId)
+        private Task LoadComplaintDataAsync(int complaintId)
         {
             try
             {
@@ -66,6 +66,8 @@ namespace LitShare.Presentation
                 MessageBox.Show($"Критична помилка: {ex.Message}", "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
                 this.Close();
             }
+
+            return Task.CompletedTask;
         }
 
         private void LoadImage(string? url)

@@ -8,7 +8,7 @@ namespace LitShare.Presentation
 
     /// <summary>
     /// Interaction logic for App.xaml
-    /// </summary>
+    /// ///. </summary>
     public partial class App : Application
     {
     }

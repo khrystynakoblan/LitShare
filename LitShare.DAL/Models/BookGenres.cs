@@ -35,6 +35,6 @@ namespace LitShare.DAL.Models
         /// Gets or sets the navigation property to the related Genre entity.
         /// </summary>
         [ForeignKey("GenreId")]
-        public virtual Genres? Genre { get; set; } 
+        public virtual Genres? Genre { get; set; }
     }
 }

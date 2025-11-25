@@ -332,7 +332,10 @@ namespace LitShare.Presentation
             try
             {
                 var users = this.userService.GetAllUsers();
-                return users.Any(u => u.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+                return users.Any(u =>
+                {
+                    return string.Equals(u.Email, email, StringComparison.OrdinalIgnoreCase);
+                });
             }
             catch
             {

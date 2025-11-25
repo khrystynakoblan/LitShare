@@ -36,7 +36,7 @@ namespace LitShare.DAL.Models
         /// Gets or sets the author of the book.
         /// </summary>
         [Column("author")]
-        public string Author { get; set; }
+        public string? Author { get; set; }
 
         /// <summary>
         /// Gets or sets the deal type for this listing (e.g., sale, exchange, free).

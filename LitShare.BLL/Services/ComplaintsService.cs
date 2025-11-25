@@ -100,10 +100,12 @@ namespace LitShare.BLL.Services
         /// <exception cref="Exception">Thrown if the complaint is not found.</exception>
         public void ApproveComplaint(int complaintId)
         {
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
             var complaint = this.context.Complaints
                 .Include(c => c.Post)
-                    .ThenInclude(p => p.BookGenres)
+                .ThenInclude(p => p.BookGenres)
                 .FirstOrDefault(c => c.Id == complaintId);
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
 
             if (complaint == null)
             {
