@@ -7,7 +7,6 @@ namespace LitShare.Presentation
     using System;
     using System.Linq;
     using System.Text.RegularExpressions;
-    using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Media;
@@ -19,7 +18,6 @@ namespace LitShare.Presentation
     /// </summary>
     public partial class AuthWindow : Window
     {
-        // SA1309: Private fields should not begin with an underscore.
         private readonly UserService userService = new UserService();
 
         /// <summary>

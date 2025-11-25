@@ -89,7 +89,6 @@ namespace LitShare.Presentation
                 var books = await this.bookService.GetAllBooksAsync();
                 var genres = await this.bookService.GetGenresAsync();
 
-                // IDE0028 - Collection initialization can be simplified (new(books))
                 this.AllBooks = new ObservableCollection<BookDto>(books);
                 this.FilteredBooks = new ObservableCollection<BookDto>(books);
                 this.BooksItemsControl.ItemsSource = this.FilteredBooks;
@@ -162,7 +161,6 @@ namespace LitShare.Presentation
         {
             if (this.isSearchPlaceholder)
             {
-                // SA1122: Use string.Empty for empty strings
                 this.SearchTextBox.Text = string.Empty;
                 this.SearchTextBox.Foreground = new SolidColorBrush(Colors.Black);
                 this.isSearchPlaceholder = false;

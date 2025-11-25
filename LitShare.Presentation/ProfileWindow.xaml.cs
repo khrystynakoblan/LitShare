@@ -16,7 +16,6 @@ namespace LitShare.Presentation
     /// </summary>
     public partial class ProfileWindow : Window
     {
-        // SA1214 - Readonly fields first (SA1309 - private fields without underscore)
         private readonly UserService userService = new UserService();
         private readonly int userId;
 
@@ -42,8 +41,6 @@ namespace LitShare.Presentation
         {
             try
             {
-                // ПОМИЛКА: CS1061. Прибрано 'await', оскільки GetUserProfileById, ймовірно, синхронний.
-                // Якщо GetUserProfileById є асинхронним, його сигнатура має бути public Task<UserDto> GetUserProfileByIdAsync(int userId).
                 var user = this.userService.GetUserProfileById(userId);
 
                 if (user != null)
@@ -63,7 +60,6 @@ namespace LitShare.Presentation
                     }
                     else
                     {
-                        // SA1000 - keyword 'new' should be followed by a space
                         string defaultUrl = $"https://randomuser.me/api/portraits/lego/{new Random().Next(0, 9)}.jpg";
                         this.userPhotoEllipse.Fill = new ImageBrush(new BitmapImage(new Uri(defaultUrl)));
                     }

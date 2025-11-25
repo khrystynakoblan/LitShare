@@ -20,22 +20,17 @@ namespace LitShare.Presentation
         /// <summary>
         /// The service for user-related operations.
         /// </summary>
-        private readonly UserService userService = new UserService();
+        private readonly UserService userService = new ();
 
         /// <summary>
         /// The service for book/ad-related operations.
         /// </summary>
-        private readonly BookService bookService = new BookService();
+        private readonly BookService bookService = new ();
 
         /// <summary>
         /// The ID of the currently logged-in user.
         /// </summary>
         private readonly int userId;
-
-        /// <summary>
-        /// The ID of the user whose profile is being viewed.
-        /// </summary>
-        private readonly int userBookId;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProfileViewWindow"/> class.
@@ -46,7 +41,6 @@ namespace LitShare.Presentation
         {
             this.InitializeComponent();
             this.userId = userId;
-            this.userBookId = userBookId;
             _ = this.LoadUserProfileAsync(userBookId);
         }
 
@@ -59,12 +53,10 @@ namespace LitShare.Presentation
         {
             try
             {
-                // Note: GetUserProfileById is assumed to return a complete UserProfileDto or null.
                 var user = await Task.Run(() => this.userService.GetUserProfileById(userId));
 
                 if (user != null)
                 {
-                    // Populate user information fields
                     this.txtName.Text = user.Name;
                     this.txtRegion.Text = user.Region;
                     this.txtDistrict.Text = user.District;
@@ -72,7 +64,6 @@ namespace LitShare.Presentation
                     this.txtPhone.Text = user.Phone ?? "—";
                     this.txtAbout.Text = user.About ?? "Користувач ще не заповнив інформацію про себе."; // Default text in Ukrainian
 
-                    // Load user's books
                     var books = await this.bookService.GetBooksByUserIdAsync(userId);
                     this.BooksList.ItemsSource = books;
                 }
@@ -136,8 +127,10 @@ namespace LitShare.Presentation
             if (sender is MenuItem menuItem &&
                 menuItem.DataContext is BookDto book)
             {
-                var viewWindow = new ViewAdWindow(book.Id, this.userId);
-                viewWindow.Owner = this;
+                var viewWindow = new ViewAdWindow(book.Id, this.userId)
+                {
+                    Owner = this,
+                };
                 viewWindow.ShowDialog();
             }
         }
@@ -153,8 +146,10 @@ namespace LitShare.Presentation
             if (sender is MenuItem menuItem &&
                 menuItem.DataContext is BookDto book)
             {
-                var reportWindow = new ReportAdWindow(book.Id, this.userId);
-                reportWindow.Owner = this;
+                var reportWindow = new ReportAdWindow(book.Id, this.userId)
+                {
+                    Owner = this,
+                };
                 reportWindow.ShowDialog();
             }
         }

@@ -42,8 +42,6 @@ namespace LitShare.Presentation
             }
             catch (Exception ex)
             {
-                // SA1200: All using directives must be placed inside the namespace. (Fixed by adding using System;)
-                // Changed localized error message to English for consistency within the file.
                 MessageBox.Show(
                     $"LOADING ERROR: {ex.Message}",
                     "Error",

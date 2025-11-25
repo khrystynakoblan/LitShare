@@ -55,7 +55,6 @@ namespace LitShare.Presentation
         {
             string? selectedReason = null;
 
-            // Determine the selected reason from the Radio Buttons, using safe access (?. and ??)
             if (this.FalseInfoRadio.IsChecked == true)
             {
                 selectedReason = this.FalseInfoRadio.Content?.ToString() ?? string.Empty;
@@ -82,7 +81,6 @@ namespace LitShare.Presentation
             string details = this.DetailsTextBox.Text.Trim();
             string fullText = selectedReason;
 
-            // Append details if provided
             if (!string.IsNullOrEmpty(details))
             {
                 fullText += ": " + details;
@@ -90,12 +88,8 @@ namespace LitShare.Presentation
 
             try
             {
-                // Submit the complaint via the business logic service
                 this.complaintService.AddComplaint(fullText, this.adId, this.currentUserId);
-
                 this.ShowStatus("Скаргу надіслано!", Brushes.Green);
-
-                // Reset form fields after successful submission
                 this.FalseInfoRadio.IsChecked = false;
                 this.SpamRadio.IsChecked = false;
                 this.ExchangeRadio.IsChecked = false;

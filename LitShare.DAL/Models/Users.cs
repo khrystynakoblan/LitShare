@@ -8,10 +8,6 @@ namespace LitShare.DAL.Models
     using System.ComponentModel.DataAnnotations.Schema;
     using NpgsqlTypes;
 
-    // ------------------------------
-    // 1. ПЕРЕРАХУВАННЯ (Enums) - Переміщено на початок для виправлення SA1201
-    // ------------------------------
-
     /// <summary>
     /// Defines the possible roles a user can have within the application.
     /// </summary>
@@ -29,10 +25,6 @@ namespace LitShare.DAL.Models
         [PgName("admin")]
         Admin,
     }
-
-    // ------------------------------
-    // 2. КЛАСИ (Classes)
-    // ------------------------------
 
     /// <summary>
     /// Represents a registered user account in the application.
@@ -110,9 +102,6 @@ namespace LitShare.DAL.Models
         /// <summary>
         /// Gets or sets the collection of posts created by this user.
         /// </summary>
-        // Примітка: Атрибут Column("photo_url") тут, ймовірно, є помилкою і має бути видалений або замінений на правильний.
-        // Я залишаю його, як у вихідному коді, але його слід перевірити.
-        [Column("photo_url")]
         public ICollection<Posts>? Posts { get; set; }
     }
 }

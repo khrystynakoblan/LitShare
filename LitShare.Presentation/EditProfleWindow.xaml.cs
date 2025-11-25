@@ -17,11 +17,9 @@ namespace LitShare.Presentation
     /// </summary>
     public partial class EditProfileWindow : Window
     {
-        // SA1214 - Readonly fields first (SA1309 - private fields without underscore)
         private readonly UserService userService = new UserService();
         private readonly int userId;
 
-        // SA1214 - Non-readonly fields
         private Users currentUser;
         private Users originalUser;
 
@@ -45,7 +43,6 @@ namespace LitShare.Presentation
         /// <param name="userId">The ID of the user whose data should be loaded.</param>
         private void LoadUserData(int userId)
         {
-            // Отримуємо користувача
             var user = this.userService.GetUserById(userId);
 
             if (user == null)
@@ -55,10 +52,8 @@ namespace LitShare.Presentation
                 return;
             }
 
-            // Присвоюємо currentUser гарантовано непусте значення
             this.currentUser = user;
 
-            // Заповнюємо поля на формі
             this.txtFirstName.Text = this.currentUser.Name;
             this.txtRegion.Text = this.currentUser.Region;
             this.txtDistrict.Text = this.currentUser.District;
@@ -71,7 +66,6 @@ namespace LitShare.Presentation
                 this.userPhotoEllipse.Fill = new ImageBrush(new BitmapImage(new Uri(this.currentUser.PhotoUrl)));
             }
 
-            // Зберігаємо копію для скасування змін
             this.originalUser = new Users
             {
                 Id = this.currentUser.Id,
@@ -117,13 +111,11 @@ namespace LitShare.Presentation
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            // Validate all required fields
             this.ValidateField(this.txtRegion, null);
             this.ValidateField(this.txtDistrict, null);
             this.ValidateField(this.txtCity, null);
             this.ValidateField(this.txtPhone, null);
 
-            // Check if any errors exist
             if (!string.IsNullOrEmpty(this.errRegion.Text) ||
                 !string.IsNullOrEmpty(this.errDistrict.Text) ||
                 !string.IsNullOrEmpty(this.errCity.Text) ||
@@ -132,7 +124,6 @@ namespace LitShare.Presentation
                 return;
             }
 
-            // Update user object
             this.currentUser.Region = this.txtRegion.Text;
             this.currentUser.District = this.txtDistrict.Text;
             this.currentUser.City = this.txtCity.Text;
@@ -155,7 +146,6 @@ namespace LitShare.Presentation
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            // Restore original values (optional, since we are closing and reopening ProfileWindow anyway, but good practice)
             this.txtFirstName.Text = this.originalUser.Name;
             this.txtRegion.Text = this.originalUser.Region;
             this.txtDistrict.Text = this.originalUser.District;
@@ -199,7 +189,6 @@ namespace LitShare.Presentation
                 {
                     this.userService.DeleteUser(this.currentUser.Id);
 
-                    // Assuming AuthWindow is the initial login/registration window
                     var authWindow = new AuthWindow();
                     authWindow.Show();
 

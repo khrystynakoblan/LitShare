@@ -67,8 +67,8 @@ namespace LitShare
             using var db = new LitShareDbContext();
             var genres = db.Genres.ToList();
             this.GenreComboBox.ItemsSource = genres;
-            this.GenreComboBox.DisplayMemberPath = "name";
-            this.GenreComboBox.SelectedValuePath = "id";
+            this.GenreComboBox.DisplayMemberPath = "Name";
+            this.GenreComboBox.SelectedValuePath = "Id";
         }
 
         /// <summary>
@@ -164,7 +164,7 @@ namespace LitShare
         /// <param name="e">The routing event data.</param>
         private void HomeButton_Click(object sender, RoutedEventArgs e)
         {
-            MainPage mainWindow = new MainPage(this.userId);
+            MainPage mainWindow = new (this.userId);
             mainWindow.Show();
             this.Close();
         }
@@ -282,8 +282,7 @@ namespace LitShare
         /// <param name="e">The text changed event data.</param>
         private void Field_TextChanged(object sender, TextChangedEventArgs e)
         {
-            var textBox = sender as TextBox;
-            if (textBox != null)
+            if (sender is TextBox textBox)
             {
                 textBox.BorderBrush = new SolidColorBrush(Color.FromRgb(171, 173, 179));
 
@@ -309,8 +308,7 @@ namespace LitShare
         /// <param name="e">The selection changed event data.</param>
         private void Field_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var comboBox = sender as ComboBox;
-            if (comboBox != null)
+            if (sender is ComboBox comboBox)
             {
                 comboBox.BorderBrush = new SolidColorBrush(Color.FromRgb(171, 173, 179));
 

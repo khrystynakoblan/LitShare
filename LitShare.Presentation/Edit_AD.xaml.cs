@@ -204,7 +204,6 @@ namespace LitShare
 
                 this.context.SaveChanges();
 
-                // Close on successful save
                 this.Close();
             }
             catch (Exception ex)
@@ -232,21 +231,17 @@ namespace LitShare
         /// </summary>
         private void UpdateBookGenre()
         {
-            // Ensure GenreComboBox.SelectedValue is a valid integer before proceeding
             if (this.GenreComboBox.SelectedValue is int selectedGenreId)
             {
                 var existingGenre = this.context.BookGenres.FirstOrDefault(bg => bg.PostId == this.postId);
 
                 if (existingGenre != null)
                 {
-                    // If the genre has changed, update the entry.
                     if (existingGenre.GenreId != selectedGenreId)
                     {
-                        // Remove the old entry
                         this.context.BookGenres.Remove(existingGenre);
                         this.context.SaveChanges(); // Necessary if FK constraints require immediate deletion
 
-                        // Add the new entry
                         this.context.BookGenres.Add(new BookGenres
                         {
                             PostId = this.postId,
@@ -256,7 +251,6 @@ namespace LitShare
                 }
                 else
                 {
-                    // Add new genre entry if one didn't exist before
                     this.context.BookGenres.Add(new BookGenres
                     {
                         PostId = this.postId,
@@ -297,7 +291,6 @@ namespace LitShare
             bool isValid = true;
             var redBrush = new SolidColorBrush(Colors.Red);
 
-            // Using &= operator to ensure isValid remains false if any validation fails
             isValid &= this.ValidateTextBox(this.TitleTextBox, this.TitleError, redBrush);
             isValid &= this.ValidateTextBox(this.AuthorTextBox, this.AuthorError, redBrush);
             isValid &= this.ValidateTextBox(this.DescriptionTextBox, this.DescriptionError, redBrush);
@@ -381,7 +374,6 @@ namespace LitShare
             {
                 comboBox.BorderBrush = normalBrush;
 
-                // Explicitly check and collapse the relevant error message
                 if (comboBox == this.GenreComboBox)
                 {
                     this.GenreError.Visibility = Visibility.Collapsed;

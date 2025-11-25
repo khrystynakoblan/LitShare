@@ -14,19 +14,11 @@ namespace LitShare.DAL
     /// </summary>
     public class LitShareDbContext : DbContext
     {
-        // ------------------------------
-        // 1. ПОЛЯ (Fields)
-        // ------------------------------
-
         /// <summary>
         /// Flag to track if the static PostgreSQL Npgsql mapper has been configured.
         /// </summary>
         // Примітка: StyleCop SA1309 для статичних полів часто вимагає CamelCase або PascalCase.
         private static bool mapperConfigured = false;
-
-        // ------------------------------
-        // 2. КОНСТРУКТОРИ (Constructors) - Виправлення SA1201
-        // ------------------------------
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LitShareDbContext"/> class.
@@ -46,12 +38,6 @@ namespace LitShare.DAL
             // Виклик тепер статичний
             ConfigureMapper();
         }
-
-        // ------------------------------
-        // 3. ВЛАСТИВОСТІ (Properties)
-        // ------------------------------
-
-        // 3.1. Публічні властивості DbSet (Public Properties)
 
         /// <summary>
         /// Gets or sets the DbSet for managing User entities.
@@ -78,12 +64,6 @@ namespace LitShare.DAL
         /// </summary>
         public DbSet<BookGenres> BookGenres { get; set; }
 
-        // ------------------------------
-        // 4. МЕТОДИ (Methods)
-        // ------------------------------
-
-        // 4.1. Protected методи (Protected Methods) - Виправлення SA1202
-
         /// <summary>
         /// Configures the database connection options if options were not passed via the constructor.
         /// This is typically used for local testing or migrations.
@@ -93,7 +73,6 @@ namespace LitShare.DAL
         {
             if (!optionsBuilder.IsConfigured)
             {
-                // NOTE: Hardcoded connection string is visible here. For production, use configuration/secrets.
                 string connectionString =
                     "User Id=postgres.arrxdcvkamsqxudjxvkm;Password=i9n4Nf?aAq#gT!N;Server=aws-1-eu-west-3.pooler.supabase.com;Port=5432;Database=postgres";
 
@@ -131,8 +110,6 @@ namespace LitShare.DAL
             modelBuilder.Entity<BookGenres>()
                 .HasKey(bg => new { bg.PostId, bg.GenreId });
         }
-
-        // 4.2. Private методи (Private Methods)
 
         /// <summary>
         /// Configures the PostgreSQL Npgsql timestamp legacy switch if not already set.

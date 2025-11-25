@@ -41,9 +41,6 @@ namespace LitShare.Presentation
         {
             var service = new ComplaintsService();
             var complaintsList = service.GetAllComplaints();
-
-            // Оскільки Complaints тепер ініціалізовано на місці, ми можемо або:
-            // 1. Присвоїти нову колекцію (як у вихідній логіці, але це може бути менш ефективно):
             this.Complaints = new ObservableCollection<ComplaintDto>(complaintsList);
         }
 

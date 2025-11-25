@@ -17,7 +17,7 @@ namespace LitShare.BLL.Services
     /// </summary>
     public class UserService
     {
-        private readonly LitShareDbContext context; // SA1300 Fix: Renamed to _context
+        private readonly LitShareDbContext context;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UserService"/> class.
