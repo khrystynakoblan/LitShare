@@ -1,10 +1,18 @@
-﻿namespace LitShare.Presentation
+﻿// <copyright file="ComplaintReviewWindow.xaml.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
+namespace LitShare.Presentation
 {
     using System.Windows;
     using System.Windows.Media.Animation;
     using System.Windows.Media.Imaging;
     using LitShare.BLL.Services;
 
+    /// <summary>
+    /// Interaction logic for ComplaintReviewWindow.xaml.
+    /// This window is used by administrators or moderators to review a specific user complaint against an advertisement.
+    /// </summary>
     public partial class ComplaintReviewWindow : Window
     {
         private readonly ComplaintsService complaintsService = new ComplaintsService();
@@ -12,6 +20,12 @@
 
         private int currentComplaintId;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ComplaintReviewWindow"/> class.
+        /// Asynchronously loads the details of the complaint and the associated post.
+        /// </summary>
+        /// <param name="complaintId">The ID of the complaint to load.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public ComplaintReviewWindow(int complaintId)
         {
             this.InitializeComponent();
@@ -19,6 +33,11 @@
             _ = this.LoadComplaintDataAsync(this.currentComplaintId);
         }
 
+        /// <summary>
+        /// Asynchronously loads the details of the complaint and the associated post.
+        /// </summary>
+        /// <param name="complaintId">The ID of the complaint to load.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         private async Task LoadComplaintDataAsync(int complaintId)
         {
             try
@@ -130,6 +149,5 @@
         {
             this.Close();
         }
-
     }
 }

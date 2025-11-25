@@ -20,6 +20,42 @@ namespace LitShare.Presentation
     public partial class MainPage : Window
     {
         /// <summary>
+        /// Static service instance for book operations. (SA1311: Name must begin with upper-case)
+        /// ///.</summary>
+        private static readonly BookService BookServiceInstance = new BookService();
+
+        /// <summary>
+        /// The book service instance used for business logic operations.
+        /// </summary>
+        private readonly BookService bookService = BookServiceInstance;
+
+        /// <summary>
+        /// The ID of the currently logged-in user.
+        /// </summary>
+        private readonly int userId;
+
+        /// <summary>
+        /// List of genre checkboxes for filtering.
+        /// </summary>
+        private readonly List<CheckBox> genreCheckBoxes = new List<CheckBox>();
+
+        /// <summary>
+        /// Flag indicating if the search box displays a placeholder text.
+        /// </summary>
+        private bool isSearchPlaceholder = true;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MainPage"/> class.
+        /// </summary>
+        /// <param name="userId">The ID of the currently logged-in user.</param>
+        public MainPage(int userId)
+        {
+            this.InitializeComponent();
+            this.userId = userId;
+            this.Loaded += this.MainPage_Loaded;
+        }
+
+        /// <summary>
         /// Gets or sets the collection of all books loaded from the database.
         /// </summary>
         public ObservableCollection<BookDto> AllBooks { get; set; } = new ObservableCollection<BookDto>();
@@ -29,25 +65,14 @@ namespace LitShare.Presentation
         /// </summary>
         public ObservableCollection<BookDto> FilteredBooks { get; set; } = new ObservableCollection<BookDto>();
 
-        private static readonly BookService bookService1 = new BookService();
-
-        // SA1214 - Readonly fields first (SA1309 - fields should not begin with an underscore)
-        private readonly BookService bookService = bookService1;
-        private readonly int userId;
-
-        // SA1214 - Non-readonly fields
-        private bool isSearchPlaceholder = true;
-        private readonly List<CheckBox> genreCheckBoxes = new List<CheckBox>();
-
         /// <summary>
-        /// Initializes a new instance of the <see cref="MainPage"/> class.
+        /// Scrolls the BooksScrollViewer to the bottom.
         /// </summary>
-        /// <param name="userId">The ID of the currently logged-in user.</param>
-        public MainPage(int userId)
+        public void ScrollToBottom()
         {
-            this.InitializeComponent();
-            this.userId = userId; // зберігаємо ID користувача
-            this.Loaded += this.MainPage_Loaded;
+            // Якщо є ScrollViewer — просто прокручуємо його вниз
+            this.BooksScrollViewer?.UpdateLayout();
+            this.BooksScrollViewer?.ScrollToEnd();
         }
 
         /// <summary>
@@ -99,7 +124,7 @@ namespace LitShare.Presentation
         private List<string> GetSelectedGenres() =>
             this.genreCheckBoxes
                 .Where(cb => cb.IsChecked == true && cb.Content != null)
-                .Select(cb => cb.Content!.ToString()!)
+                .Select(cb => cb.Content!.ToString() !)
                 .ToList();
 
         private void ApplyFilters()
@@ -112,7 +137,7 @@ namespace LitShare.Presentation
             string? location = this.LocationTextBox?.Text?.Trim();
             string? search = this.isSearchPlaceholder ? null : this.SearchTextBox?.Text?.Trim();
             string? dealType = this.ExchangeRadio?.IsChecked == true ? "Обмін" :
-                                 this.FreeRadio?.IsChecked == true ? "Безкоштовно" : null;
+                               this.FreeRadio?.IsChecked == true ? "Безкоштовно" : null;
             var selectedGenres = this.GetSelectedGenres();
 
             var filtered = this.bookService.GetFilteredBooks(this.AllBooks.ToList(), search, location, dealType, selectedGenres);
@@ -242,16 +267,6 @@ namespace LitShare.Presentation
                 reportWindow.Owner = this;
                 reportWindow.ShowDialog();
             }
-        }
-
-        /// <summary>
-        /// Scrolls the BooksScrollViewer to the bottom.
-        /// </summary>
-        public void ScrollToBottom()
-        {
-            // Якщо є ScrollViewer — просто прокручуємо його вниз
-            this.BooksScrollViewer?.UpdateLayout();
-            this.BooksScrollViewer?.ScrollToEnd();
         }
     }
 }

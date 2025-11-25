@@ -23,6 +23,7 @@ namespace LitShare.DAL.Models
         /// <summary>
         /// Gets or sets the detailed message or description of the complaint.
         /// </summary>
+        [Column("text")]
         public string? Text { get; set; }
 
         /// <summary>

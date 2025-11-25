@@ -36,7 +36,9 @@ namespace LitShare.Presentation
         /// </summary>
         /// <param name="userId">The ID of the user whose profile should be loaded.</param>
         /// <returns>A task that represents the asynchronous loading operation.</returns>
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         private async Task LoadUserProfileAsync(int userId)
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             try
             {

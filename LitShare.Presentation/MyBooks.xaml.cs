@@ -19,7 +19,7 @@ namespace LitShare.Presentation
         private readonly LitShareDbContext context;
         private readonly int userId;
 
-        private List<BookItem> allBooks;
+        private List<BookItem> allBooks = new List<BookItem>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MyBook"/> class.
@@ -51,7 +51,7 @@ namespace LitShare.Presentation
                         Title = p.Title,
                         Author = p.Author,
                         City = u.City,
-                        PhotoUrl = p.PhotoUrl
+                        PhotoUrl = p.PhotoUrl,
                     })
                     .ToList();
 
@@ -70,17 +70,17 @@ namespace LitShare.Presentation
             if (string.IsNullOrEmpty(searchText))
             {
                 this.DisplayBooks(this.allBooks);
+                return;
             }
-            else
-            {
-                var filteredBooks = this.allBooks.Where(b =>
-                    b.Title.ToLower().Contains(searchText) ||
-                    b.Author.ToLower().Contains(searchText) ||
-                    b.City.ToLower().Contains(searchText)
-                ).ToList();
 
-                this.DisplayBooks(filteredBooks);
-            }
+            var filteredBooks = this.allBooks
+                .Where(b =>
+                    (b.Title ?? string.Empty).ToLower().Contains(searchText) ||
+                    (b.Author ?? string.Empty).ToLower().Contains(searchText) ||
+                    (b.City ?? string.Empty).ToLower().Contains(searchText))
+                .ToList();
+
+            this.DisplayBooks(filteredBooks);
         }
 
         /// <summary>
@@ -129,22 +129,22 @@ namespace LitShare.Presentation
             /// <summary>
             /// Gets or sets the book title.
             /// </summary>
-            public string Title { get; set; }
+            public string? Title { get; set; }
 
             /// <summary>
             /// Gets or sets the book author.
             /// </summary>
-            public string Author { get; set; }
+            public string? Author { get; set; }
 
             /// <summary>
             /// Gets or sets the city where the book is located.
             /// </summary>
-            public string City { get; set; }
+            public string? City { get; set; }
 
             /// <summary>
             /// Gets or sets the URL of the book's photo.
             /// </summary>
-            public string PhotoUrl { get; set; }
+            public string? PhotoUrl { get; set; }
         }
     }
 }

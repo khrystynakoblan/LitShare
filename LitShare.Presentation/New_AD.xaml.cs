@@ -1,52 +1,88 @@
-﻿using LitShare.DAL;
-using LitShare.DAL.Models;
-using LitShare.Presentation;
-using Microsoft.EntityFrameworkCore;
-using System.Windows;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
+﻿// <copyright file="New_AD.xaml.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
 
 namespace LitShare
 {
+    using System;
+    using System.Linq;
+    using System.Windows;
+    using System.Windows.Controls;
+    using System.Windows.Media;
+    using System.Windows.Media.Imaging;
+    using LitShare.DAL;
+    using LitShare.DAL.Models;
+    using LitShare.Presentation;
+    using Microsoft.EntityFrameworkCore;
+    using Microsoft.Win32;
+
+    /// <summary>
+    /// Interaction logic for NewAdWindow.xaml, allowing the user to create a new book advertisement.
+    /// </summary>
     public partial class NewAdWindow : Window
     {
-        private readonly int _userId;
+        /// <summary>
+        /// The ID of the current user.
+        /// </summary>
+        private readonly int userId;
+
+        /// <summary>
+        /// The file path of the selected book photo.
+        /// </summary>
+        private string? selectedPhotoPath;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NewAdWindow"/> class.
+        /// </summary>
+        /// <param name="userId">The ID of the user creating the advertisement.</param>
         public NewAdWindow(int userId)
         {
-            InitializeComponent();
-            _userId = userId;
-            LoadDealTypes();
-            LoadGenres();
+            this.InitializeComponent();
+            this.userId = userId;
+            this.LoadDealTypes();
+            this.LoadGenres();
         }
 
-
+        /// <summary>
+        /// Loads the available deal types (Exchange, Donation) into the corresponding ComboBox.
+        /// </summary>
         private void LoadDealTypes()
         {
             var dealTypes = new[]
             {
-                new { Value = DealType.Exchange, Display = "Обмін" },
-                new { Value = DealType.Donation, Display = "Безкоштовно" }
+                new { Value = DealType.Exchange, Display = "Обмін" }, // Exchange
+                new { Value = DealType.Donation, Display = "Безкоштовно" }, // Donation (Free)
             };
 
-            DealTypeComboBox.ItemsSource = dealTypes;
-            DealTypeComboBox.DisplayMemberPath = "Display";
-            DealTypeComboBox.SelectedValuePath = "Value";
+            this.DealTypeComboBox.ItemsSource = dealTypes;
+            this.DealTypeComboBox.DisplayMemberPath = "Display";
+            this.DealTypeComboBox.SelectedValuePath = "Value";
         }
 
-
+        /// <summary>
+        /// Loads the list of available genres from the database into the corresponding ComboBox.
+        /// </summary>
         private void LoadGenres()
         {
             using var db = new LitShareDbContext();
             var genres = db.Genres.ToList();
-            GenreComboBox.ItemsSource = genres;
-            GenreComboBox.DisplayMemberPath = "name";
-            GenreComboBox.SelectedValuePath = "id";
+            this.GenreComboBox.ItemsSource = genres;
+            this.GenreComboBox.DisplayMemberPath = "name";
+            this.GenreComboBox.SelectedValuePath = "id";
         }
 
+        /// <summary>
+        /// Handles the click event for the "Add Ad" button.
+        /// Saves the new advertisement and associated genre to the database.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The routing event data.</param>
         private void AddAdButton_Click(object sender, RoutedEventArgs e)
         {
-            if (!ValidateFields())
+            if (!this.ValidateFields())
+            {
                 return;
+            }
 
             try
             {
@@ -54,30 +90,30 @@ namespace LitShare
 
                 var post = new Posts
                 {
-                    Title = TitleTextBox.Text,
-                    Author = AuthorTextBox.Text,
-                    Description = DescriptionTextBox.Text,
-                    DealType = (DealType)DealTypeComboBox.SelectedValue,
-                    UserId = _userId,
-                    PhotoUrl = selectedPhotoPath,
-                    // ADD THIS LINE: Initialize the required navigation property to null
-                    User = null
+                    Title = this.TitleTextBox.Text,
+                    Author = this.AuthorTextBox.Text,
+                    Description = this.DescriptionTextBox.Text,
+                    DealType = (DealType)this.DealTypeComboBox.SelectedValue,
+                    UserId = this.userId,
+                    PhotoUrl = this.selectedPhotoPath,
+                    User = null,
                 };
 
                 db.Posts.Add(post);
                 db.SaveChanges();
 
-                var selectedGenre = (Genres)GenreComboBox.SelectedItem;
+                var selectedGenre = (Genres)this.GenreComboBox.SelectedItem;
                 var bookGenre = new BookGenres
                 {
                     PostId = post.Id,
-                    GenreId = selectedGenre.Id
+                    GenreId = selectedGenre.Id,
                 };
 
                 db.BookGenres.Add(bookGenre);
                 db.SaveChanges();
 
-                var mainWindow = new MainPage(_userId);
+                // Navigate to the main page and scroll to the new ad
+                var mainWindow = new MainPage(this.userId);
                 mainWindow.Loaded += (s, e2) => mainWindow.ScrollToBottom();
                 mainWindow.Show();
 
@@ -85,147 +121,208 @@ namespace LitShare
             }
             catch (DbUpdateException ex)
             {
-                MessageBox.Show($"Сталася помилка при додаванні оголошення:\n{ex.InnerException?.Message}");
+                MessageBox.Show(
+                    $"An error occurred while adding the advertisement:\n{ex.InnerException?.Message}",
+                    "Database Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An unknown error occurred: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-
+        /// <summary>
+        /// Handles the click event for the "Cancel" button.
+        /// Closes the current window.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The routing event data.</param>
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
         }
 
+        /// <summary>
+        /// Handles the click event for the "My Profile" button.
+        /// Opens the user's profile window.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The routing event data.</param>
         private void MyProfile_Click(object sender, RoutedEventArgs e)
         {
-            var profileWindow = new ProfileWindow(_userId);
+            var profileWindow = new ProfileWindow(this.userId);
             profileWindow.ShowDialog();
         }
 
-        private string selectedPhotoPath;
-
+        /// <summary>
+        /// Handles the click event for the "Home" button.
+        /// Opens the main page and closes the current window.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The routing event data.</param>
         private void HomeButton_Click(object sender, RoutedEventArgs e)
         {
-            MainPage mainWindow = new MainPage(_userId);
+            MainPage mainWindow = new MainPage(this.userId);
             mainWindow.Show();
             this.Close();
         }
+
+        /// <summary>
+        /// Handles the click event for the "Add Photo" button.
+        /// Opens a file dialog to select an image file and displays it.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The routing event data.</param>
         private void AddPhotoButton_Click(object sender, RoutedEventArgs e)
         {
-            var openFileDialog = new Microsoft.Win32.OpenFileDialog
+            var openFileDialog = new OpenFileDialog
             {
-                Title = "Виберіть фото книги",
-                Filter = "Зображення|*.jpg;*.jpeg;*.png;*.bmp;*.gif",
-                Multiselect = false
+                Title = "Select Book Photo",
+                Filter = "Images|*.jpg;*.jpeg;*.png;*.bmp;*.gif",
+                Multiselect = false,
             };
-
 
             bool? result = openFileDialog.ShowDialog();
 
             if (result == true)
             {
-                selectedPhotoPath = openFileDialog.FileName;
+                this.selectedPhotoPath = openFileDialog.FileName;
 
-                if (BookImage != null)
+                if (this.BookImage != null)
                 {
-                    BookImage.Source = new BitmapImage(new Uri(selectedPhotoPath));
+                    this.BookImage.Source = new BitmapImage(new Uri(this.selectedPhotoPath));
                 }
             }
         }
+
+        /// <summary>
+        /// Validates if all required fields in the form are filled and displays error messages if necessary.
+        /// </summary>
+        /// <returns><c>true</c> if all fields are valid; otherwise, <c>false</c>.</returns>
         private bool ValidateFields()
         {
             bool isValid = true;
             var redBrush = new SolidColorBrush(Colors.Red);
-            var normalBrush = new SolidColorBrush(Color.FromRgb(171, 173, 179));
+            var normalBrush = new SolidColorBrush(Color.FromRgb(171, 173, 179)); // Standard Border Color (Gray)
 
-            if (string.IsNullOrWhiteSpace(TitleTextBox.Text))
+            // Title Validation
+            if (string.IsNullOrWhiteSpace(this.TitleTextBox.Text))
             {
-                TitleTextBox.BorderBrush = redBrush;
-                TitleError.Visibility = Visibility.Visible;
+                this.TitleTextBox.BorderBrush = redBrush;
+                this.TitleError.Visibility = Visibility.Visible;
                 isValid = false;
             }
             else
             {
-                TitleTextBox.BorderBrush = normalBrush;
-                TitleError.Visibility = Visibility.Collapsed;
+                this.TitleTextBox.BorderBrush = normalBrush;
+                this.TitleError.Visibility = Visibility.Collapsed;
             }
 
-            if (string.IsNullOrWhiteSpace(AuthorTextBox.Text))
+            // Author Validation
+            if (string.IsNullOrWhiteSpace(this.AuthorTextBox.Text))
             {
-                AuthorTextBox.BorderBrush = redBrush;
-                AuthorError.Visibility = Visibility.Visible;
+                this.AuthorTextBox.BorderBrush = redBrush;
+                this.AuthorError.Visibility = Visibility.Visible;
                 isValid = false;
             }
             else
             {
-                AuthorTextBox.BorderBrush = normalBrush;
-                AuthorError.Visibility = Visibility.Collapsed;
+                this.AuthorTextBox.BorderBrush = normalBrush;
+                this.AuthorError.Visibility = Visibility.Collapsed;
             }
 
-            if (string.IsNullOrWhiteSpace(DescriptionTextBox.Text))
+            // Description Validation
+            if (string.IsNullOrWhiteSpace(this.DescriptionTextBox.Text))
             {
-                DescriptionTextBox.BorderBrush = redBrush;
-                DescriptionError.Visibility = Visibility.Visible;
+                this.DescriptionTextBox.BorderBrush = redBrush;
+                this.DescriptionError.Visibility = Visibility.Visible;
                 isValid = false;
             }
             else
             {
-                DescriptionTextBox.BorderBrush = normalBrush;
-                DescriptionError.Visibility = Visibility.Collapsed;
+                this.DescriptionTextBox.BorderBrush = normalBrush;
+                this.DescriptionError.Visibility = Visibility.Collapsed;
             }
 
-
-            if (DealTypeComboBox.SelectedItem == null)
+            // DealType ComboBox Validation
+            if (this.DealTypeComboBox.SelectedItem == null)
             {
-                DealTypeComboBox.BorderBrush = redBrush;
-                DealTypeError.Visibility = Visibility.Visible;
+                this.DealTypeComboBox.BorderBrush = redBrush;
+                this.DealTypeError.Visibility = Visibility.Visible;
                 isValid = false;
             }
             else
             {
-                DealTypeComboBox.BorderBrush = normalBrush;
-                DealTypeError.Visibility = Visibility.Collapsed;
+                this.DealTypeComboBox.BorderBrush = normalBrush;
+                this.DealTypeError.Visibility = Visibility.Collapsed;
             }
 
-            if (GenreComboBox.SelectedItem == null)
+            // Genre ComboBox Validation
+            if (this.GenreComboBox.SelectedItem == null)
             {
-                GenreComboBox.BorderBrush = redBrush;
-                GenreError.Visibility = Visibility.Visible;
+                this.GenreComboBox.BorderBrush = redBrush;
+                this.GenreError.Visibility = Visibility.Visible;
                 isValid = false;
             }
             else
             {
-                GenreComboBox.BorderBrush = normalBrush;
-                GenreError.Visibility = Visibility.Collapsed;
+                this.GenreComboBox.BorderBrush = normalBrush;
+                this.GenreError.Visibility = Visibility.Collapsed;
             }
-
-
 
             return isValid;
         }
 
-
-        private void Field_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        /// <summary>
+        /// Handles the text changed event, resetting the border color and hiding the error message for the TextBox.
+        /// </summary>
+        /// <param name="sender">The TextBox where the text was changed.</param>
+        /// <param name="e">The text changed event data.</param>
+        private void Field_TextChanged(object sender, TextChangedEventArgs e)
         {
-            var textBox = sender as System.Windows.Controls.TextBox;
-            textBox.BorderBrush = new SolidColorBrush(Color.FromRgb(171, 173, 179));
+            var textBox = sender as TextBox;
+            if (textBox != null)
+            {
+                textBox.BorderBrush = new SolidColorBrush(Color.FromRgb(171, 173, 179));
 
-            if (textBox == TitleTextBox) TitleError.Visibility = Visibility.Collapsed;
-            else if (textBox == AuthorTextBox) AuthorError.Visibility = Visibility.Collapsed;
-            else if (textBox == DescriptionTextBox) DescriptionError.Visibility = Visibility.Collapsed;
+                if (textBox == this.TitleTextBox)
+                {
+                    this.TitleError.Visibility = Visibility.Collapsed;
+                }
+                else if (textBox == this.AuthorTextBox)
+                {
+                    this.AuthorError.Visibility = Visibility.Collapsed;
+                }
+                else if (textBox == this.DescriptionTextBox)
+                {
+                    this.DescriptionError.Visibility = Visibility.Collapsed;
+                }
+            }
         }
 
-        private void Field_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        /// <summary>
+        /// Handles the selection changed event in a ComboBox, resetting the border color and hiding the error message.
+        /// </summary>
+        /// <param name="sender">The ComboBox where the selection was changed.</param>
+        /// <param name="e">The selection changed event data.</param>
+        private void Field_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var comboBox = sender as System.Windows.Controls.ComboBox;
-            comboBox.BorderBrush = new SolidColorBrush(Color.FromRgb(171, 173, 179));
+            var comboBox = sender as ComboBox;
+            if (comboBox != null)
+            {
+                comboBox.BorderBrush = new SolidColorBrush(Color.FromRgb(171, 173, 179));
 
-            if (comboBox == GenreComboBox) GenreError.Visibility = Visibility.Collapsed;
-            else if (comboBox == DealTypeComboBox) DealTypeError.Visibility = Visibility.Collapsed;
+                if (comboBox == this.GenreComboBox)
+                {
+                    this.GenreError.Visibility = Visibility.Collapsed;
+                }
+                else if (comboBox == this.DealTypeComboBox)
+                {
+                    this.DealTypeError.Visibility = Visibility.Collapsed;
+                }
+            }
         }
-
     }
-
 }
-
-
-

@@ -142,7 +142,9 @@ namespace LitShare.Presentation
             {
                 _ = MessageBox.Show(
                     $"Помилка реєстрації: {ex.Message}\n\n{ex.InnerException?.Message}",
-                    "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    "Помилка",
+                    button: MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
         }
 

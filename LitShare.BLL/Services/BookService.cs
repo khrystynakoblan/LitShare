@@ -34,22 +34,22 @@ namespace LitShare.BLL.Services
             try
             {
                 var books = await this.context.Posts
-                    .Include(p => p.BookGenres)
-                        .ThenInclude(bg => bg.Genre)
-                    .Include(p => p.User)
-                    .AsNoTracking()
-                    .Select(p => new BookDto
-                    {
-                        Id = p.Id,
-                        Title = p.Title,
-                        Author = p.Author,
-                        Location = p.User.City,
-                        Genre = string.Join(", ", p.BookGenres.Select(bg => bg.Genre.Name)),
-                        DealType = p.DealType == DealType.Exchange ? "Обмін" : "Безкоштовно",
-                        ImagePath = p.PhotoUrl,
-                        UserId = p.UserId,
-                    })
-                    .ToListAsync();
+                  .Include(p => p.BookGenres)
+                    .ThenInclude(bg => bg.Genre)
+                  .Include(p => p.User)
+                  .AsNoTracking()
+                  .Select(p => new BookDto
+                  {
+                      Id = p.Id,
+                      Title = p.Title,
+                      Author = p.Author,
+                      Location = p.User!.City,
+                      Genre = string.Join(", ", p.BookGenres.Select(bg => bg.Genre!.Name)),
+                      DealType = p.DealType == DealType.Exchange ? "Обмін" : "Безкоштовно",
+                      ImagePath = p.PhotoUrl,
+                      UserId = p.UserId,
+                  })
+                  .ToListAsync();
 
                 return books;
             }
@@ -142,8 +142,8 @@ namespace LitShare.BLL.Services
                         Id = p.Id,
                         Title = p.Title,
                         Author = p.Author,
-                        Location = p.User.City,
-                        Genre = string.Join(", ", p.BookGenres.Select(bg => bg.Genre.Name)),
+                        Location = p.User!.City,
+                        Genre = string.Join(", ", p.BookGenres.Select(bg => bg.Genre!.Name)),
                         DealType = p.DealType == DealType.Exchange ? "Обмін" : "Безкоштовно",
                         ImagePath = p.PhotoUrl,
                         UserId = p.UserId,
@@ -177,8 +177,8 @@ namespace LitShare.BLL.Services
                     Id = p.Id,
                     Title = p.Title,
                     Author = p.Author,
-                    Location = p.User.City,
-                    Genre = string.Join(", ", p.BookGenres.Select(bg => bg.Genre.Name)),
+                    Location = p.User!.City, // Виправлення CS8602
+                    Genre = string.Join(", ", p.BookGenres.Select(bg => bg.Genre!.Name)),
                     DealType = p.DealType == DealType.Exchange ? "Обмін" : "Безкоштовно",
                     ImagePath = p.PhotoUrl,
                     UserId = p.UserId,

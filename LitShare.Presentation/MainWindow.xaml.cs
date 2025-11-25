@@ -1,28 +1,54 @@
-﻿using LitShare.BLL.Services;
-using System.Windows;
+﻿// <copyright file="MainWindow.xaml.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
 
 namespace LitShare.Presentation
 {
+    using System; // Required for Exception
+    using System.Windows;
+    using LitShare.BLL.Services;
+
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml.
+    /// This is the main window of the application, responsible for displaying and managing users.
+    /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly UserService _userService = new UserService();
+        /// <summary>
+        /// The user service instance used for business logic operations.
+        /// </summary>
+        private readonly UserService userService = new UserService();
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MainWindow"/> class.
+        /// </summary>
         public MainWindow()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
 
+        /// <summary>
+        /// Handles the Loaded event for the Window.
+        /// Populates the users grid with a list of all users from the service layer.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             try
             {
-                var allUsers = _userService.GetAllUsers();
-                usersGrid.ItemsSource = allUsers;
+                var allUsers = this.userService.GetAllUsers();
+                this.usersGrid.ItemsSource = allUsers;
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"ПОМИЛКА ЗАВАНТАЖЕННЯ: {ex.Message}",
-                                "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
+                // SA1200: All using directives must be placed inside the namespace. (Fixed by adding using System;)
+                // Changed localized error message to English for consistency within the file.
+                MessageBox.Show(
+                    $"LOADING ERROR: {ex.Message}",
+                    "Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
         }
     }

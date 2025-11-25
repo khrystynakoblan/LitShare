@@ -6,7 +6,6 @@ namespace LitShare.Presentation
 {
     using System;
     using System.Text.RegularExpressions;
-    using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Media;
     using System.Windows.Media.Imaging;
@@ -34,6 +33,9 @@ namespace LitShare.Presentation
         {
             this.InitializeComponent();
             this.userId = userId;
+            this.currentUser = new Users();
+            this.originalUser = new Users();
+
             this.LoadUserData(this.userId);
         }
 
@@ -43,25 +45,33 @@ namespace LitShare.Presentation
         /// <param name="userId">The ID of the user whose data should be loaded.</param>
         private void LoadUserData(int userId)
         {
-            this.currentUser = this.userService.GetUserById(userId);
-            if (this.currentUser == null)
+            // Отримуємо користувача
+            var user = this.userService.GetUserById(userId);
+
+            if (user == null)
             {
+                MessageBox.Show("Користувача не знайдено!", "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
+                this.Close();
                 return;
             }
 
+            // Присвоюємо currentUser гарантовано непусте значення
+            this.currentUser = user;
+
+            // Заповнюємо поля на формі
             this.txtFirstName.Text = this.currentUser.Name;
             this.txtRegion.Text = this.currentUser.Region;
             this.txtDistrict.Text = this.currentUser.District;
             this.txtCity.Text = this.currentUser.City;
             this.txtPhone.Text = this.currentUser.Phone;
-            this.txtAbout.Text = this.currentUser.About ?? string.Empty; // SA1122: Use string.Empty
+            this.txtAbout.Text = this.currentUser.About ?? string.Empty;
 
             if (!string.IsNullOrEmpty(this.currentUser.PhotoUrl))
             {
                 this.userPhotoEllipse.Fill = new ImageBrush(new BitmapImage(new Uri(this.currentUser.PhotoUrl)));
             }
 
-            // Copy current user data to originalUser for restoration on Cancel
+            // Зберігаємо копію для скасування змін
             this.originalUser = new Users
             {
                 Id = this.currentUser.Id,
@@ -132,11 +142,9 @@ namespace LitShare.Presentation
             try
             {
                 this.userService.UpdateUser(this.currentUser);
-                MessageBox.Show("Профіль успішно оновлено!", "Успіх", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
-                // SA1000 - keyword 'new' should be followed by a space
                 MessageBox.Show($"Помилка при збереженні профілю: {ex.Message}", "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 

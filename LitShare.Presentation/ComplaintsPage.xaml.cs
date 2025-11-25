@@ -6,13 +6,21 @@ namespace LitShare.Presentation
 {
     using System.Collections.ObjectModel;
     using System.Windows;
+    using System.Windows.Input;
     using LitShare.BLL.DTOs;
     using LitShare.BLL.Services;
 
+    /// <summary>
+    /// Interaction logic for ComplaintsPage.xaml.
+    /// This window displays a list of all complaints and allows for their review.
+    /// </summary>
     public partial class ComplaintsPage : Window
     {
-        public ObservableCollection<ComplaintDto> Complaints { get; set; }
+        // SA1201: Поля та Конструктори йдуть перед Властивостями.
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ComplaintsPage"/> class.
+        /// </summary>
         public ComplaintsPage()
         {
             this.InitializeComponent();
@@ -20,24 +28,43 @@ namespace LitShare.Presentation
             this.ComplaintsGrid.ItemsSource = this.Complaints;
         }
 
+        /// <summary>
+        /// Gets or sets the collection of complaints to be displayed.
+        /// Використовується ініціалізація, щоб уникнути попередження CS8618.
+        /// </summary>
+        public ObservableCollection<ComplaintDto> Complaints { get; set; } = new ObservableCollection<ComplaintDto>();
+
+        /// <summary>
+        /// Loads all complaints from the service layer into the <see cref="Complaints"/> collection.
+        /// </summary>
         private void LoadComplaints()
         {
             var service = new ComplaintsService();
             var complaintsList = service.GetAllComplaints();
+
+            // Оскільки Complaints тепер ініціалізовано на місці, ми можемо або:
+            // 1. Присвоїти нову колекцію (як у вихідній логіці, але це може бути менш ефективно):
             this.Complaints = new ObservableCollection<ComplaintDto>(complaintsList);
         }
 
-        private void ComplaintsGrid_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        /// <summary>
+        /// Handles the MouseDoubleClick event on the ComplaintsGrid.
+        /// Opens a new ComplaintReviewWindow for the selected complaint and reloads the list after the review.
+        /// </summary>
+        /// <param name="sender">The source of the event, which is the ComplaintsGrid.</param>
+        /// <param name="e">The <see cref="MouseButtonEventArgs"/> instance containing the event data.</param>
+        private void ComplaintsGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             if (this.ComplaintsGrid.SelectedItem is ComplaintDto selectedComplaint)
             {
+                // Assuming ComplaintReviewWindow is available
                 var reviewWindow = new ComplaintReviewWindow(selectedComplaint.Id);
                 reviewWindow.ShowDialog();
 
+                // Reload complaints to refresh the grid (in case the status changed)
                 this.LoadComplaints();
                 this.ComplaintsGrid.ItemsSource = this.Complaints;
             }
         }
-
     }
 }

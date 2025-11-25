@@ -60,8 +60,7 @@ namespace LitShare.DAL.Models
         /// Gets or sets the navigation property to the user who owns the post.
         /// </summary>
         [ForeignKey("UserId")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.OrderingRules", "SA1206:Declaration keywords should follow order", Justification = "<Pending>")]
-        public virtual required Users User { get; set; } 
+        public virtual Users? User { get; set; }
 
         /// <summary>
         /// Gets or sets the collection of genre mappings associated with this post.

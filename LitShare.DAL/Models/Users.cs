@@ -84,6 +84,7 @@ namespace LitShare.DAL.Models
         /// <summary>
         /// Gets or sets the collection of posts created by this user.
         /// </summary>
+        [Column("photo_url")]
         public ICollection<Posts>? Posts { get; set; }
     }
 
