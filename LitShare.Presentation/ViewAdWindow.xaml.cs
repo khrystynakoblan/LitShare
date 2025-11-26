@@ -17,7 +17,7 @@ namespace LitShare.Presentation
         /// <summary>
         /// Сервіс для роботи з даними книг.
         /// </summary>
-        private readonly BookService bookService = new BookService();
+        private readonly BookService bookService = new ();
 
         /// <summary>
         /// Ідентифікатор поточного користувача.
@@ -146,8 +146,10 @@ namespace LitShare.Presentation
         {
             if (this.currentBook != null)
             {
-                var profileWindow = new ProfileViewWindow(this.currentBook.UserId, this.userId);
-                profileWindow.Owner = this;
+                var profileWindow = new ProfileViewWindow(this.currentBook.UserId, this.userId)
+                {
+                    Owner = this,
+                };
                 profileWindow.ShowDialog();
             }
         }
@@ -191,8 +193,10 @@ namespace LitShare.Presentation
 
             this.Hide();
 
-            var reportWindow = new ReportAdWindow(this.currentBook.Id, this.userId);
-            reportWindow.Owner = this;
+            var reportWindow = new ReportAdWindow(this.currentBook.Id, this.userId)
+            {
+                Owner = this,
+            };
             reportWindow.ShowDialog();
 
             this.Show();

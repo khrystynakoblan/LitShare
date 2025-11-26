@@ -1,0 +1,614 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<coverage line-rate="0.9490000000000001" branch-rate="0.9615" version="1.9" timestamp="1764110007" lines-covered="149" lines-valid="157" branches-covered="25" branches-valid="26">
+  <sources>
+    <source>C:\</source>
+  </sources>
+  <packages>
+    <package name="LitShare.ConsoleApp" line-rate="0.9490000000000001" branch-rate="0.9615" complexity="62">
+      <classes>
+        <class name="LitShare.ConsoleApp.InMemoryBookRepository" filename="Users\Lenovo\Desktop\LitShare\LitShare.ConsoleApp\Program.cs" line-rate="0.9229999999999999" branch-rate="1" complexity="11">
+          <methods>
+            <method name="ClearAllData" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="30" hits="2" branch="False" />
+                <line number="31" hits="2" branch="False" />
+                <line number="32" hits="2" branch="False" />
+                <line number="33" hits="2" branch="False" />
+                <line number="34" hits="2" branch="False" />
+                <line number="35" hits="2" branch="False" />
+                <line number="36" hits="2" branch="False" />
+              </lines>
+            </method>
+            <method name="AddUser" signature="(LitShare.ConsoleApp.User)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="39" hits="11" branch="False" />
+                <line number="40" hits="11" branch="False" />
+                <line number="41" hits="11" branch="False" />
+                <line number="42" hits="11" branch="False" />
+                <line number="43" hits="11" branch="False" />
+              </lines>
+            </method>
+            <method name="AddPost" signature="(LitShare.ConsoleApp.Post)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="46" hits="22" branch="False" />
+                <line number="47" hits="22" branch="False" />
+                <line number="48" hits="22" branch="False" />
+                <line number="49" hits="22" branch="False" />
+                <line number="50" hits="22" branch="False" />
+              </lines>
+            </method>
+            <method name="AddGenre" signature="(LitShare.ConsoleApp.Genre)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="53" hits="8" branch="False" />
+                <line number="54" hits="8" branch="False" />
+                <line number="55" hits="8" branch="False" />
+                <line number="56" hits="8" branch="False" />
+                <line number="57" hits="8" branch="False" />
+              </lines>
+            </method>
+            <method name="AddBookGenre" signature="(System.Int32,System.Int32)" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="60" hits="0" branch="False" />
+                <line number="61" hits="0" branch="False" />
+                <line number="62" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name="AddComplaint" signature="(LitShare.ConsoleApp.Complaint)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="65" hits="8" branch="False" />
+                <line number="66" hits="8" branch="False" />
+                <line number="67" hits="8" branch="False" />
+                <line number="68" hits="8" branch="False" />
+                <line number="69" hits="8" branch="False" />
+              </lines>
+            </method>
+            <method name="GetAllPosts" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="71" hits="11" branch="False" />
+              </lines>
+            </method>
+            <method name="GetAllUsers" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="72" hits="11" branch="False" />
+              </lines>
+            </method>
+            <method name="GetAllGenres" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="73" hits="5" branch="False" />
+              </lines>
+            </method>
+            <method name="GetAllComplaints" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="74" hits="5" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="23" hits="9" branch="False" />
+                <line number="24" hits="9" branch="False" />
+                <line number="25" hits="9" branch="False" />
+                <line number="26" hits="9" branch="False" />
+                <line number="27" hits="9" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="30" hits="2" branch="False" />
+            <line number="31" hits="2" branch="False" />
+            <line number="32" hits="2" branch="False" />
+            <line number="33" hits="2" branch="False" />
+            <line number="34" hits="2" branch="False" />
+            <line number="35" hits="2" branch="False" />
+            <line number="36" hits="2" branch="False" />
+            <line number="39" hits="11" branch="False" />
+            <line number="40" hits="11" branch="False" />
+            <line number="41" hits="11" branch="False" />
+            <line number="42" hits="11" branch="False" />
+            <line number="43" hits="11" branch="False" />
+            <line number="46" hits="22" branch="False" />
+            <line number="47" hits="22" branch="False" />
+            <line number="48" hits="22" branch="False" />
+            <line number="49" hits="22" branch="False" />
+            <line number="50" hits="22" branch="False" />
+            <line number="53" hits="8" branch="False" />
+            <line number="54" hits="8" branch="False" />
+            <line number="55" hits="8" branch="False" />
+            <line number="56" hits="8" branch="False" />
+            <line number="57" hits="8" branch="False" />
+            <line number="60" hits="0" branch="False" />
+            <line number="61" hits="0" branch="False" />
+            <line number="62" hits="0" branch="False" />
+            <line number="65" hits="8" branch="False" />
+            <line number="66" hits="8" branch="False" />
+            <line number="67" hits="8" branch="False" />
+            <line number="68" hits="8" branch="False" />
+            <line number="69" hits="8" branch="False" />
+            <line number="71" hits="11" branch="False" />
+            <line number="72" hits="11" branch="False" />
+            <line number="73" hits="5" branch="False" />
+            <line number="74" hits="5" branch="False" />
+            <line number="23" hits="9" branch="False" />
+            <line number="24" hits="9" branch="False" />
+            <line number="25" hits="9" branch="False" />
+            <line number="26" hits="9" branch="False" />
+            <line number="27" hits="9" branch="False" />
+          </lines>
+        </class>
+        <class name="LitShare.ConsoleApp.DataSeeder" filename="Users\Lenovo\Desktop\LitShare\LitShare.ConsoleApp\Program.cs" line-rate="1" branch-rate="1" complexity="9">
+          <methods>
+            <method name="SeedUsersAndPosts" signature="(System.Int32,System.Int32)" line-rate="1" branch-rate="1" complexity="4">
+              <lines>
+                <line number="87" hits="3" branch="False" />
+                <line number="88" hits="3" branch="False" />
+                <line number="89" hits="9" branch="False" />
+                <line number="90" hits="9" branch="False" />
+                <line number="91" hits="9" branch="False" />
+                <line number="92" hits="9" branch="False" />
+                <line number="93" hits="9" branch="False" />
+                <line number="94" hits="9" branch="False" />
+                <line number="95" hits="9" branch="False" />
+                <line number="96" hits="12" branch="False" />
+                <line number="98" hits="3" branch="False" />
+                <line number="99" hits="20" branch="False" />
+                <line number="100" hits="20" branch="False" />
+                <line number="101" hits="20" branch="False" />
+                <line number="102" hits="20" branch="False" />
+                <line number="103" hits="23" branch="False" />
+                <line number="105" hits="24" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="1441" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="106" hits="9" branch="False" />
+                <line number="107" hits="9" branch="False" />
+                <line number="108" hits="9" branch="False" />
+                <line number="110" hits="9" branch="False" />
+                <line number="111" hits="20" branch="False" />
+                <line number="112" hits="9" branch="False" />
+                <line number="114" hits="67" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="1398" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="115" hits="20" branch="False" />
+                <line number="117" hits="9" branch="False" />
+                <line number="118" hits="9" branch="False" />
+                <line number="120" hits="3" branch="False" />
+                <line number="121" hits="3" branch="False" />
+              </lines>
+            </method>
+            <method name="SeedGenres" signature="(System.Int32)" line-rate="1" branch-rate="1" complexity="2">
+              <lines>
+                <line number="124" hits="2" branch="False" />
+                <line number="125" hits="2" branch="False" />
+                <line number="126" hits="8" branch="False" />
+                <line number="128" hits="16" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="146" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="129" hits="6" branch="False" />
+                <line number="130" hits="6" branch="False" />
+                <line number="131" hits="6" branch="False" />
+                <line number="132" hits="6" branch="False" />
+                <line number="134" hits="2" branch="False" />
+                <line number="135" hits="2" branch="False" />
+              </lines>
+            </method>
+            <method name="SeedComplaints" signature="(System.Int32)" line-rate="1" branch-rate="1" complexity="2">
+              <lines>
+                <line number="138" hits="2" branch="False" />
+                <line number="139" hits="2" branch="False" />
+                <line number="140" hits="6" branch="False" />
+                <line number="141" hits="6" branch="False" />
+                <line number="142" hits="8" branch="False" />
+                <line number="144" hits="16" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="294" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="145" hits="6" branch="False" />
+                <line number="146" hits="6" branch="False" />
+                <line number="147" hits="6" branch="False" />
+                <line number="148" hits="6" branch="False" />
+                <line number="150" hits="2" branch="False" />
+                <line number="151" hits="2" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="(LitShare.ConsoleApp.IBookRepository)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="81" hits="4" branch="False" />
+                <line number="82" hits="4" branch="False" />
+                <line number="83" hits="4" branch="False" />
+                <line number="84" hits="4" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="87" hits="3" branch="False" />
+            <line number="88" hits="3" branch="False" />
+            <line number="89" hits="9" branch="False" />
+            <line number="90" hits="9" branch="False" />
+            <line number="91" hits="9" branch="False" />
+            <line number="92" hits="9" branch="False" />
+            <line number="93" hits="9" branch="False" />
+            <line number="94" hits="9" branch="False" />
+            <line number="95" hits="9" branch="False" />
+            <line number="96" hits="12" branch="False" />
+            <line number="98" hits="3" branch="False" />
+            <line number="99" hits="20" branch="False" />
+            <line number="100" hits="20" branch="False" />
+            <line number="101" hits="20" branch="False" />
+            <line number="102" hits="20" branch="False" />
+            <line number="103" hits="23" branch="False" />
+            <line number="105" hits="24" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="1441" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="106" hits="9" branch="False" />
+            <line number="107" hits="9" branch="False" />
+            <line number="108" hits="9" branch="False" />
+            <line number="110" hits="9" branch="False" />
+            <line number="111" hits="20" branch="False" />
+            <line number="112" hits="9" branch="False" />
+            <line number="114" hits="67" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="1398" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="115" hits="20" branch="False" />
+            <line number="117" hits="9" branch="False" />
+            <line number="118" hits="9" branch="False" />
+            <line number="120" hits="3" branch="False" />
+            <line number="121" hits="3" branch="False" />
+            <line number="124" hits="2" branch="False" />
+            <line number="125" hits="2" branch="False" />
+            <line number="126" hits="8" branch="False" />
+            <line number="128" hits="16" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="146" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="129" hits="6" branch="False" />
+            <line number="130" hits="6" branch="False" />
+            <line number="131" hits="6" branch="False" />
+            <line number="132" hits="6" branch="False" />
+            <line number="134" hits="2" branch="False" />
+            <line number="135" hits="2" branch="False" />
+            <line number="138" hits="2" branch="False" />
+            <line number="139" hits="2" branch="False" />
+            <line number="140" hits="6" branch="False" />
+            <line number="141" hits="6" branch="False" />
+            <line number="142" hits="8" branch="False" />
+            <line number="144" hits="16" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="294" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="145" hits="6" branch="False" />
+            <line number="146" hits="6" branch="False" />
+            <line number="147" hits="6" branch="False" />
+            <line number="148" hits="6" branch="False" />
+            <line number="150" hits="2" branch="False" />
+            <line number="151" hits="2" branch="False" />
+            <line number="81" hits="4" branch="False" />
+            <line number="82" hits="4" branch="False" />
+            <line number="83" hits="4" branch="False" />
+            <line number="84" hits="4" branch="False" />
+          </lines>
+        </class>
+        <class name="LitShare.ConsoleApp.User" filename="Users\Lenovo\Desktop\LitShare\LitShare.ConsoleApp\Program.cs" line-rate="1" branch-rate="1" complexity="9">
+          <methods>
+            <method name="get_Id" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="156" hits="27" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Name" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="157" hits="16" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Email" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="158" hits="9" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Password" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="159" hits="9" branch="False" />
+              </lines>
+            </method>
+            <method name="get_About" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="160" hits="9" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Role" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="161" hits="14" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Region" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="162" hits="9" branch="False" />
+              </lines>
+            </method>
+            <method name="get_District" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="163" hits="9" branch="False" />
+              </lines>
+            </method>
+            <method name="get_City" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="164" hits="9" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="156" hits="27" branch="False" />
+            <line number="157" hits="16" branch="False" />
+            <line number="158" hits="9" branch="False" />
+            <line number="159" hits="9" branch="False" />
+            <line number="160" hits="9" branch="False" />
+            <line number="161" hits="14" branch="False" />
+            <line number="162" hits="9" branch="False" />
+            <line number="163" hits="9" branch="False" />
+            <line number="164" hits="9" branch="False" />
+          </lines>
+        </class>
+        <class name="LitShare.ConsoleApp.Post" filename="Users\Lenovo\Desktop\LitShare\LitShare.ConsoleApp\Program.cs" line-rate="1" branch-rate="1" complexity="7">
+          <methods>
+            <method name="get_Id" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="169" hits="54" branch="False" />
+              </lines>
+            </method>
+            <method name="get_UserId" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="170" hits="30" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Title" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="171" hits="32" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Author" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="172" hits="20" branch="False" />
+              </lines>
+            </method>
+            <method name="get_DealType" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="173" hits="30" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Description" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="174" hits="20" branch="False" />
+              </lines>
+            </method>
+            <method name="get_PhotoUrl" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="175" hits="20" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="169" hits="54" branch="False" />
+            <line number="170" hits="30" branch="False" />
+            <line number="171" hits="32" branch="False" />
+            <line number="172" hits="20" branch="False" />
+            <line number="173" hits="30" branch="False" />
+            <line number="174" hits="20" branch="False" />
+            <line number="175" hits="20" branch="False" />
+          </lines>
+        </class>
+        <class name="LitShare.ConsoleApp.Genre" filename="Users\Lenovo\Desktop\LitShare\LitShare.ConsoleApp\Program.cs" line-rate="1" branch-rate="1" complexity="2">
+          <methods>
+            <method name="get_Id" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="180" hits="19" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Name" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="181" hits="11" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="180" hits="19" branch="False" />
+            <line number="181" hits="11" branch="False" />
+          </lines>
+        </class>
+        <class name="LitShare.ConsoleApp.Complaint" filename="Users\Lenovo\Desktop\LitShare\LitShare.ConsoleApp\Program.cs" line-rate="1" branch-rate="1" complexity="5">
+          <methods>
+            <method name="get_Id" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="186" hits="18" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Text" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="187" hits="10" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Date" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="188" hits="8" branch="False" />
+              </lines>
+            </method>
+            <method name="get_PostId" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="189" hits="8" branch="False" />
+              </lines>
+            </method>
+            <method name="get_ComplainantId" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="190" hits="8" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="186" hits="18" branch="False" />
+            <line number="187" hits="10" branch="False" />
+            <line number="188" hits="8" branch="False" />
+            <line number="189" hits="8" branch="False" />
+            <line number="190" hits="8" branch="False" />
+          </lines>
+        </class>
+        <class name="LitShare.ConsoleApp.ConsoleApp" filename="Users\Lenovo\Desktop\LitShare\LitShare.ConsoleApp\Program.cs" line-rate="0.875" branch-rate="0.9444" complexity="19">
+          <methods>
+            <method name="Main" signature="()" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="196" hits="0" branch="False" />
+                <line number="197" hits="0" branch="False" />
+                <line number="198" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name="RunMenu" signature="(System.IO.TextReader,System.IO.TextWriter)" line-rate="0.9459000000000001" branch-rate="0.9444" complexity="18">
+              <lines>
+                <line number="201" hits="1" branch="False" />
+                <line number="202" hits="1" branch="False" />
+                <line number="203" hits="1" branch="False" />
+                <line number="205" hits="1" branch="False" />
+                <line number="206" hits="1" branch="False" />
+                <line number="208" hits="1" branch="False" />
+                <line number="209" hits="1" branch="False" />
+                <line number="210" hits="1" branch="False" />
+                <line number="212" hits="1" branch="False" />
+                <line number="214" hits="5" branch="False" />
+                <line number="215" hits="5" branch="False" />
+                <line number="216" hits="5" branch="False" />
+                <line number="217" hits="5" branch="False" />
+                <line number="218" hits="5" branch="False" />
+                <line number="219" hits="5" branch="False" />
+                <line number="220" hits="5" branch="False" />
+                <line number="221" hits="5" branch="False" />
+                <line number="223" hits="5" branch="False" />
+                <line number="224" hits="6" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="168" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="226" hits="4" branch="True" condition-coverage="87.5% (7/8)">
+                  <conditions>
+                    <condition number="194" type="jump" coverage="100%" />
+                    <condition number="208" type="jump" coverage="100%" />
+                    <condition number="225" type="jump" coverage="100%" />
+                    <condition number="242" type="jump" coverage="50%" />
+                  </conditions>
+                </line>
+                <line number="229" hits="13" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="392" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="230" hits="5" branch="False" />
+                <line number="231" hits="1" branch="False" />
+                <line number="233" hits="23" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="587" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="234" hits="10" branch="False" />
+                <line number="235" hits="1" branch="False" />
+                <line number="237" hits="9" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="726" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="238" hits="3" branch="False" />
+                <line number="239" hits="1" branch="False" />
+                <line number="241" hits="7" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="921" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="242" hits="2" branch="False" />
+                <line number="243" hits="1" branch="False" />
+                <line number="245" hits="0" branch="False" />
+                <line number="246" hits="0" branch="False" />
+                <line number="249" hits="4" branch="False" />
+                <line number="250" hits="4" branch="False" />
+                <line number="251" hits="1" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="196" hits="0" branch="False" />
+            <line number="197" hits="0" branch="False" />
+            <line number="198" hits="0" branch="False" />
+            <line number="201" hits="1" branch="False" />
+            <line number="202" hits="1" branch="False" />
+            <line number="203" hits="1" branch="False" />
+            <line number="205" hits="1" branch="False" />
+            <line number="206" hits="1" branch="False" />
+            <line number="208" hits="1" branch="False" />
+            <line number="209" hits="1" branch="False" />
+            <line number="210" hits="1" branch="False" />
+            <line number="212" hits="1" branch="False" />
+            <line number="214" hits="5" branch="False" />
+            <line number="215" hits="5" branch="False" />
+            <line number="216" hits="5" branch="False" />
+            <line number="217" hits="5" branch="False" />
+            <line number="218" hits="5" branch="False" />
+            <line number="219" hits="5" branch="False" />
+            <line number="220" hits="5" branch="False" />
+            <line number="221" hits="5" branch="False" />
+            <line number="223" hits="5" branch="False" />
+            <line number="224" hits="6" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="168" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="226" hits="4" branch="True" condition-coverage="87.5% (7/8)">
+              <conditions>
+                <condition number="194" type="jump" coverage="100%" />
+                <condition number="208" type="jump" coverage="100%" />
+                <condition number="225" type="jump" coverage="100%" />
+                <condition number="242" type="jump" coverage="50%" />
+              </conditions>
+            </line>
+            <line number="229" hits="13" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="392" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="230" hits="5" branch="False" />
+            <line number="231" hits="1" branch="False" />
+            <line number="233" hits="23" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="587" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="234" hits="10" branch="False" />
+            <line number="235" hits="1" branch="False" />
+            <line number="237" hits="9" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="726" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="238" hits="3" branch="False" />
+            <line number="239" hits="1" branch="False" />
+            <line number="241" hits="7" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="921" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="242" hits="2" branch="False" />
+            <line number="243" hits="1" branch="False" />
+            <line number="245" hits="0" branch="False" />
+            <line number="246" hits="0" branch="False" />
+            <line number="249" hits="4" branch="False" />
+            <line number="250" hits="4" branch="False" />
+            <line number="251" hits="1" branch="False" />
+          </lines>
+        </class>
+      </classes>
+    </package>
+  </packages>
+</coverage>
