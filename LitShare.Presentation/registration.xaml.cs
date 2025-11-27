@@ -10,6 +10,7 @@ namespace LitShare.Presentation
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Media;
+    using LitShare.BLL.Logging;
     using LitShare.BLL.Services;
     using LitShare.DAL.Models;
 
@@ -26,6 +27,7 @@ namespace LitShare.Presentation
         public AuthWindow()
         {
             this.InitializeComponent();
+            AppLogger.Info("Відкрито AuthWindow");
         }
 
         /// <summary>
@@ -137,6 +139,7 @@ namespace LitShare.Presentation
         /// <param name="e">The event data.</param>
         private void Button_Click_Register(object sender, RoutedEventArgs e)
         {
+            AppLogger.Info("Натиснуто кнопку Реєстрація");
             this.ClearValidation();
 
             string name = this.txtName.Text.Trim();
@@ -170,6 +173,7 @@ namespace LitShare.Presentation
             {
                 ShowError(this.txtEmail, this.errorEmail, "Користувач з такою поштою вже зареєстрований.");
                 hasError = true;
+                AppLogger.Warn($"Реєстрація: email вже існує {email}");
             }
 
             if (string.IsNullOrEmpty(phone))
@@ -186,6 +190,7 @@ namespace LitShare.Presentation
             {
                 ShowError(this.txtPhone, this.errorPhone, "Користувач з таким номером вже зареєстрований.");
                 hasError = true;
+                AppLogger.Warn($"Реєстрація: телефон вже існує {phone}");
             }
 
             if (string.IsNullOrEmpty(password))
@@ -197,6 +202,7 @@ namespace LitShare.Presentation
             {
                 ShowError(this.txtPassword, this.errorPassword, passwordError);
                 hasError = true;
+                AppLogger.Warn($"Реєстрація: пароль не відповідає вимогам - {passwordError}");
             }
 
             if (string.IsNullOrEmpty(confirmPassword))
@@ -230,16 +236,20 @@ namespace LitShare.Presentation
 
             if (hasError)
             {
+                AppLogger.Warn("Реєстрація: форма містить помилки валідації");
                 return;
             }
 
             try
             {
                 this.userService.AddUser(name, email, phone, password, region, district, city);
+                AppLogger.Info($"Користувач зареєстрований: {email}");
                 this.mainTabs.SelectedItem = this.loginTab;
             }
             catch (Exception ex)
             {
+                AppLogger.Error($"Помилка реєстрації користувача {email}: {ex}");
+
                 _ = MessageBox.Show(
                     $"Помилка реєстрації: {ex.Message}\n\n{ex.InnerException?.Message}",
                     "Помилка",
@@ -255,6 +265,8 @@ namespace LitShare.Presentation
         /// <param name="e">The event data.</param>
         private async void Button_Click_Login(object sender, RoutedEventArgs e)
         {
+            AppLogger.Info("Спроба входу в систему");
+
             this.ClearLoginValidation();
 
             var button = sender as Button;
@@ -294,6 +306,7 @@ namespace LitShare.Presentation
 
                 if (hasError)
                 {
+                    AppLogger.Warn("Вхід: валідація не пройдена");
                     if (button != null)
                     {
                         button.IsEnabled = true;
@@ -305,6 +318,7 @@ namespace LitShare.Presentation
                 bool isValid = await this.userService.ValidateUser(email, password);
                 if (isValid)
                 {
+                    AppLogger.Info($"Користувач увійшов: {email}");
                     var user = this.userService.GetAllUsers().FirstOrDefault(u => u.Email == email);
 
                     if (user == null)
@@ -330,10 +344,12 @@ namespace LitShare.Presentation
                 {
                     ShowError(this.txtLoginEmail, this.errorLoginEmail, "Невірна пошта або пароль.");
                     ShowError(this.txtLoginPassword, this.errorLoginPassword, "Невірна пошта або пароль.");
+                    AppLogger.Warn($"Невдалий вхід користувача {email}");
                 }
             }
             catch (Exception ex)
             {
+                AppLogger.Error($"Помилка входу: {ex}");
                 MessageBox.Show("Помилка: " + ex.Message);
             }
             finally
@@ -502,8 +518,9 @@ namespace LitShare.Presentation
                     return string.Equals(u.Email, email, StringComparison.OrdinalIgnoreCase);
                 });
             }
-            catch
+            catch (Exception ex)
             {
+                AppLogger.Error($"Помилка перевірки існування email={email}", ex);
                 return false;
             }
         }
@@ -520,8 +537,9 @@ namespace LitShare.Presentation
                 var users = this.userService.GetAllUsers();
                 return users.Any(u => u.Phone == phone);
             }
-            catch
+            catch (Exception ex)
             {
+                AppLogger.Error($"Помилка перевірки існування телефону={phone}", ex);
                 return false;
             }
         }

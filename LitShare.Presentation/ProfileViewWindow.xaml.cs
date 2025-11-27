@@ -9,6 +9,7 @@ namespace LitShare.Presentation
     using System.Windows;
     using System.Windows.Controls;
     using LitShare.BLL.DTOs;
+    using LitShare.BLL.Logging;
     using LitShare.BLL.Services;
 
     /// <summary>
@@ -41,6 +42,9 @@ namespace LitShare.Presentation
         {
             this.InitializeComponent();
             this.userId = userId;
+
+            AppLogger.Info($"Відкрито ProfileViewWindow. Перегляд профілю користувача ID = {userBookId}, поточний користувач ID = {userId}");
+
             _ = this.LoadUserProfileAsync(userBookId);
         }
 
@@ -53,6 +57,8 @@ namespace LitShare.Presentation
         {
             try
             {
+                AppLogger.Info($"Початок завантаження профілю користувача ID = {userId}");
+
                 var user = await Task.Run(() => this.userService.GetUserProfileById(userId));
 
                 if (user != null)
@@ -66,15 +72,21 @@ namespace LitShare.Presentation
 
                     var books = await this.bookService.GetBooksByUserIdAsync(userId);
                     this.BooksList.ItemsSource = books;
+
+                    AppLogger.Info($"Профіль користувача ID = {userId} успішно завантажено. Книг: {books.Count}");
                 }
                 else
                 {
+                    AppLogger.Warn($"Користувача з ID = {userId} не знайдено");
+
                     MessageBox.Show("Користувача не знайдено!", "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
                     this.Close();
                 }
             }
             catch (Exception ex)
             {
+                AppLogger.Error($"ПОМИЛКА при завантаженні профілю користувача ID = {userId}: {ex}");
+
                 MessageBox.Show($"An error occurred while loading the profile: {ex.Message}", "Loading Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 this.Close();
             }
@@ -88,6 +100,7 @@ namespace LitShare.Presentation
         /// <param name="e">The routing event data.</param>
         private void HomeButton_Click(object sender, RoutedEventArgs e)
         {
+            AppLogger.Info($"Перехід на головну з ProfileViewWindow. Користувач ID = {this.userId}");
             var mainPage = new MainPage(this.userId);
             mainPage.Show();
             this.Close();
@@ -101,6 +114,8 @@ namespace LitShare.Presentation
         /// <param name="e">The routing event data.</param>
         private void MyProfileButton_Click(object sender, RoutedEventArgs e)
         {
+            AppLogger.Info($"Перехід до власного профілю з ProfileViewWindow. Користувач ID = {this.userId}");
+
             var profileWindow = new ProfileWindow(this.userId);
             profileWindow.ShowDialog();
         }
@@ -113,6 +128,8 @@ namespace LitShare.Presentation
         /// <param name="e">The routing event data.</param>
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
+            AppLogger.Info("Закриття ProfileViewWindow кнопкою Назад");
+
             this.Close();
         }
 
@@ -127,6 +144,7 @@ namespace LitShare.Presentation
             if (sender is MenuItem menuItem &&
                 menuItem.DataContext is BookDto book)
             {
+                AppLogger.Info($"Перегляд оголошення ID = {book.Id} користувачем ID = {this.userId}");
                 var viewWindow = new ViewAdWindow(book.Id, this.userId)
                 {
                     Owner = this,
@@ -146,11 +164,17 @@ namespace LitShare.Presentation
             if (sender is MenuItem menuItem &&
                 menuItem.DataContext is BookDto book)
             {
+                AppLogger.Warn($"СКАРГА на оголошення ID = {book.Id} від користувача ID = {this.userId}");
+
                 var reportWindow = new ReportAdWindow(book.Id, this.userId)
                 {
                     Owner = this,
                 };
                 reportWindow.ShowDialog();
+            }
+            else
+            {
+                AppLogger.Warn("Спроба скарги на оголошення без вибраної книги");
             }
         }
     }

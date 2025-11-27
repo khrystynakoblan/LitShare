@@ -12,6 +12,7 @@ namespace LitShare.Presentation
     using System.Windows.Controls;
     using System.Windows.Media;
     using LitShare.BLL.DTOs;
+    using LitShare.BLL.Logging;
     using LitShare.BLL.Services;
 
     /// <summary>
@@ -84,6 +85,7 @@ namespace LitShare.Presentation
         {
             try
             {
+                AppLogger.Info("MainPage завантажується");
                 this.ResultsCountText.Text = "Завантаження даних...";
 
                 var books = await this.bookService.GetAllBooksAsync();
@@ -111,9 +113,11 @@ namespace LitShare.Presentation
 
                 this.UpdateResultsCount();
                 this.SetupSearchPlaceholder();
+                AppLogger.Info("MainPage успішно завантажено");
             }
             catch (Exception ex)
             {
+                AppLogger.Error("Помилка при завантаженні MainPage", ex);
                 MessageBox.Show($"Помилка ініціалізації: {ex.Message}");
             }
         }
@@ -201,11 +205,13 @@ namespace LitShare.Presentation
         /// <param name="e">The event data.</param>
         private async void AddBook_Click(object sender, RoutedEventArgs e)
         {
+            AppLogger.Info("Відкрито вікно додавання нового оголошення");
             var newAdWindow = new NewAdWindow(this.userId);
             bool? result = newAdWindow.ShowDialog();
 
             if (result == true)
             {
+                AppLogger.Info("Додано нове оголошення");
                 var books = await this.bookService.GetAllBooksAsync();
                 this.AllBooks = new ObservableCollection<BookDto>(books);
                 this.FilteredBooks = new ObservableCollection<BookDto>(books);
@@ -223,12 +229,14 @@ namespace LitShare.Presentation
         {
             if (sender is FrameworkElement element && element.Tag is int bookId && bookId > 0)
             {
+                AppLogger.Info($"Відкрито перегляд оголошення з Id={bookId}");
                 var viewWindow = new ViewAdWindow(bookId, this.userId);
                 viewWindow.Owner = this;
                 viewWindow.ShowDialog();
             }
             else
             {
+                AppLogger.Warn("Не вдалося визначити книгу для перегляду");
                 MessageBox.Show("Не вдалося визначити книгу для перегляду.", "Помилка", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
@@ -250,6 +258,7 @@ namespace LitShare.Presentation
             if (sender is MenuItem menuItem &&
                 menuItem.DataContext is BookDto book)
             {
+                AppLogger.Info($"Відкрито перегляд оголошення з Id={book.Id} через контекстне меню");
                 var viewWindow = new ViewAdWindow(book.Id, this.userId);
                 viewWindow.Owner = this;
                 viewWindow.ShowDialog();
@@ -261,6 +270,7 @@ namespace LitShare.Presentation
             if (sender is MenuItem menuItem &&
                 menuItem.DataContext is BookDto book)
             {
+                AppLogger.Info($"Подача скарги на оголошення Id={book.Id}");
                 var reportWindow = new ReportAdWindow(book.Id, this.userId);
                 reportWindow.Owner = this;
                 reportWindow.ShowDialog();

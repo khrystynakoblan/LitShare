@@ -7,6 +7,7 @@ namespace LitShare.Presentation
     using System.Windows;
     using System.Windows.Media.Animation;
     using System.Windows.Media.Imaging;
+    using LitShare.BLL.Logging;
     using LitShare.BLL.Services;
 
     /// <summary>
@@ -30,6 +31,9 @@ namespace LitShare.Presentation
         {
             this.InitializeComponent();
             this.currentComplaintId = complaintId;
+
+            AppLogger.Info($"Відкрито ComplaintReviewWindow для скарги Id={complaintId}");
+
             _ = this.LoadComplaintDataAsync(this.currentComplaintId);
         }
 
@@ -54,15 +58,20 @@ namespace LitShare.Presentation
                     this.txtPostAuthor.Text = author?.Name ?? "Невідомий автор";
 
                     this.LoadImage(complaint.Post.PhotoUrl);
+
+                    AppLogger.Info($"Скарга Id={complaintId} успішно завантажена");
                 }
                 else
                 {
+                    AppLogger.Warn($"Не вдалося завантажити скаргу з ID {complaintId}");
+
                     MessageBox.Show($"Не вдалося завантажити скаргу з ID {complaintId}.", "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
                     this.Close();
                 }
             }
             catch (Exception ex)
             {
+                AppLogger.Error($"Критична помилка при завантаженні скарги Id={complaintId}", ex);
                 MessageBox.Show($"Критична помилка: {ex.Message}", "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
                 this.Close();
             }
@@ -87,15 +96,19 @@ namespace LitShare.Presentation
                 bitmap.EndInit();
 
                 this.postImage.Source = bitmap;
+
+                AppLogger.Info($"Завантажено фото скарги: {url}");
             }
-            catch
+            catch (Exception ex)
             {
+                AppLogger.Warn($"Не вдалося завантажити фото скарги: {url}. {ex.Message}");
                 this.postImage.Source = null;
             }
         }
 
         private void ExitButton_Click(object sender, RoutedEventArgs e)
         {
+            AppLogger.Info($"Вікно ComplaintReviewWindow закрито вручну");
             this.Close();
         }
 
@@ -104,6 +117,7 @@ namespace LitShare.Presentation
             try
             {
                 this.complaintsService.ApproveComplaint(this.currentComplaintId);
+                AppLogger.Info($"Скаргу Id={this.currentComplaintId} підтверджено");
 
                 await this.ShowToast("✔ Скаргу підтверджено");
 
@@ -111,6 +125,7 @@ namespace LitShare.Presentation
             }
             catch (Exception ex)
             {
+                AppLogger.Error($"Помилка при підтвердженні скарги Id={this.currentComplaintId}", ex);
                 MessageBox.Show($"Помилка: {ex.Message}");
             }
         }
@@ -120,6 +135,7 @@ namespace LitShare.Presentation
             try
             {
                 this.complaintsService.DeleteComplaint(this.currentComplaintId);
+                AppLogger.Info($"Скаргу Id={this.currentComplaintId} відхилено");
 
                 await this.ShowToast("✖ Скаргу відхилено");
 
@@ -127,6 +143,7 @@ namespace LitShare.Presentation
             }
             catch (Exception ex)
             {
+                AppLogger.Error($"Помилка при відхиленні скарги Id={this.currentComplaintId}", ex);
                 MessageBox.Show($"Помилка: {ex.Message}");
             }
         }
@@ -149,6 +166,7 @@ namespace LitShare.Presentation
 
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
+            AppLogger.Info("Повернення з ComplaintReviewWindow");
             this.Close();
         }
     }

@@ -5,6 +5,7 @@
 namespace LitShare.Presentation
 {
     using System.Windows;
+    using LitShare.BLL.Logging;
 
     /// <summary>
     /// Interaction logic for App.xaml.
@@ -28,6 +29,10 @@ namespace LitShare.Presentation
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+
+            AppLogger.Init();
+
+            AppLogger.Info("Додаток LitShare запущено");
 
             // Additional application startup logic can be placed here if needed.
         }

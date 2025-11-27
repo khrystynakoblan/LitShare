@@ -10,6 +10,7 @@ namespace LitShare
     using System.Windows.Controls;
     using System.Windows.Media;
     using System.Windows.Media.Imaging;
+    using LitShare.BLL.Logging;
     using LitShare.DAL;
     using LitShare.DAL.Models;
     using LitShare.Presentation;
@@ -53,7 +54,17 @@ namespace LitShare
             this.postId = postId;
             this.userId = userId;
 
-            this.LoadData();
+            AppLogger.Info($"Відкрито EditAdWindow для посту Id={postId}, користувач Id={userId}");
+
+            try
+            {
+                this.LoadData();
+            }
+            catch (Exception ex)
+            {
+                AppLogger.Error("Помилка при завантаженні даних у EditAdWindow", ex);
+                this.Close();
+            }
         }
 
         /// <summary>
@@ -66,9 +77,11 @@ namespace LitShare
                 this.LoadGenres();
                 this.LoadDealTypes();
                 this.LoadPostData();
+                AppLogger.Info($"Успішно завантажено дані для посту Id={this.postId}");
             }
             catch (Exception ex)
             {
+                AppLogger.Error("Помилка при LoadData", ex);
                 MessageBox.Show($"Error loading data:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 this.Close();
             }
@@ -81,8 +94,8 @@ namespace LitShare
         {
             var genres = this.context.Genres.ToList();
             this.GenreComboBox.ItemsSource = genres;
-            this.GenreComboBox.DisplayMemberPath = "name";
-            this.GenreComboBox.SelectedValuePath = "id";
+            this.GenreComboBox.DisplayMemberPath = "Name";
+            this.GenreComboBox.SelectedValuePath = "Id";
         }
 
         /// <summary>
@@ -110,10 +123,13 @@ namespace LitShare
 
             if (this.currentPost == null)
             {
+                AppLogger.Warn($"Пост з Id={this.postId} не знайдено");
                 MessageBox.Show("Advertisement not found.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 this.Close();
                 return;
             }
+
+            AppLogger.Info($"Завантажено пост: {this.currentPost.Title} ({this.currentPost.Id})");
 
             // Populate text fields and combo box for post data
             this.TitleTextBox.Text = this.currentPost.Title;
@@ -170,9 +186,12 @@ namespace LitShare
                     {
                         this.currentPost.PhotoUrl = selectedFile;
                     }
+
+                    AppLogger.Info($"Змінено фото для посту Id={this.postId}: {selectedFile}");
                 }
                 catch (Exception ex)
                 {
+                    AppLogger.Error($"Помилка при завантаженні фото для посту Id={this.postId}", ex);
                     MessageBox.Show($"Error loading image:\n{ex.Message}", "Image Load Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
@@ -193,6 +212,7 @@ namespace LitShare
 
             if (this.currentPost == null)
             {
+                AppLogger.Warn($"Спроба зберегти пост, який не знайдено Id={this.postId}");
                 MessageBox.Show("Advertisement not found.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
@@ -204,6 +224,7 @@ namespace LitShare
 
                 this.context.SaveChanges();
 
+                AppLogger.Info($"Пост Id={this.postId} успішно оновлено користувачем Id={this.userId}");
                 this.Close();
             }
             catch (Exception ex)
@@ -276,6 +297,8 @@ namespace LitShare
         /// <param name="e">The routing event data.</param>
         private void HomeButton_Click(object sender, RoutedEventArgs e)
         {
+            AppLogger.Info($"Користувач Id={this.userId} повертається на MainPage з EditAdWindow для посту Id={this.postId}");
+
             // Navigate to main page
             MainPage mainWindow = new MainPage(this.userId);
             mainWindow.Show();

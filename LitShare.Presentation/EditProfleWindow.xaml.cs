@@ -9,6 +9,7 @@ namespace LitShare.Presentation
     using System.Windows;
     using System.Windows.Media;
     using System.Windows.Media.Imaging;
+    using LitShare.BLL.Logging;
     using LitShare.BLL.Services;
     using LitShare.DAL.Models;
 
@@ -33,6 +34,7 @@ namespace LitShare.Presentation
             this.userId = userId;
             this.currentUser = new Users();
             this.originalUser = new Users();
+            AppLogger.Info($"Відкрито вікно редагування профілю користувача ID={userId}");
 
             this.LoadUserData(this.userId);
         }
@@ -43,42 +45,54 @@ namespace LitShare.Presentation
         /// <param name="userId">The ID of the user whose data should be loaded.</param>
         private void LoadUserData(int userId)
         {
-            var user = this.userService.GetUserById(userId);
-
-            if (user == null)
+            try
             {
-                MessageBox.Show("Користувача не знайдено!", "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
-                this.Close();
-                return;
+                AppLogger.Info($"Завантаження даних користувача ID={userId}");
+
+                var user = this.userService.GetUserById(userId);
+
+                if (user == null)
+                {
+                    AppLogger.Warn($"Користувач не знайдений: ID={userId}");
+                    this.Close();
+                    return;
+                }
+
+                this.currentUser = user;
+
+                this.txtFirstName.Text = this.currentUser.Name;
+                this.txtRegion.Text = this.currentUser.Region;
+                this.txtDistrict.Text = this.currentUser.District;
+                this.txtCity.Text = this.currentUser.City;
+                this.txtPhone.Text = this.currentUser.Phone;
+                this.txtAbout.Text = this.currentUser.About ?? string.Empty;
+
+                if (!string.IsNullOrEmpty(this.currentUser.PhotoUrl))
+                {
+                    this.userPhotoEllipse.Fill = new ImageBrush(
+                        new BitmapImage(new Uri(this.currentUser.PhotoUrl)));
+                }
+
+                this.originalUser = new Users
+                {
+                    Id = this.currentUser.Id,
+                    Name = this.currentUser.Name,
+                    Email = this.currentUser.Email,
+                    Phone = this.currentUser.Phone,
+                    Password = this.currentUser.Password,
+                    Region = this.currentUser.Region,
+                    District = this.currentUser.District,
+                    City = this.currentUser.City,
+                    About = this.currentUser.About,
+                    PhotoUrl = this.currentUser.PhotoUrl,
+                };
+
+                AppLogger.Info($"Дані користувача ID={userId} успішно завантажені");
             }
-
-            this.currentUser = user;
-
-            this.txtFirstName.Text = this.currentUser.Name;
-            this.txtRegion.Text = this.currentUser.Region;
-            this.txtDistrict.Text = this.currentUser.District;
-            this.txtCity.Text = this.currentUser.City;
-            this.txtPhone.Text = this.currentUser.Phone;
-            this.txtAbout.Text = this.currentUser.About ?? string.Empty;
-
-            if (!string.IsNullOrEmpty(this.currentUser.PhotoUrl))
+            catch (Exception ex)
             {
-                this.userPhotoEllipse.Fill = new ImageBrush(new BitmapImage(new Uri(this.currentUser.PhotoUrl)));
+                AppLogger.Error("Помилка при завантаженні профілю", ex);
             }
-
-            this.originalUser = new Users
-            {
-                Id = this.currentUser.Id,
-                Name = this.currentUser.Name,
-                Email = this.currentUser.Email,
-                Phone = this.currentUser.Phone,
-                Password = this.currentUser.Password,
-                Region = this.currentUser.Region,
-                District = this.currentUser.District,
-                City = this.currentUser.City,
-                About = this.currentUser.About,
-                PhotoUrl = this.currentUser.PhotoUrl,
-            };
         }
 
         /// <summary>
@@ -111,6 +125,8 @@ namespace LitShare.Presentation
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
+            AppLogger.Info($"Спроба збереження профілю користувача ID={this.userId}");
+
             this.ValidateField(this.txtRegion, null);
             this.ValidateField(this.txtDistrict, null);
             this.ValidateField(this.txtCity, null);
@@ -121,6 +137,7 @@ namespace LitShare.Presentation
                 !string.IsNullOrEmpty(this.errCity.Text) ||
                 !string.IsNullOrEmpty(this.errPhone.Text))
             {
+                AppLogger.Warn("Збереження профілю скасовано через помилки валідації");
                 return;
             }
 
@@ -133,9 +150,11 @@ namespace LitShare.Presentation
             try
             {
                 this.userService.UpdateUser(this.currentUser);
+                AppLogger.Info($"Профіль користувача ID={this.userId} успішно оновлено");
             }
             catch (Exception ex)
             {
+                AppLogger.Error("Помилка при збереженні профілю", ex);
                 MessageBox.Show($"Помилка при збереженні профілю: {ex.Message}", "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
@@ -146,6 +165,8 @@ namespace LitShare.Presentation
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
+            AppLogger.Info($"Скасування змін профілю користувача ID={this.userId}");
+
             this.txtFirstName.Text = this.originalUser.Name;
             this.txtRegion.Text = this.originalUser.Region;
             this.txtDistrict.Text = this.originalUser.District;
@@ -166,6 +187,7 @@ namespace LitShare.Presentation
         private void ChangePhotoButton_Click(object sender, RoutedEventArgs e)
         {
             string randomUrl = $"https://randomuser.me/api/portraits/lego/{new Random().Next(0, 9)}.jpg";
+            AppLogger.Info($"Користувач ID={this.userId} змінив фото профілю");
             this.userPhotoEllipse.Fill = new ImageBrush(new BitmapImage(new Uri(randomUrl)));
             this.currentUser.PhotoUrl = randomUrl;
         }
@@ -174,8 +196,11 @@ namespace LitShare.Presentation
         {
             if (this.currentUser == null)
             {
+                AppLogger.Warn("Спроба видалити null-користувача");
                 return;
             }
+
+            AppLogger.Warn($"Спроба видалення профілю користувача ID={this.currentUser.Id}");
 
             var result = MessageBox.Show(
                 "Ви дійсно хочете видалити профіль?",
@@ -188,6 +213,7 @@ namespace LitShare.Presentation
                 try
                 {
                     this.userService.DeleteUser(this.currentUser.Id);
+                    AppLogger.Warn($"Користувача ID={this.currentUser.Id} видалено");
 
                     var authWindow = new AuthWindow();
                     authWindow.Show();
@@ -196,6 +222,7 @@ namespace LitShare.Presentation
                 }
                 catch (Exception ex)
                 {
+                    AppLogger.Error("Помилка при видаленні користувача", ex);
                     MessageBox.Show($"Сталася помилка при видаленні профілю:\n{ex.Message}", "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
@@ -206,6 +233,8 @@ namespace LitShare.Presentation
             // Simply closing this window and showing the profile window is enough,
             // no need for async/await here unless the original code required a delay for UI effect.
             // If the original intent was a smooth transition, we keep async/await.
+            AppLogger.Info($"Повернення на профіль користувача ID={this.userId}");
+
             var profilePage = new ProfileWindow(this.userId);
             profilePage.Show();
             this.Close();

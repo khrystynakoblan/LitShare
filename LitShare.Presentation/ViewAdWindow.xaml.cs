@@ -7,6 +7,7 @@ namespace LitShare.Presentation
     using System.Windows;
     using System.Windows.Media.Imaging;
     using LitShare.BLL.DTOs;
+    using LitShare.BLL.Logging;
     using LitShare.BLL.Services;
 
     /// <summary>
@@ -51,6 +52,8 @@ namespace LitShare.Presentation
         {
             _ = this.LoadBook(bookId);
             this.userId = userId;
+
+            AppLogger.Info($"Відкрито ViewAdWindow: BookId={bookId}, UserId={userId}");
         }
 
         /// <summary>
@@ -73,12 +76,15 @@ namespace LitShare.Presentation
         /// <returns>Задача, що представляє асинхронну операцію.</returns>
         private async Task LoadBook(int bookId)
         {
+            AppLogger.Info($"Завантаження даних книги: BookId={bookId}");
             try
             {
                 this.currentBook = await this.bookService.GetBookById(bookId);
             }
             catch (Exception ex)
             {
+                AppLogger.Error($"Помилка завантаження книги з БД: BookId={bookId}", ex);
+
                 MessageBox.Show(
                     $"Помилка при зверненні до бази: {ex.Message}",
                     "Помилка",
@@ -90,6 +96,8 @@ namespace LitShare.Presentation
 
             if (this.currentBook == null)
             {
+                AppLogger.Warn($"Книгу не знайдено в БД: BookId={bookId}");
+
                 MessageBox.Show(
                     "Книга не знайдена.",
                     "Помилка",
@@ -98,6 +106,8 @@ namespace LitShare.Presentation
                 this.Close();
                 return;
             }
+
+            AppLogger.Info($"Книгу успішно завантажено: BookId={bookId}, Title='{this.currentBook.Title}'");
 
             this.TitleText.Text = this.currentBook.Title ?? string.Empty;
             this.AuthorText.Text = this.currentBook.Author ?? string.Empty;
@@ -129,8 +139,10 @@ namespace LitShare.Presentation
                 img.EndInit();
                 this.PostImage.Source = img;
             }
-            catch
+            catch (Exception ex)
             {
+                AppLogger.Warn($"Не вдалося завантажити зображення книги: URL={url}, Error={ex.Message}");
+
                 // У разі помилки завантаження зображення (наприклад, невірний шлях), просто скидаємо джерело.
                 this.PostImage.Source = null;
             }
@@ -146,6 +158,8 @@ namespace LitShare.Presentation
         {
             if (this.currentBook != null)
             {
+                AppLogger.Info($"Перегляд профілю автора оголошення: BookId={this.currentBook.Id}, AuthorUserId={this.currentBook.UserId}, ViewerUserId={this.userId}");
+
                 var profileWindow = new ProfileViewWindow(this.currentBook.UserId, this.userId)
                 {
                     Owner = this,
@@ -190,6 +204,8 @@ namespace LitShare.Presentation
             {
                 return;
             }
+
+            AppLogger.Info($"Відкрито вікно скарги на оголошення: BookId={this.currentBook.Id}, UserId={this.userId}");
 
             this.Hide();
 

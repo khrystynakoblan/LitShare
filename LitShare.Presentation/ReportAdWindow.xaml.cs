@@ -8,6 +8,7 @@ namespace LitShare.Presentation
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Media;
+    using LitShare.BLL.Logging;
     using LitShare.BLL.Services;
     using LitShare.Presentation;
 
@@ -32,6 +33,8 @@ namespace LitShare.Presentation
             this.adId = adId;
             this.currentUserId = userId;
 
+            AppLogger.Info($"Відкрито ReportAdWindow для оголошення {adId} користувачем {userId}");
+
             // Subscribe to the Loaded event to set up text change listener after components are initialized.
             this.Loaded += (s, e) =>
             {
@@ -53,6 +56,7 @@ namespace LitShare.Presentation
         /// <param name="e">The event data.</param>
         private void SubmitButton_Click(object sender, RoutedEventArgs e)
         {
+            AppLogger.Info($"Спроба надіслати скаргу: AdId={this.adId}, UserId={this.currentUserId}");
             string? selectedReason = null;
 
             if (this.FalseInfoRadio.IsChecked == true)
@@ -75,6 +79,9 @@ namespace LitShare.Presentation
             if (string.IsNullOrEmpty(selectedReason))
             {
                 this.ShowStatus("Будь ласка, оберіть причину скарги.", Brushes.OrangeRed);
+
+                AppLogger.Warn($"Скаргу не надіслано - причину не обрано: AdId={this.adId}, UserId={this.currentUserId}");
+
                 return;
             }
 
@@ -90,6 +97,7 @@ namespace LitShare.Presentation
             {
                 this.complaintService.AddComplaint(fullText, this.adId, this.currentUserId);
                 this.ShowStatus("Скаргу надіслано!", Brushes.Green);
+                AppLogger.Info($"Скаргу успішно надіслано: AdId={this.adId}, UserId={this.currentUserId}, Reason='{selectedReason}'");
                 this.FalseInfoRadio.IsChecked = false;
                 this.SpamRadio.IsChecked = false;
                 this.ExchangeRadio.IsChecked = false;
@@ -100,6 +108,8 @@ namespace LitShare.Presentation
             {
                 // Display error status
                 this.ShowStatus($"Помилка: {ex.InnerException?.Message ?? ex.Message}", Brushes.Red);
+
+                AppLogger.Error($"Помилка надсилання скарги: AdId={this.adId}, UserId={this.currentUserId}", ex);
             }
         }
 

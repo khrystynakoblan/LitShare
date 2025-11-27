@@ -6,6 +6,7 @@ namespace LitShare.Presentation
 {
     using System; // Required for Exception
     using System.Windows;
+    using LitShare.BLL.Logging;
     using LitShare.BLL.Services;
 
     /// <summary>
@@ -25,6 +26,7 @@ namespace LitShare.Presentation
         public MainWindow()
         {
             this.InitializeComponent();
+            AppLogger.Info("MainWindow створено");
         }
 
         /// <summary>
@@ -35,13 +37,18 @@ namespace LitShare.Presentation
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            AppLogger.Info("Спроба завантаження списку користувачів у MainWindow");
             try
             {
                 var allUsers = this.userService.GetAllUsers();
                 this.usersGrid.ItemsSource = allUsers;
+
+                AppLogger.Info($"Успішно завантажено користувачів: {allUsers?.Count()}");
             }
             catch (Exception ex)
             {
+                AppLogger.Error($"ПОМИЛКА при завантаженні користувачів у MainWindow: {ex.Message}");
+
                 MessageBox.Show(
                     $"LOADING ERROR: {ex.Message}",
                     "Error",

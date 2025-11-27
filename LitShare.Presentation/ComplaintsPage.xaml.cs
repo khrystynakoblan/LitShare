@@ -8,6 +8,7 @@ namespace LitShare.Presentation
     using System.Windows;
     using System.Windows.Input;
     using LitShare.BLL.DTOs;
+    using LitShare.BLL.Logging;
     using LitShare.BLL.Services;
 
     /// <summary>
@@ -24,8 +25,20 @@ namespace LitShare.Presentation
         public ComplaintsPage()
         {
             this.InitializeComponent();
-            this.LoadComplaints();
-            this.ComplaintsGrid.ItemsSource = this.Complaints;
+
+            AppLogger.Info("Відкрито ComplaintsPage");
+
+            try
+            {
+                this.LoadComplaints();
+                this.ComplaintsGrid.ItemsSource = this.Complaints;
+                AppLogger.Info($"Завантажено {this.Complaints.Count} скарг");
+            }
+            catch (Exception ex)
+            {
+                AppLogger.Error("Помилка при завантаженні скарг", ex);
+                MessageBox.Show($"Помилка при завантаженні скарг: {ex.Message}");
+            }
         }
 
         /// <summary>
@@ -39,9 +52,27 @@ namespace LitShare.Presentation
         /// </summary>
         private void LoadComplaints()
         {
-            var service = new ComplaintsService();
-            var complaintsList = service.GetAllComplaints();
-            this.Complaints = new ObservableCollection<ComplaintDto>(complaintsList);
+            try
+            {
+                var service = new ComplaintsService();
+                var complaintsList = service.GetAllComplaints();
+
+                if (complaintsList != null)
+                {
+                    this.Complaints = new ObservableCollection<ComplaintDto>(complaintsList);
+                    AppLogger.Info($"LoadComplaints: отримано {complaintsList.Count} скарг");
+                }
+                else
+                {
+                    AppLogger.Warn("LoadComplaints: сервіс повернув null");
+                    this.Complaints = new ObservableCollection<ComplaintDto>();
+                }
+            }
+            catch (Exception ex)
+            {
+                AppLogger.Error("Помилка при отриманні скарг у LoadComplaints", ex);
+                throw;
+            }
         }
 
         /// <summary>
@@ -54,13 +85,21 @@ namespace LitShare.Presentation
         {
             if (this.ComplaintsGrid.SelectedItem is ComplaintDto selectedComplaint)
             {
-                // Assuming ComplaintReviewWindow is available
-                var reviewWindow = new ComplaintReviewWindow(selectedComplaint.Id);
-                reviewWindow.ShowDialog();
+                AppLogger.Info($"Відкрито ComplaintReviewWindow для скарги Id={selectedComplaint.Id}");
 
-                // Reload complaints to refresh the grid (in case the status changed)
-                this.LoadComplaints();
-                this.ComplaintsGrid.ItemsSource = this.Complaints;
+                try
+                {
+                    var reviewWindow = new ComplaintReviewWindow(selectedComplaint.Id);
+                    reviewWindow.ShowDialog();
+
+                    this.LoadComplaints();
+                    this.ComplaintsGrid.ItemsSource = this.Complaints;
+                    AppLogger.Info("ComplaintsPage оновлено після перегляду скарги");
+                }
+                catch (Exception ex)
+                {
+                    AppLogger.Error($"Помилка при відкритті ComplaintReviewWindow для Id={selectedComplaint.Id}", ex);
+                }
             }
         }
     }

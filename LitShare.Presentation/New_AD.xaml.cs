@@ -10,6 +10,7 @@ namespace LitShare
     using System.Windows.Controls;
     using System.Windows.Media;
     using System.Windows.Media.Imaging;
+    using LitShare.BLL.Logging;
     using LitShare.DAL;
     using LitShare.DAL.Models;
     using LitShare.Presentation;
@@ -39,8 +40,19 @@ namespace LitShare
         {
             this.InitializeComponent();
             this.userId = userId;
-            this.LoadDealTypes();
-            this.LoadGenres();
+            AppLogger.Info($"Відкрито NewAdWindow для користувача Id={userId}");
+
+            try
+            {
+                this.LoadDealTypes();
+                this.LoadGenres();
+                AppLogger.Info($"Завантажено deal types і genres для користувача Id={userId}");
+            }
+            catch (Exception ex)
+            {
+                AppLogger.Error("Помилка при завантаженні deal types і genres", ex);
+                this.Close();
+            }
         }
 
         /// <summary>
@@ -48,15 +60,24 @@ namespace LitShare
         /// </summary>
         private void LoadDealTypes()
         {
-            var dealTypes = new[]
+            try
             {
-                new { Value = DealType.Exchange, Display = "Обмін" }, // Exchange
-                new { Value = DealType.Donation, Display = "Безкоштовно" }, // Donation (Free)
-            };
+                var dealTypes = new[]
+                {
+                    new { Value = DealType.Exchange, Display = "Обмін" },
+                    new { Value = DealType.Donation, Display = "Безкоштовно" },
+                };
 
-            this.DealTypeComboBox.ItemsSource = dealTypes;
-            this.DealTypeComboBox.DisplayMemberPath = "Display";
-            this.DealTypeComboBox.SelectedValuePath = "Value";
+                this.DealTypeComboBox.ItemsSource = dealTypes;
+                this.DealTypeComboBox.DisplayMemberPath = "Display";
+                this.DealTypeComboBox.SelectedValuePath = "Value";
+
+                AppLogger.Info("Deal types успішно завантажено");
+            }
+            catch (Exception ex)
+            {
+                AppLogger.Error("Помилка при завантаженні deal types", ex);
+            }
         }
 
         /// <summary>
@@ -64,11 +85,20 @@ namespace LitShare
         /// </summary>
         private void LoadGenres()
         {
-            using var db = new LitShareDbContext();
-            var genres = db.Genres.ToList();
-            this.GenreComboBox.ItemsSource = genres;
-            this.GenreComboBox.DisplayMemberPath = "Name";
-            this.GenreComboBox.SelectedValuePath = "Id";
+            try
+        {
+                using var db = new LitShareDbContext();
+                var genres = db.Genres.ToList();
+                this.GenreComboBox.ItemsSource = genres;
+                this.GenreComboBox.DisplayMemberPath = "Name";
+                this.GenreComboBox.SelectedValuePath = "Id";
+
+                AppLogger.Info("Genres успішно завантажено");
+            }
+        catch (Exception ex)
+        {
+                AppLogger.Error("Помилка при завантаженні genres", ex);
+            }
         }
 
         /// <summary>
@@ -81,6 +111,7 @@ namespace LitShare
         {
             if (!this.ValidateFields())
             {
+                AppLogger.Warn($"Користувач Id={this.userId} намагався додати оголошення з невалідними полями");
                 return;
             }
 
@@ -112,6 +143,8 @@ namespace LitShare
                 db.BookGenres.Add(bookGenre);
                 db.SaveChanges();
 
+                AppLogger.Info($"Користувач Id={this.userId} додав нове оголошення Id={post.Id}, жанр Id={selectedGenre.Id}");
+
                 // Navigate to the main page and scroll to the new ad
                 var mainWindow = new MainPage(this.userId);
                 mainWindow.Loaded += (s, e2) => mainWindow.ScrollToBottom();
@@ -121,6 +154,7 @@ namespace LitShare
             }
             catch (DbUpdateException ex)
             {
+                AppLogger.Error("Помилка при збереженні нового оголошення в БД", ex);
                 MessageBox.Show(
                     $"An error occurred while adding the advertisement:\n{ex.InnerException?.Message}",
                     "Database Error",
@@ -129,6 +163,7 @@ namespace LitShare
             }
             catch (Exception ex)
             {
+                AppLogger.Error("Невідома помилка при додаванні оголошення", ex);
                 MessageBox.Show($"An unknown error occurred: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -141,6 +176,7 @@ namespace LitShare
         /// <param name="e">The routing event data.</param>
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
+            AppLogger.Info($"Користувач Id={this.userId} закрив NewAdWindow без додавання оголошення");
             this.Close();
         }
 
@@ -152,6 +188,7 @@ namespace LitShare
         /// <param name="e">The routing event data.</param>
         private void MyProfile_Click(object sender, RoutedEventArgs e)
         {
+            AppLogger.Info($"Користувач Id={this.userId} відкрив ProfileWindow з NewAdWindow");
             var profileWindow = new ProfileWindow(this.userId);
             profileWindow.ShowDialog();
         }
@@ -164,6 +201,7 @@ namespace LitShare
         /// <param name="e">The routing event data.</param>
         private void HomeButton_Click(object sender, RoutedEventArgs e)
         {
+            AppLogger.Info($"Користувач Id={this.userId} перейшов на MainPage з NewAdWindow");
             MainPage mainWindow = new (this.userId);
             mainWindow.Show();
             this.Close();
@@ -177,23 +215,32 @@ namespace LitShare
         /// <param name="e">The routing event data.</param>
         private void AddPhotoButton_Click(object sender, RoutedEventArgs e)
         {
-            var openFileDialog = new OpenFileDialog
+            try
             {
-                Title = "Select Book Photo",
-                Filter = "Images|*.jpg;*.jpeg;*.png;*.bmp;*.gif",
-                Multiselect = false,
-            };
-
-            bool? result = openFileDialog.ShowDialog();
-
-            if (result == true)
-            {
-                this.selectedPhotoPath = openFileDialog.FileName;
-
-                if (this.BookImage != null)
+                var openFileDialog = new OpenFileDialog
                 {
-                    this.BookImage.Source = new BitmapImage(new Uri(this.selectedPhotoPath));
+                    Title = "Select Book Photo",
+                    Filter = "Images|*.jpg;*.jpeg;*.png;*.bmp;*.gif",
+                    Multiselect = false,
+                };
+
+                bool? result = openFileDialog.ShowDialog();
+
+                if (result == true)
+                {
+                    this.selectedPhotoPath = openFileDialog.FileName;
+
+                    if (this.BookImage != null)
+                    {
+                        this.BookImage.Source = new BitmapImage(new Uri(this.selectedPhotoPath));
+                    }
+
+                    AppLogger.Info($"Користувач Id={this.userId} вибрав фото: {this.selectedPhotoPath}");
                 }
+            }
+            catch (Exception ex)
+            {
+                AppLogger.Error("Помилка при виборі фото", ex);
             }
         }
 

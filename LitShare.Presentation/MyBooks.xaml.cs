@@ -9,6 +9,7 @@ namespace LitShare.Presentation
     using System.Linq;
     using System.Windows;
     using System.Windows.Controls;
+    using LitShare.BLL.Logging;
     using LitShare.DAL;
 
     /// <summary>
@@ -30,6 +31,9 @@ namespace LitShare.Presentation
             this.InitializeComponent();
             this.context = new LitShareDbContext();
             this.userId = userId;
+
+            AppLogger.Info($"Відкрито вікно MyBook для користувача ID = {userId}");
+
             this.LoadBooks();
             this.SearchTextBox.TextChanged += this.SearchTextBox_TextChanged;
         }
@@ -41,6 +45,7 @@ namespace LitShare.Presentation
         {
             try
             {
+
                 int currentUserId = this.userId;
 
                 this.allBooks = this.context.Posts
@@ -55,32 +60,42 @@ namespace LitShare.Presentation
                     })
                     .ToList();
 
+                AppLogger.Info($"Завантажено {this.allBooks.Count} книг користувача ID = {this.userId}");
+
                 this.DisplayBooks(this.allBooks);
             }
             catch (Exception ex)
             {
+                AppLogger.Error($"ПОМИЛКА завантаження книг користувача ID = {this.userId}: {ex}");
                 MessageBox.Show($"Помилка при завантаженні книг: {ex.Message}");
             }
         }
 
         private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            var searchText = this.SearchTextBox.Text.ToLower().Trim();
-
-            if (string.IsNullOrEmpty(searchText))
+            try
             {
-                this.DisplayBooks(this.allBooks);
-                return;
+                var searchText = this.SearchTextBox.Text.ToLower().Trim();
+
+                if (string.IsNullOrEmpty(searchText))
+                {
+                    this.DisplayBooks(this.allBooks);
+                    return;
+                }
+
+                var filteredBooks = this.allBooks
+                    .Where(b =>
+                        (b.Title ?? string.Empty).ToLower().Contains(searchText) ||
+                        (b.Author ?? string.Empty).ToLower().Contains(searchText) ||
+                        (b.City ?? string.Empty).ToLower().Contains(searchText))
+                    .ToList();
+
+                this.DisplayBooks(filteredBooks);
             }
-
-            var filteredBooks = this.allBooks
-                .Where(b =>
-                    (b.Title ?? string.Empty).ToLower().Contains(searchText) ||
-                    (b.Author ?? string.Empty).ToLower().Contains(searchText) ||
-                    (b.City ?? string.Empty).ToLower().Contains(searchText))
-                .ToList();
-
-            this.DisplayBooks(filteredBooks);
+            catch (Exception ex)
+            {
+                AppLogger.Error($"ПОМИЛКА під час пошуку книг: {ex}");
+            }
         }
 
         /// <summary>
@@ -94,6 +109,7 @@ namespace LitShare.Presentation
 
         private void HomeButton_Click(object sender, RoutedEventArgs e)
         {
+            AppLogger.Info($"Перехід на головну сторінку з MyBook. Користувач ID = {this.userId}");
             MainPage mainWindow = new MainPage(this.userId);
             mainWindow.Show();
             this.Close();
@@ -103,16 +119,23 @@ namespace LitShare.Presentation
         {
             if (sender is Button button && button.DataContext is BookItem selectedBook)
             {
+                AppLogger.Info($"Редагування книги ID = {selectedBook.Id} користувачем ID = {this.userId}");
+
                 var editWindow = new EditAdWindow(selectedBook.Id, this.userId);
                 editWindow.Owner = this;
                 editWindow.ShowDialog();
 
                 this.LoadBooks();
             }
+            else
+            {
+                AppLogger.Warn("Спроба редагування книги без вибраного елемента");
+            }
         }
 
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
+            AppLogger.Info("Закриття вікна MyBook кнопкою Назад");
             this.Close();
         }
 
