@@ -94,32 +94,60 @@
                                     Tag="{Binding Id}"
                                     PreviewMouseLeftButtonDown="BookCard_Click">
 
-                                    <Border.Effect>
-                                        <DropShadowEffect BlurRadius="5" ShadowDepth="2" Opacity="0.2"/>
-                                    </Border.Effect>
+                                    <Border.RenderTransform>
+                                        <ScaleTransform ScaleX="1" ScaleY="1"/>
+                                    </Border.RenderTransform>
 
-                                    <Border.ContextMenu>
-                                        <ContextMenu>
-                                            <MenuItem Header="Переглянути"
-                                                  Click="ContextMenu_View_Click"
-                                                  DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
-                                            <MenuItem Header="Поскаржитись"
-                                                  Click="ContextMenu_Report_Click"
-                                                  DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
-                                        </ContextMenu>
-                                    </Border.ContextMenu>
-                                    
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+
+                                            <Style.Triggers>
+
+                                                <!-- Збільшення при наведенні -->
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Trigger.EnterActions>
+                                                        <BeginStoryboard>
+                                                            <Storyboard>
+                                                                <DoubleAnimation
+                                                                    Storyboard.TargetProperty="(Border.RenderTransform).(ScaleTransform.ScaleX)"
+                                                                    To="1.05" Duration="0:0:0.15"/>
+                                                                <DoubleAnimation
+                                                                    Storyboard.TargetProperty="(Border.RenderTransform).(ScaleTransform.ScaleY)"
+                                                                    To="1.05" Duration="0:0:0.15"/>
+                                                            </Storyboard>
+                                                        </BeginStoryboard>
+                                                    </Trigger.EnterActions>
+
+                                                    <Trigger.ExitActions>
+                                                        <BeginStoryboard>
+                                                            <Storyboard>
+                                                                <DoubleAnimation
+                                                                    Storyboard.TargetProperty="(Border.RenderTransform).(ScaleTransform.ScaleX)"
+                                                                    To="1" Duration="0:0:0.15"/>
+                                                                <DoubleAnimation
+                                                                    Storyboard.TargetProperty="(Border.RenderTransform).(ScaleTransform.ScaleY)"
+                                                                    To="1" Duration="0:0:0.15"/>
+                                                            </Storyboard>
+                                                        </BeginStoryboard>
+                                                    </Trigger.ExitActions>
+
+                                                </Trigger>
+
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+
+                                    <!-- Контент картки -->
                                     <StackPanel>
                                         <Border Height="180" Background="#E8E8E8">
-                                            <Border Height="180" Background="#E8E8E8" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                                <Image Source="{Binding ImagePath}"
-                                                   Stretch="Uniform"
-                                                   HorizontalAlignment="Center"
-                                                   VerticalAlignment="Center"
-                                                   Margin="5"/>
-                                            </Border>
+                                            <Image Source="{Binding ImagePath}"
+                                               Stretch="Uniform"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"
+                                               Margin="5"/>
                                         </Border>
-
+                                        
                                         <StackPanel Margin="10">
                                             <TextBlock Text="{Binding Title}" FontWeight="Bold"
                                                TextWrapping="Wrap" Margin="0,0,0,3"/>
@@ -132,6 +160,7 @@
                                 </Border>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
+
                     </ItemsControl>
 
                 </StackPanel>
