@@ -119,13 +119,13 @@
                     </Grid.ColumnDefinitions>
 
                     <Button Grid.Column="0" 
-                            Content="Підтвердити скаргу" 
+                            Content="Видалити оголошення" 
                             Style="{StaticResource AppButtonStyle}"
                             HorizontalAlignment="Left"
                             Click="ApproveButton_Click"/>
 
                     <Button Grid.Column="1" 
-                            Content="Відхилити скаргу" 
+                            Content="Видалити скаргу" 
                             Style="{StaticResource AppButtonStyle}"
                             HorizontalAlignment="Right"
                             Click="RejectButton_Click"/>

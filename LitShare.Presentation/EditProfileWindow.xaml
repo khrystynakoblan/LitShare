@@ -83,7 +83,7 @@
                         <ColumnDefinition Width="120"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="Ім'я" VerticalAlignment="Center" FontWeight="SemiBold" FontSize="14"/>
+                    <TextBlock Text="Ім'я:" VerticalAlignment="Center" FontWeight="SemiBold" FontSize="14"/>
                     <TextBox x:Name="txtFirstName" Grid.Column="1" Height="35" IsReadOnly="True" Background="#EEE" Padding="8,2"/>
                 </Grid>
 
@@ -94,7 +94,7 @@
                             <ColumnDefinition Width="120"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="Область" VerticalAlignment="Center" FontWeight="SemiBold" FontSize="14"/>
+                        <TextBlock Text="Область:" VerticalAlignment="Center" FontWeight="SemiBold" FontSize="14"/>
                         <TextBox x:Name="txtRegion" Grid.Column="1" Height="35" Padding="8,2" TextChanged="ValidateField"/>
                     </Grid>
                     <TextBlock x:Name="errRegion" Foreground="Red" FontSize="12" Margin="120,2,0,0"/>
@@ -107,7 +107,7 @@
                             <ColumnDefinition Width="120"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="Район" VerticalAlignment="Center" FontWeight="SemiBold" FontSize="14"/>
+                        <TextBlock Text="Район:" VerticalAlignment="Center" FontWeight="SemiBold" FontSize="14"/>
                         <TextBox x:Name="txtDistrict" Grid.Column="1" Height="35" Padding="8,2" TextChanged="ValidateField"/>
                     </Grid>
                     <TextBlock x:Name="errDistrict" Foreground="Red" FontSize="12" Margin="120,2,0,0"/>
@@ -120,7 +120,7 @@
                             <ColumnDefinition Width="120"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="Місто" VerticalAlignment="Center" FontWeight="SemiBold" FontSize="14"/>
+                        <TextBlock Text="Місто:" VerticalAlignment="Center" FontWeight="SemiBold" FontSize="14"/>
                         <TextBox x:Name="txtCity" Grid.Column="1" Height="35" Padding="8,2" TextChanged="ValidateField"/>
                     </Grid>
                     <TextBlock x:Name="errCity" Foreground="Red" FontSize="12" Margin="120,2,0,0"/>
@@ -133,7 +133,7 @@
                             <ColumnDefinition Width="120"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="Телефон" VerticalAlignment="Center" FontWeight="SemiBold" FontSize="14"/>
+                        <TextBlock Text="Телефон:" VerticalAlignment="Center" FontWeight="SemiBold" FontSize="14"/>
                         <TextBox x:Name="txtPhone" Grid.Column="1" Height="35" Padding="8,2" TextChanged="ValidateField"/>
                     </Grid>
                     <TextBlock x:Name="errPhone" Foreground="Red" FontSize="12" Margin="120,2,0,0"/>
@@ -145,7 +145,7 @@
                         <ColumnDefinition Width="120"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="Про себе" 
+                    <TextBlock Text="Про себе:" 
                                FontWeight="SemiBold" 
                                FontSize="14"
                                VerticalAlignment="Top"

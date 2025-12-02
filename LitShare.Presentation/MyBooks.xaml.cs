@@ -45,7 +45,6 @@ namespace LitShare.Presentation
         {
             try
             {
-
                 int currentUserId = this.userId;
 
                 this.allBooks = this.context.Posts

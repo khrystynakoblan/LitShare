@@ -117,15 +117,15 @@ namespace LitShare.Presentation
             try
             {
                 this.complaintsService.ApproveComplaint(this.currentComplaintId);
-                AppLogger.Info($"Скаргу Id={this.currentComplaintId} підтверджено");
+                AppLogger.Info($"Оголошення для скарги Id={this.currentComplaintId} видалено");
 
-                await this.ShowToast("✔ Скаргу підтверджено");
+                await this.ShowToast("✔ Оголошення видалено");
 
                 this.Close();
             }
             catch (Exception ex)
             {
-                AppLogger.Error($"Помилка при підтвердженні скарги Id={this.currentComplaintId}", ex);
+                AppLogger.Error($"Помилка при видаленні оголошення для скарги Id={this.currentComplaintId}", ex);
                 MessageBox.Show($"Помилка: {ex.Message}");
             }
         }
@@ -135,15 +135,15 @@ namespace LitShare.Presentation
             try
             {
                 this.complaintsService.DeleteComplaint(this.currentComplaintId);
-                AppLogger.Info($"Скаргу Id={this.currentComplaintId} відхилено");
+                AppLogger.Info($"Скаргу Id={this.currentComplaintId} видалено");
 
-                await this.ShowToast("✖ Скаргу відхилено");
+                await this.ShowToast("✖ Скаргу видалено");
 
                 this.Close();
             }
             catch (Exception ex)
             {
-                AppLogger.Error($"Помилка при відхиленні скарги Id={this.currentComplaintId}", ex);
+                AppLogger.Error($"Помилка при видаленні скарги Id={this.currentComplaintId}", ex);
                 MessageBox.Show($"Помилка: {ex.Message}");
             }
         }
