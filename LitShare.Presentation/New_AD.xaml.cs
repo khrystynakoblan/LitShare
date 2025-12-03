@@ -148,7 +148,6 @@ namespace LitShare
                 // Navigate to the main page and scroll to the new ad
                 var mainWindow = new MainPage(this.userId);
                 mainWindow.Loaded += (s, e2) => mainWindow.ScrollToBottom();
-                mainWindow.Show();
 
                 this.Close();
             }

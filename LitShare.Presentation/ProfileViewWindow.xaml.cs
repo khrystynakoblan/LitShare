@@ -102,7 +102,6 @@ namespace LitShare.Presentation
         {
             AppLogger.Info($"Перехід на головну з ProfileViewWindow. Користувач ID = {this.userId}");
             var mainPage = new MainPage(this.userId);
-            mainPage.Show();
             this.Close();
         }
 
@@ -118,6 +117,7 @@ namespace LitShare.Presentation
 
             var profileWindow = new ProfileWindow(this.userId);
             profileWindow.ShowDialog();
+            this.Close();
         }
 
         /// <summary>
@@ -149,6 +149,7 @@ namespace LitShare.Presentation
                 {
                     Owner = this,
                 };
+                this.Hide();
                 viewWindow.ShowDialog();
             }
         }
@@ -170,6 +171,7 @@ namespace LitShare.Presentation
                 {
                     Owner = this,
                 };
+                this.Hide();
                 reportWindow.ShowDialog();
             }
             else

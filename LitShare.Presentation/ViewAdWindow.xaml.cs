@@ -164,7 +164,9 @@ namespace LitShare.Presentation
                 {
                     Owner = this,
                 };
+                this.Hide();
                 profileWindow.ShowDialog();
+                this.Close();
             }
         }
 
@@ -188,7 +190,6 @@ namespace LitShare.Presentation
         private void HomePage_Click(object sender, RoutedEventArgs e)
         {
             var mainPage = new MainPage(this.userId);
-            mainPage.Show();
             this.Close();
         }
 

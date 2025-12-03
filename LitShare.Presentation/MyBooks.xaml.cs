@@ -122,6 +122,7 @@ namespace LitShare.Presentation
 
                 var editWindow = new EditAdWindow(selectedBook.Id, this.userId);
                 editWindow.Owner = this;
+                this.Hide();
                 editWindow.ShowDialog();
 
                 this.LoadBooks();

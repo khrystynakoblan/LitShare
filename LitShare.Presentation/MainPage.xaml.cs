@@ -127,7 +127,7 @@ namespace LitShare.Presentation
         private List<string> GetSelectedGenres() =>
             this.genreCheckBoxes
                 .Where(cb => cb.IsChecked == true && cb.Content != null)
-                .Select(cb => cb.Content!.ToString() !)
+                .Select(cb => cb.Content!.ToString()!)
                 .ToList();
 
         private void ApplyFilters()
@@ -194,8 +194,11 @@ namespace LitShare.Presentation
         /// <param name="e">The event data.</param>
         private void MyProfile_Click(object sender, RoutedEventArgs e)
         {
+            // Логіка для забезпечення активності лише одного вікна
             var profileWindow = new ProfileWindow(this.userId);
+            this.Hide(); // Приховуємо головне вікно
             profileWindow.ShowDialog();
+            this.Show(); // Показуємо головне вікно знову після закриття профілю
         }
 
         /// <summary>
@@ -207,7 +210,9 @@ namespace LitShare.Presentation
         {
             AppLogger.Info("Відкрито вікно додавання нового оголошення");
             var newAdWindow = new NewAdWindow(this.userId);
+            this.Hide(); // Приховуємо головне вікно
             bool? result = newAdWindow.ShowDialog();
+            this.Show(); // Показуємо головне вікно знову
 
             if (result == true)
             {
@@ -232,7 +237,10 @@ namespace LitShare.Presentation
                 AppLogger.Info($"Відкрито перегляд оголошення з Id={bookId}");
                 var viewWindow = new ViewAdWindow(bookId, this.userId);
                 viewWindow.Owner = this;
+
+                this.Hide(); // Приховуємо головне вікно
                 viewWindow.ShowDialog();
+                this.Show(); // Показуємо головне вікно знову
             }
             else
             {
@@ -261,7 +269,10 @@ namespace LitShare.Presentation
                 AppLogger.Info($"Відкрито перегляд оголошення з Id={book.Id} через контекстне меню");
                 var viewWindow = new ViewAdWindow(book.Id, this.userId);
                 viewWindow.Owner = this;
+
+                this.Hide(); // Приховуємо головне вікно
                 viewWindow.ShowDialog();
+                this.Show(); // Показуємо головне вікно знову
             }
         }
 
@@ -273,7 +284,10 @@ namespace LitShare.Presentation
                 AppLogger.Info($"Подача скарги на оголошення Id={book.Id}");
                 var reportWindow = new ReportAdWindow(book.Id, this.userId);
                 reportWindow.Owner = this;
+
+                this.Hide(); // Приховуємо головне вікно
                 reportWindow.ShowDialog();
+                this.Show(); // Показуємо головне вікно знову
             }
         }
     }

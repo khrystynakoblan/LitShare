@@ -159,7 +159,6 @@ namespace LitShare.Presentation
             }
 
             var profilePage = new ProfileWindow(this.userId);
-            profilePage.Show();
             this.Close();
         }
 
@@ -180,7 +179,6 @@ namespace LitShare.Presentation
             }
 
             var profilePage = new ProfileWindow(this.userId);
-            profilePage.Show();
             this.Close();
         }
 
@@ -236,7 +234,6 @@ namespace LitShare.Presentation
             AppLogger.Info($"Повернення на профіль користувача ID={this.userId}");
 
             var profilePage = new ProfileWindow(this.userId);
-            profilePage.Show();
             this.Close();
         }
     }

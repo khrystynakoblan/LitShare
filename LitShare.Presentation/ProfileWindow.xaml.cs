@@ -129,7 +129,6 @@ namespace LitShare.Presentation
             AppLogger.Info($"Перехід на головну з ProfileWindow. Користувач ID = {this.userId}");
 
             var mainPage = new MainPage(this.userId);
-            mainPage.Show();
             this.Close();
         }
 
@@ -138,6 +137,7 @@ namespace LitShare.Presentation
             AppLogger.Info($"Відкрито редагування профілю користувача ID = {this.userId}");
 
             var editProfileWindow = new EditProfileWindow(this.userId);
+            this.Hide();
             bool? result = editProfileWindow.ShowDialog();
 
             if (result == true)
