@@ -32,6 +32,8 @@ namespace LitShare
         /// </summary>
         private string? selectedPhotoPath;
 
+        public event Action? AdCreated;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="NewAdWindow"/> class.
         /// </summary>
@@ -79,6 +81,7 @@ namespace LitShare
                 AppLogger.Error("Помилка при завантаженні deal types", ex);
             }
         }
+
 
         /// <summary>
         /// Loads the list of available genres from the database into the corresponding ComboBox.
@@ -142,6 +145,9 @@ namespace LitShare
 
                 db.BookGenres.Add(bookGenre);
                 db.SaveChanges();
+
+                AdCreated?.Invoke(); // <<<<<< ОНОВИТИ ГОЛОВНЕ ВІКНО
+
 
                 AppLogger.Info($"Користувач Id={this.userId} додав нове оголошення Id={post.Id}, жанр Id={selectedGenre.Id}");
 

@@ -71,9 +71,16 @@ namespace LitShare.Presentation
         /// </summary>
         public void ScrollToBottom()
         {
-            // Якщо є ScrollViewer — просто прокручуємо його вниз
             this.BooksScrollViewer?.UpdateLayout();
             this.BooksScrollViewer?.ScrollToEnd();
+        }
+
+        public async Task ReloadBooks()
+        {
+            var books = await this.bookService.GetAllBooksAsync();
+            this.AllBooks = new ObservableCollection<BookDto>(books);
+            this.FilteredBooks = new ObservableCollection<BookDto>(books);
+            this.BooksItemsControl.ItemsSource = this.FilteredBooks;
         }
 
         /// <summary>
@@ -209,7 +216,14 @@ namespace LitShare.Presentation
         private async void AddBook_Click(object sender, RoutedEventArgs e)
         {
             AppLogger.Info("Відкрито вікно додавання нового оголошення");
+
             var newAdWindow = new NewAdWindow(this.userId);
+            newAdWindow.AdCreated += async () =>
+            {
+                await this.ReloadBooks();
+                this.ScrollToBottom();
+            };
+
             this.Hide(); // Приховуємо головне вікно
             bool? result = newAdWindow.ShowDialog();
             this.Show(); // Показуємо головне вікно знову
