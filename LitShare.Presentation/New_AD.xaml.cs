@@ -146,8 +146,7 @@ namespace LitShare
                 db.BookGenres.Add(bookGenre);
                 db.SaveChanges();
 
-                AdCreated?.Invoke(); // <<<<<< ОНОВИТИ ГОЛОВНЕ ВІКНО
-
+                AdCreated?.Invoke(); 
 
                 AppLogger.Info($"Користувач Id={this.userId} додав нове оголошення Id={post.Id}, жанр Id={selectedGenre.Id}");
 
@@ -183,19 +182,6 @@ namespace LitShare
         {
             AppLogger.Info($"Користувач Id={this.userId} закрив NewAdWindow без додавання оголошення");
             this.Close();
-        }
-
-        /// <summary>
-        /// Handles the click event for the "My Profile" button.
-        /// Opens the user's profile window.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The routing event data.</param>
-        private void MyProfile_Click(object sender, RoutedEventArgs e)
-        {
-            AppLogger.Info($"Користувач Id={this.userId} відкрив ProfileWindow з NewAdWindow");
-            var profileWindow = new ProfileWindow(this.userId);
-            profileWindow.ShowDialog();
         }
 
         /// <summary>

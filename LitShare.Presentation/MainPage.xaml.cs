@@ -201,11 +201,10 @@ namespace LitShare.Presentation
         /// <param name="e">The event data.</param>
         private void MyProfile_Click(object sender, RoutedEventArgs e)
         {
-            // Логіка для забезпечення активності лише одного вікна
             var profileWindow = new ProfileWindow(this.userId);
-            this.Hide(); // Приховуємо головне вікно
+            this.Hide();
             profileWindow.ShowDialog();
-            this.Show(); // Показуємо головне вікно знову після закриття профілю
+            this.Show();
         }
 
         /// <summary>
@@ -224,9 +223,9 @@ namespace LitShare.Presentation
                 this.ScrollToBottom();
             };
 
-            this.Hide(); // Приховуємо головне вікно
+            this.Hide();
             bool? result = newAdWindow.ShowDialog();
-            this.Show(); // Показуємо головне вікно знову
+            this.Show();
 
             if (result == true)
             {
@@ -252,9 +251,9 @@ namespace LitShare.Presentation
                 var viewWindow = new ViewAdWindow(bookId, this.userId);
                 viewWindow.Owner = this;
 
-                this.Hide(); // Приховуємо головне вікно
+                this.Hide();
                 viewWindow.ShowDialog();
-                this.Show(); // Показуємо головне вікно знову
+                this.Show();
             }
             else
             {
@@ -284,9 +283,9 @@ namespace LitShare.Presentation
                 var viewWindow = new ViewAdWindow(book.Id, this.userId);
                 viewWindow.Owner = this;
 
-                this.Hide(); // Приховуємо головне вікно
+                this.Hide();
                 viewWindow.ShowDialog();
-                this.Show(); // Показуємо головне вікно знову
+                this.Show();
             }
         }
 
@@ -299,9 +298,9 @@ namespace LitShare.Presentation
                 var reportWindow = new ReportAdWindow(book.Id, this.userId);
                 reportWindow.Owner = this;
 
-                this.Hide(); // Приховуємо головне вікно
+                this.Hide();
                 reportWindow.ShowDialog();
-                this.Show(); // Показуємо головне вікно знову
+                this.Show();
             }
         }
     }

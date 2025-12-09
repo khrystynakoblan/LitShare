@@ -23,18 +23,15 @@ namespace LitShare.BLL.Logging
         public static void Init()
         {
             Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Debug() // Мінімальний рівень для Serilog
-                .WriteTo.Console(
-                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] {Message}{NewLine}{Exception}")
+                .MinimumLevel.Debug()
 
                 .WriteTo.File(
-                    path: "Logs/log-.txt",  // Щоденні файли
+                    path: "Logs/log-.txt", 
                     rollingInterval: RollingInterval.Day,
                     restrictedToMinimumLevel: LogEventLevel.Information,
                     outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] {Message}{NewLine}{Exception}")
                 .CreateLogger();
 
-            // Інтегруємо Serilog у Microsoft ILogger
             var factory = LoggerFactory.Create(builder =>
             {
                 builder.AddSerilog(dispose: true);
@@ -44,7 +41,7 @@ namespace LitShare.BLL.Logging
         }
 
         /// <summary>
-        /// Лог попередження (Warning).
+        /// Лог інформації (Information).
         /// </summary>
         /// <param name="message">Повідомлення для логування.</param>
         public static void Info(string message)
