@@ -134,7 +134,7 @@ namespace LitShare.Presentation
         {
             // Assuming ProfileWindow exists and takes userId
             var profileWindow = new ProfileWindow(this.currentUserId);
-            profileWindow.ShowDialog();
+            NavigationManager.NavigateTo(profileWindow, this);
         }
 
         /// <summary>
@@ -147,9 +147,7 @@ namespace LitShare.Presentation
         private void HomeButton_Click(object sender, RoutedEventArgs e)
         {
             // Assuming MainPage exists and takes userId
-            var mainPage = new MainPage(this.currentUserId);
-            mainPage.ShowDialog();
-            this.Close();
+            NavigationManager.GoToMainPage(this.currentUserId);
         }
 
         /// <summary>
@@ -159,7 +157,7 @@ namespace LitShare.Presentation
         /// <param name="e">The event data.</param>
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            NavigationManager.GoBack();
         }
     }
 }

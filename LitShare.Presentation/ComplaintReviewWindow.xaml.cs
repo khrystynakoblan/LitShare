@@ -66,14 +66,16 @@ namespace LitShare.Presentation
                     AppLogger.Warn($"Не вдалося завантажити скаргу з ID {complaintId}");
 
                     MessageBox.Show($"Не вдалося завантажити скаргу з ID {complaintId}.", "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
-                    this.Close();
+                    NavigationManager.GoBack();
+
                 }
             }
             catch (Exception ex)
             {
                 AppLogger.Error($"Критична помилка при завантаженні скарги Id={complaintId}", ex);
                 MessageBox.Show($"Критична помилка: {ex.Message}", "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
-                this.Close();
+                NavigationManager.GoBack();
+
             }
 
             return Task.CompletedTask;
@@ -109,7 +111,8 @@ namespace LitShare.Presentation
         private void ExitButton_Click(object sender, RoutedEventArgs e)
         {
             AppLogger.Info($"Вікно ComplaintReviewWindow закрито вручну");
-            this.Close();
+            NavigationManager.GoBack();
+
         }
 
         private async void ApproveButton_Click(object sender, RoutedEventArgs e)
@@ -121,7 +124,8 @@ namespace LitShare.Presentation
 
                 await this.ShowToast("✔ Оголошення видалено");
 
-                this.Close();
+                NavigationManager.GoBack();
+
             }
             catch (Exception ex)
             {
@@ -139,7 +143,7 @@ namespace LitShare.Presentation
 
                 await this.ShowToast("✖ Скаргу видалено");
 
-                this.Close();
+                NavigationManager.GoBack();
             }
             catch (Exception ex)
             {
@@ -167,7 +171,7 @@ namespace LitShare.Presentation
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
             AppLogger.Info("Повернення з ComplaintReviewWindow");
-            this.Close();
+            NavigationManager.GoBack();
         }
     }
 }

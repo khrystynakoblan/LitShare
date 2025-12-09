@@ -158,27 +158,17 @@ namespace LitShare.Presentation
                 MessageBox.Show($"Помилка при збереженні профілю: {ex.Message}", "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
-            var profilePage = new ProfileWindow(this.userId);
+            this.DialogResult = true;
             this.Close();
+
+
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             AppLogger.Info($"Скасування змін профілю користувача ID={this.userId}");
 
-            this.txtFirstName.Text = this.originalUser.Name;
-            this.txtRegion.Text = this.originalUser.Region;
-            this.txtDistrict.Text = this.originalUser.District;
-            this.txtCity.Text = this.originalUser.City;
-            this.txtPhone.Text = this.originalUser.Phone;
-            this.txtAbout.Text = this.originalUser.About ?? string.Empty;
-
-            if (!string.IsNullOrEmpty(this.originalUser.PhotoUrl))
-            {
-                this.userPhotoEllipse.Fill = new ImageBrush(new BitmapImage(new Uri(this.originalUser.PhotoUrl)));
-            }
-
-            var profilePage = new ProfileWindow(this.userId);
+            this.DialogResult = false;
             this.Close();
         }
 
@@ -233,8 +223,7 @@ namespace LitShare.Presentation
             // If the original intent was a smooth transition, we keep async/await.
             AppLogger.Info($"Повернення на профіль користувача ID={this.userId}");
 
-            var profilePage = new ProfileWindow(this.userId);
-            this.Close();
+            NavigationManager.GoToMainPage(this.userId);
         }
     }
 }

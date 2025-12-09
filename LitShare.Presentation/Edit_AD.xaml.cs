@@ -225,7 +225,7 @@ namespace LitShare
                 this.context.SaveChanges();
 
                 AppLogger.Info($"Пост Id={this.postId} успішно оновлено користувачем Id={this.userId}");
-                this.Close();
+                NavigationManager.GoBack(); 
             }
             catch (Exception ex)
             {
@@ -287,7 +287,10 @@ namespace LitShare
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The routing event data.</param>
-        private void CancelButton_Click(object sender, RoutedEventArgs e) => this.Close();
+        private void CancelButton_Click(object sender, RoutedEventArgs e)
+        {
+            NavigationManager.GoBack();
+        }
 
         /// <summary>
         /// Handles the click event for the "Home" button.
@@ -299,10 +302,7 @@ namespace LitShare
         {
             AppLogger.Info($"Користувач Id={this.userId} повертається на MainPage з EditAdWindow для посту Id={this.postId}");
 
-            // Navigate to main page
-            MainPage mainWindow = new MainPage(this.userId);
-            mainWindow.Show();
-            this.Close();
+            NavigationManager.GoToMainPage(this.userId);
         }
 
         /// <summary>

@@ -71,16 +71,47 @@ namespace LitShare.Presentation
         /// </summary>
         public void ScrollToBottom()
         {
-            this.BooksScrollViewer?.UpdateLayout();
-            this.BooksScrollViewer?.ScrollToEnd();
+            if (this.BooksScrollViewer != null)
+            {
+                this.Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    this.BooksScrollViewer.ScrollToEnd();
+                }), System.Windows.Threading.DispatcherPriority.Background);
+            }
         }
 
         public async Task ReloadBooks()
         {
-            var books = await this.bookService.GetAllBooksAsync();
-            this.AllBooks = new ObservableCollection<BookDto>(books);
-            this.FilteredBooks = new ObservableCollection<BookDto>(books);
-            this.BooksItemsControl.ItemsSource = this.FilteredBooks;
+            try
+            {
+                AppLogger.Info("Початок перезавантаження списку книг");
+
+                var books = await this.bookService.GetAllBooksAsync();
+                AppLogger.Info($"Отримано {books.Count} книг з бази даних");
+
+                this.AllBooks.Clear();
+                this.FilteredBooks.Clear();
+
+                foreach (var book in books)
+                {
+                    this.AllBooks.Add(book);
+                    this.FilteredBooks.Add(book);
+                }
+
+                if (this.BooksItemsControl.ItemsSource == null)
+                {
+                    this.BooksItemsControl.ItemsSource = this.FilteredBooks;
+                }
+
+                this.UpdateResultsCount();
+
+                AppLogger.Info($"Список книг оновлено. Всього: {this.FilteredBooks.Count}");
+            }
+            catch (Exception ex)
+            {
+                AppLogger.Error("Помилка при оновленні списку книг", ex);
+                MessageBox.Show($"Помилка при оновленні списку книг: {ex.Message}", "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         /// <summary>
@@ -202,9 +233,7 @@ namespace LitShare.Presentation
         private void MyProfile_Click(object sender, RoutedEventArgs e)
         {
             var profileWindow = new ProfileWindow(this.userId);
-            this.Hide();
-            profileWindow.ShowDialog();
-            this.Show();
+            NavigationManager.NavigateTo(profileWindow, this);
         }
 
         /// <summary>
@@ -217,11 +246,6 @@ namespace LitShare.Presentation
             AppLogger.Info("Відкрито вікно додавання нового оголошення");
 
             var newAdWindow = new NewAdWindow(this.userId);
-            newAdWindow.AdCreated += async () =>
-            {
-                await this.ReloadBooks();
-                this.ScrollToBottom();
-            };
 
             this.Hide();
             bool? result = newAdWindow.ShowDialog();
@@ -229,12 +253,13 @@ namespace LitShare.Presentation
 
             if (result == true)
             {
-                AppLogger.Info("Додано нове оголошення");
-                var books = await this.bookService.GetAllBooksAsync();
-                this.AllBooks = new ObservableCollection<BookDto>(books);
-                this.FilteredBooks = new ObservableCollection<BookDto>(books);
-                this.BooksItemsControl.ItemsSource = this.FilteredBooks;
-                this.UpdateResultsCount();
+                AppLogger.Info("Оголошення створено");
+                await this.ReloadBooks();
+                this.ScrollToBottom();
+            }
+            else
+            {
+                AppLogger.Info("Додавання оголошення скасовано");
             }
         }
 
@@ -249,11 +274,7 @@ namespace LitShare.Presentation
             {
                 AppLogger.Info($"Відкрито перегляд оголошення з Id={bookId}");
                 var viewWindow = new ViewAdWindow(bookId, this.userId);
-                viewWindow.Owner = this;
-
-                this.Hide();
-                viewWindow.ShowDialog();
-                this.Show();
+                NavigationManager.NavigateTo(viewWindow, this);
             }
             else
             {
@@ -272,36 +293,6 @@ namespace LitShare.Presentation
                 _ => "книг"
             };
             this.ResultsCountText.Text = $"Знайдено: {count} {booksWord}";
-        }
-
-        private void ContextMenu_View_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is MenuItem menuItem &&
-                menuItem.DataContext is BookDto book)
-            {
-                AppLogger.Info($"Відкрито перегляд оголошення з Id={book.Id} через контекстне меню");
-                var viewWindow = new ViewAdWindow(book.Id, this.userId);
-                viewWindow.Owner = this;
-
-                this.Hide();
-                viewWindow.ShowDialog();
-                this.Show();
-            }
-        }
-
-        private void ContextMenu_Report_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is MenuItem menuItem &&
-                menuItem.DataContext is BookDto book)
-            {
-                AppLogger.Info($"Подача скарги на оголошення Id={book.Id}");
-                var reportWindow = new ReportAdWindow(book.Id, this.userId);
-                reportWindow.Owner = this;
-
-                this.Hide();
-                reportWindow.ShowDialog();
-                this.Show();
-            }
         }
     }
 }

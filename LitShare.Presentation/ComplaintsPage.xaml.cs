@@ -41,9 +41,16 @@ namespace LitShare.Presentation
             }
         }
 
+        protected override void OnActivated(EventArgs e)
+        {
+            base.OnActivated(e);
+
+            this.LoadComplaints();
+            this.ComplaintsGrid.ItemsSource = this.Complaints;
+        }
+
         /// <summary>
         /// Gets or sets the collection of complaints to be displayed.
-        /// Використовується ініціалізація, щоб уникнути попередження CS8618.
         /// </summary>
         public ObservableCollection<ComplaintDto> Complaints { get; set; } = new ObservableCollection<ComplaintDto>();
 
@@ -89,8 +96,9 @@ namespace LitShare.Presentation
 
                 try
                 {
-                    var reviewWindow = new ComplaintReviewWindow(selectedComplaint.Id);
-                    reviewWindow.ShowDialog();
+                    var review = new ComplaintReviewWindow(selectedComplaint.Id);
+
+                    NavigationManager.NavigateTo(review, this);
 
                     this.LoadComplaints();
                     this.ComplaintsGrid.ItemsSource = this.Complaints;

@@ -11,29 +11,28 @@ namespace LitShare.Presentation
     using LitShare.BLL.Services;
 
     /// <summary>
-    /// Логіка взаємодії для ViewAdWindow.xaml, що відображає деталі оголошення про книгу.
+    /// Interaction logic for ViewAdWindow.xaml, which displays detailed information about a book advertisement.
     /// </summary>
     public partial class ViewAdWindow : Window
     {
         /// <summary>
-        /// Сервіс для роботи з даними книг.
+        /// Service used for working with book data.
         /// </summary>
         private readonly BookService bookService = new ();
 
         /// <summary>
-        /// Ідентифікатор поточного користувача.
+        /// Identifier of the currently logged-in user.
         /// </summary>
         private readonly int userId;
 
         /// <summary>
-        /// Дані про книгу, які відображаються у вікні.
+        /// Book data displayed in the window.
         /// </summary>
         private BookDto? currentBook;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ViewAdWindow"/> class.
-        /// Ініціалізує новий екземпляр класу <see cref="ViewAdWindow"/>.
-        /// Використовується для дизайну або при виклику з іншого конструктора.
+        /// Used for design-time support or when called from another constructor.
         /// </summary>
         public ViewAdWindow()
         {
@@ -42,11 +41,12 @@ namespace LitShare.Presentation
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ViewAdWindow"/> class.
-        /// Ініціалізує новий екземпляр класу <see cref="ViewAdWindow"/> з вказаними ідентифікаторами книги та користувача.
+        /// Initializes a new instance of the <see cref="ViewAdWindow"/> class
+        /// with the specified book and user identifiers.
         /// </summary>
-        /// <param name="bookId">Ідентифікатор книги для відображення.</param>
-        /// <param name="userId">Ідентифікатор поточного користувача.</param>
+        /// <param name="bookId">Identifier of the book to display.</param>
+        /// <param name="userId">Identifier of the currently logged-in user.</param>
+
         public ViewAdWindow(int bookId, int userId)
             : this()
         {
@@ -57,7 +57,7 @@ namespace LitShare.Presentation
         }
 
         /// <summary>
-        /// Встановлює тестові дані-заповнювачі у поля відображення.
+        /// Sets placeholder test values for the preview fields.
         /// </summary>
         private void SetPlaceholder()
         {
@@ -70,10 +70,10 @@ namespace LitShare.Presentation
         }
 
         /// <summary>
-        /// Асинхронно завантажує дані книги за її ідентифікатором і відображає їх.
+        /// Asynchronously loads book data by its identifier and displays it in the window.
         /// </summary>
-        /// <param name="bookId">Ідентифікатор книги.</param>
-        /// <returns>Задача, що представляє асинхронну операцію.</returns>
+        /// <param name="bookId">Identifier of the book.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
         private async Task LoadBook(int bookId)
         {
             AppLogger.Info($"Завантаження даних книги: BookId={bookId}");
@@ -119,9 +119,9 @@ namespace LitShare.Presentation
         }
 
         /// <summary>
-        /// Завантажує зображення книги з вказаного URL-шляху.
+        /// Loads the book image from the provided URL path.
         /// </summary>
-        /// <param name="url">Шлях до зображення (локальний або абсолютний).</param>
+        /// <param name="url">Path to the image (local or absolute).</param>
         private void LoadBookImage(string? url)
         {
             if (string.IsNullOrWhiteSpace(url))
@@ -143,62 +143,55 @@ namespace LitShare.Presentation
             {
                 AppLogger.Warn($"Не вдалося завантажити зображення книги: URL={url}, Error={ex.Message}");
 
-                // У разі помилки завантаження зображення (наприклад, невірний шлях), просто скидаємо джерело.
                 this.PostImage.Source = null;
             }
         }
 
         /// <summary>
-        /// Обробник події натискання на кнопку "Профіль користувача".
-        /// Відкриває вікно профілю користувача, який розмістив оголошення.
+        /// Handles the click event of the "User Profile" button.
+        /// Opens the profile of the user who created the advertisement.
         /// </summary>
-        /// <param name="sender">Джерело події.</param>
-        /// <param name="e">Дані події маршрутизації.</param>
+        /// <param name="sender">Event source.</param>
+        /// <param name="e">Routed event data.</param>
         private void UserProfile_Click(object sender, RoutedEventArgs e)
         {
             if (this.currentBook != null)
             {
                 AppLogger.Info($"Перегляд профілю автора оголошення: BookId={this.currentBook.Id}, AuthorUserId={this.currentBook.UserId}, ViewerUserId={this.userId}");
 
-                var profileWindow = new ProfileViewWindow(this.currentBook.UserId, this.userId)
-                {
-                    Owner = this,
-                };
-                this.Hide();
-                profileWindow.ShowDialog();
-                this.Close();
+                var profileWindow = new ProfileViewWindow(this.currentBook.UserId, this.userId);
+                NavigationManager.NavigateTo(profileWindow, this);
             }
         }
 
         /// <summary>
-        /// Обробник події натискання на кнопку "Назад".
-        /// Закриває поточне вікно.
+        /// Handles the click event of the "Back" button.
+        /// Closes the current window.
         /// </summary>
-        /// <param name="sender">Джерело події.</param>
-        /// <param name="e">Дані події маршрутизації.</param>
+        /// <param name="sender">Event source.</param>
+        /// <param name="e">Routed event data.</param>
         private void Back_Click(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            NavigationManager.GoBack();
         }
 
         /// <summary>
-        /// Обробник події натискання на кнопку "Головна сторінка".
-        /// Відкриває головну сторінку і закриває поточне вікно.
+        /// Handles the click event of the "Home" button.
+        /// Navigates to the main page and closes the current window.
         /// </summary>
-        /// <param name="sender">Джерело події.</param>
-        /// <param name="e">Дані події маршрутизації.</param>
+        /// <param name="sender">Event source.</param>
+        /// <param name="e">Routed event data.</param>
         private void HomePage_Click(object sender, RoutedEventArgs e)
         {
-            var mainPage = new MainPage(this.userId);
-            this.Close();
+            NavigationManager.GoToMainPage(this.userId);
         }
 
         /// <summary>
-        /// Обробник події натискання на кнопку "Поскаржитися на оголошення".
-        /// Відкриває вікно для створення скарги.
+        /// Handles the click event of the "Report Advertisement" button.
+        /// Opens a window for submitting a complaint about the advertisement.
         /// </summary>
-        /// <param name="sender">Джерело події.</param>
-        /// <param name="e">Дані події маршрутизації.</param>
+        /// <param name="sender">Event source.</param>
+        /// <param name="e">Routed event data.</param>
         private void ReportAd_Click(object sender, RoutedEventArgs e)
         {
             if (this.currentBook == null)
@@ -208,15 +201,8 @@ namespace LitShare.Presentation
 
             AppLogger.Info($"Відкрито вікно скарги на оголошення: BookId={this.currentBook.Id}, UserId={this.userId}");
 
-            this.Hide();
-
-            var reportWindow = new ReportAdWindow(this.currentBook.Id, this.userId)
-            {
-                Owner = this,
-            };
-            reportWindow.ShowDialog();
-
-            this.Show();
+            var reportWindow = new ReportAdWindow(this.currentBook.Id, this.userId);
+            NavigationManager.ShowDialog(reportWindow, this);
         }
     }
 }

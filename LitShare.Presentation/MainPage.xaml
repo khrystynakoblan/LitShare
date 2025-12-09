@@ -92,7 +92,7 @@
                                 <Border Background="White" BorderBrush="#E0E0E0" BorderThickness="1"
                                     Margin="5" Width="220" Height="280" Cursor="Hand"
                                     Tag="{Binding Id}"
-                                    PreviewMouseLeftButtonDown="BookCard_Click">
+                                    MouseLeftButtonUp="BookCard_Click">
 
                                     <Border.RenderTransform>
                                         <ScaleTransform ScaleX="1" ScaleY="1"/>

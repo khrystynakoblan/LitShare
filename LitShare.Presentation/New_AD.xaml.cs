@@ -150,11 +150,7 @@ namespace LitShare
 
                 AppLogger.Info($"Користувач Id={this.userId} додав нове оголошення Id={post.Id}, жанр Id={selectedGenre.Id}");
 
-                // Navigate to the main page and scroll to the new ad
-                var mainWindow = new MainPage(this.userId);
-                mainWindow.Loaded += (s, e2) => mainWindow.ScrollToBottom();
-
-                this.Close();
+                this.DialogResult = true;
             }
             catch (DbUpdateException ex)
             {
@@ -193,9 +189,7 @@ namespace LitShare
         private void HomeButton_Click(object sender, RoutedEventArgs e)
         {
             AppLogger.Info($"Користувач Id={this.userId} перейшов на MainPage з NewAdWindow");
-            MainPage mainWindow = new (this.userId);
-            mainWindow.Show();
-            this.Close();
+            NavigationManager.GoToMainPage(this.userId);
         }
 
         /// <summary>

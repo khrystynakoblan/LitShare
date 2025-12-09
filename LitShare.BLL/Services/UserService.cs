@@ -87,12 +87,13 @@ namespace LitShare.BLL.Services
         /// </summary>
         /// <param name="id">The ID of the user.</param>
         /// <returns>The user entity including posts, or null.</returns>
-        public Users? GetUserProfileById(int id)
+        public Users GetUserProfileById(int id)
         {
             return this.context.Users
-                .Include(u => u.Posts)
+                .AsNoTracking()
                 .FirstOrDefault(u => u.Id == id);
         }
+
 
         /// <summary>
         /// Updates the user's profile photo URL.

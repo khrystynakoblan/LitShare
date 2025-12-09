@@ -101,8 +101,7 @@ namespace LitShare.Presentation
         private void HomeButton_Click(object sender, RoutedEventArgs e)
         {
             AppLogger.Info($"Перехід на головну з ProfileViewWindow. Користувач ID = {this.userId}");
-            var mainPage = new MainPage(this.userId);
-            this.Close();
+            NavigationManager.GoToMainPage(this.userId);
         }
 
         /// <summary>
@@ -116,8 +115,7 @@ namespace LitShare.Presentation
             AppLogger.Info($"Перехід до власного профілю з ProfileViewWindow. Користувач ID = {this.userId}");
 
             var profileWindow = new ProfileWindow(this.userId);
-            profileWindow.ShowDialog();
-            this.Close();
+            NavigationManager.NavigateTo(profileWindow, this);
         }
 
         /// <summary>
@@ -129,8 +127,7 @@ namespace LitShare.Presentation
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
             AppLogger.Info("Закриття ProfileViewWindow кнопкою Назад");
-
-            this.Close();
+            NavigationManager.GoBack();
         }
 
         /// <summary>
@@ -145,12 +142,8 @@ namespace LitShare.Presentation
                 menuItem.DataContext is BookDto book)
             {
                 AppLogger.Info($"Перегляд оголошення ID = {book.Id} користувачем ID = {this.userId}");
-                var viewWindow = new ViewAdWindow(book.Id, this.userId)
-                {
-                    Owner = this,
-                };
-                this.Hide();
-                viewWindow.ShowDialog();
+                var viewWindow = new ViewAdWindow(book.Id, this.userId);
+                NavigationManager.NavigateTo(viewWindow, this);
             }
         }
 
@@ -167,12 +160,8 @@ namespace LitShare.Presentation
             {
                 AppLogger.Warn($"СКАРГА на оголошення ID = {book.Id} від користувача ID = {this.userId}");
 
-                var reportWindow = new ReportAdWindow(book.Id, this.userId)
-                {
-                    Owner = this,
-                };
-                this.Hide();
-                reportWindow.ShowDialog();
+                var reportWindow = new ReportAdWindow(book.Id, this.userId);
+                NavigationManager.ShowDialog(reportWindow, this);
             }
             else
             {

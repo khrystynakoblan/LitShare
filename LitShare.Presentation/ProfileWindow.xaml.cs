@@ -31,7 +31,7 @@ namespace LitShare.Presentation
 
             AppLogger.Info($"Відкрито ProfileWindow для користувача ID = {userId}");
 
-            _ = this.LoadUserProfileAsync(this.userId);
+            this.LoadUserProfile(this.userId);
         }
 
         /// <summary>
@@ -39,9 +39,7 @@ namespace LitShare.Presentation
         /// </summary>
         /// <param name="userId">The ID of the user whose profile should be loaded.</param>
         /// <returns>A task that represents the asynchronous loading operation.</returns>
-#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-        private async Task LoadUserProfileAsync(int userId)
-#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
+        private void LoadUserProfile(int userId)
         {
             try
             {
@@ -92,7 +90,7 @@ namespace LitShare.Presentation
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
             AppLogger.Info($"Натиснуто Назад у ProfileWindow (користувач ID = {this.userId})");
-            this.Close();
+            NavigationManager.GoBack();
         }
 
         private void AddBookButton_Click(object sender, RoutedEventArgs e)
@@ -100,20 +98,12 @@ namespace LitShare.Presentation
             AppLogger.Info($"Перехід до створення оголошення. Користувач ID = {this.userId}");
 
             var newAdWindow = new NewAdWindow(this.userId);
-            bool? result = newAdWindow.ShowDialog();
-
-            if (result == true)
+            newAdWindow.AdCreated += () =>
             {
                 AppLogger.Info($"Оголошення успішно додано користувачем ID = {this.userId}");
+            };
 
-                var myBooksWindow = new MyBook(this.userId);
-                myBooksWindow.Show();
-                this.Close();
-            }
-            else
-            {
-                AppLogger.Warn($"Створення оголошення скасовано користувачем ID = {this.userId}");
-            }
+            NavigationManager.ShowDialog(newAdWindow, this);
         }
 
         private void MyBooksButton_Click(object sender, RoutedEventArgs e)
@@ -121,15 +111,15 @@ namespace LitShare.Presentation
             AppLogger.Info($"Відкрито список моїх книг користувачем ID = {this.userId}");
 
             var myBooksWindow = new MyBook(this.userId);
-            myBooksWindow.Show();
+            NavigationManager.NavigateTo(myBooksWindow, this);
         }
 
         private void HomeButton_Click(object sender, RoutedEventArgs e)
         {
             AppLogger.Info($"Перехід на головну з ProfileWindow. Користувач ID = {this.userId}");
 
-            var mainPage = new MainPage(this.userId);
-            this.Close();
+            NavigationManager.GoToMainPage(this.userId);
+
         }
 
         private void EditProfileButton_Click(object sender, RoutedEventArgs e)
@@ -137,15 +127,13 @@ namespace LitShare.Presentation
             AppLogger.Info($"Відкрито редагування профілю користувача ID = {this.userId}");
 
             var editProfileWindow = new EditProfileWindow(this.userId);
-            this.Hide();
-            bool? result = editProfileWindow.ShowDialog();
+            bool? result = NavigationManager.ShowDialog(editProfileWindow, this);
 
             if (result == true)
             {
-                AppLogger.Info($"Профіль користувача ID = {this.userId} змінено. Перезавантаження даних.");
-
-                _ = this.LoadUserProfileAsync(this.userId);
+                this.LoadUserProfile(this.userId);
             }
+
             else
             {
                 AppLogger.Warn($"Редагування профілю скасовано користувачем ID = {this.userId}");

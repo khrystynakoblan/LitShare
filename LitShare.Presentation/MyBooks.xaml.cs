@@ -45,6 +45,8 @@ namespace LitShare.Presentation
         {
             try
             {
+                this.context.ChangeTracker.Clear();
+
                 int currentUserId = this.userId;
 
                 this.allBooks = this.context.Posts
@@ -103,15 +105,15 @@ namespace LitShare.Presentation
         /// <param name="books">The list of books to display.</param>
         private void DisplayBooks(List<BookItem> books)
         {
+            this.BooksItemsControl.ItemsSource = null; 
             this.BooksItemsControl.ItemsSource = books;
         }
+
 
         private void HomeButton_Click(object sender, RoutedEventArgs e)
         {
             AppLogger.Info($"Перехід на головну сторінку з MyBook. Користувач ID = {this.userId}");
-            MainPage mainWindow = new MainPage(this.userId);
-            mainWindow.Show();
-            this.Close();
+            NavigationManager.GoToMainPage(this.userId);
         }
 
         private void EditBookButton_Click(object sender, RoutedEventArgs e)
@@ -121,11 +123,13 @@ namespace LitShare.Presentation
                 AppLogger.Info($"Редагування книги ID = {selectedBook.Id} користувачем ID = {this.userId}");
 
                 var editWindow = new EditAdWindow(selectedBook.Id, this.userId);
-                editWindow.Owner = this;
-                this.Hide();
-                editWindow.ShowDialog();
 
-                this.LoadBooks();
+                editWindow.Closed += (s, args) =>
+                {
+                    this.LoadBooks();
+                };
+
+                NavigationManager.NavigateTo(editWindow, this);
             }
             else
             {
@@ -133,10 +137,11 @@ namespace LitShare.Presentation
             }
         }
 
+
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
             AppLogger.Info("Закриття вікна MyBook кнопкою Назад");
-            this.Close();
+            NavigationManager.GoBack();
         }
 
         /// <summary>
