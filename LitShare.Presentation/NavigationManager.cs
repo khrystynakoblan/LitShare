@@ -1,10 +1,12 @@
-﻿// NavigationManager.cs - ВИПРАВЛЕНА ВЕРСІЯ
-namespace LitShare.Presentation
+﻿namespace LitShare.Presentation
 {
     using System;
     using System.Collections.Generic;
     using System.Windows;
 
+    /// <summary>
+    /// Manages navigation between WPF windows using an internal stack.
+    /// </summary>
     public static class NavigationManager
     {
         private static readonly Stack<Window> _windowStack = new Stack<Window>();
@@ -12,7 +14,7 @@ namespace LitShare.Presentation
         private static bool _isNavigating = false;
 
         /// <summary>
-        /// Відкриває нове вікно та ховає поточне
+        /// Navigates to a new window and hides the current one.
         /// </summary>
         public static void NavigateTo(Window newWindow, Window currentWindow)
         {
@@ -21,14 +23,12 @@ namespace LitShare.Presentation
 
             try
             {
-                // Додаємо поточне вікно в стек
                 if (currentWindow != null)
                 {
                     _windowStack.Push(currentWindow);
                     currentWindow.Hide();
                 }
 
-                // Налаштовуємо нове вікно
                 _currentWindow = newWindow;
                 newWindow.Closed += OnWindowClosed;
                 newWindow.Show();
@@ -39,8 +39,9 @@ namespace LitShare.Presentation
             }
         }
 
+
         /// <summary>
-        /// Відкриває діалогове вікно
+        /// Opens a modal dialog and restores the owner window afterward.
         /// </summary>
         public static bool? ShowDialog(Window dialog, Window owner)
         {
@@ -49,15 +50,13 @@ namespace LitShare.Presentation
 
             bool? result = dialog.ShowDialog();
 
-            // Після закриття діалогового вікна — повертаємо головне
             owner.Show();
 
             return result;
         }
 
-
         /// <summary>
-        /// Повертається до попереднього вікна
+        /// Returns to the previous window in the navigation stack.
         /// </summary>
         public static void GoBack()
         {
@@ -66,7 +65,6 @@ namespace LitShare.Presentation
 
             try
             {
-                // Закриваємо поточне вікно
                 if (_currentWindow != null)
                 {
                     _currentWindow.Closed -= OnWindowClosed;
@@ -74,7 +72,6 @@ namespace LitShare.Presentation
                     _currentWindow = null;
                 }
 
-                // Відкриваємо попереднє вікно зі стеку
                 if (_windowStack.Count > 0)
                 {
                     var previousWindow = _windowStack.Pop();
@@ -89,7 +86,7 @@ namespace LitShare.Presentation
         }
 
         /// <summary>
-        /// Повертається до головної сторінки
+        /// Clears the navigation stack and opens the main page.
         /// </summary>
         public static void GoToMainPage(int userId)
         {
@@ -98,10 +95,8 @@ namespace LitShare.Presentation
 
             try
             {
-                // Збираємо всі вікна, які потрібно закрити (крім нового головного)
                 var windowsToClose = new List<Window>();
 
-                // Додаємо поточне вікно
                 if (_currentWindow != null)
                 {
                     _currentWindow.Closed -= OnWindowClosed;
@@ -109,23 +104,19 @@ namespace LitShare.Presentation
                     _currentWindow = null;
                 }
 
-                // Додаємо всі вікна зі стеку
                 while (_windowStack.Count > 0)
                 {
                     var window = _windowStack.Pop();
                     windowsToClose.Add(window);
                 }
 
-                // Очищаємо стек
                 _windowStack.Clear();
 
-                // Спочатку створюємо нову головну сторінку
                 var mainPage = new MainPage(userId);
                 _currentWindow = mainPage;
                 mainPage.Closed += OnWindowClosed;
                 mainPage.Show();
 
-                // Потім закриваємо всі старі вікна
                 foreach (var window in windowsToClose)
                 {
                     if (window.IsVisible && window != mainPage)
@@ -141,7 +132,7 @@ namespace LitShare.Presentation
         }
 
         /// <summary>
-        /// Обробник закриття вікна
+        /// Handles window closing and triggers back navigation if needed.
         /// </summary>
         private static void OnWindowClosed(object sender, EventArgs e)
         {
@@ -151,7 +142,6 @@ namespace LitShare.Presentation
             {
                 closedWindow.Closed -= OnWindowClosed;
 
-                // Якщо це поточне вікно, викликаємо GoBack
                 if (closedWindow == _currentWindow)
                 {
                     GoBack();
