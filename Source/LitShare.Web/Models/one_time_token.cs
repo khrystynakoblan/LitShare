@@ -1,0 +1,21 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace LitShare.Web.Models;
+
+public partial class one_time_token
+{
+    public Guid id { get; set; }
+
+    public Guid user_id { get; set; }
+
+    public string token_hash { get; set; } = null!;
+
+    public string relates_to { get; set; } = null!;
+
+    public DateTime created_at { get; set; }
+
+    public DateTime updated_at { get; set; }
+
+    public virtual user1 user { get; set; } = null!;
+}
