@@ -19,10 +19,13 @@ namespace LitShare.DAL.Context
         /// <summary>
         /// Initializes a new instance of the <see cref="LitShareDbContext"/> class.
         /// </summary>
-        public LitShareDbContext() => ConfigureMapper();
+        public LitShareDbContext()
+        {
+            ConfigureMapper();
+        }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="LitShareDbContext"/> class.
+        /// Initializes a new instance of the <see cref="LitShareDbContext"/> class with specified options.
         /// </summary>
         /// <param name="options">The options for this context.</param>
         public LitShareDbContext(DbContextOptions<LitShareDbContext> options)
@@ -31,16 +34,35 @@ namespace LitShare.DAL.Context
             ConfigureMapper();
         }
 
+        /// <summary>
+        /// Gets or sets the Users table in the database.
+        /// </summary>
         public DbSet<Users> Users { get; set; }
 
+        /// <summary>
+        /// Gets or sets the Posts table in the database.
+        /// </summary>
         public DbSet<Posts> Posts { get; set; }
 
+        /// <summary>
+        /// Gets or sets the Genres table in the database.
+        /// </summary>
         public DbSet<Genres> Genres { get; set; }
 
+        /// <summary>
+        /// Gets or sets the Complaints table in the database.
+        /// </summary>
         public DbSet<Complaints> Complaints { get; set; }
 
+        /// <summary>
+        /// Gets or sets the relationship table between books and genres.
+        /// </summary>
         public DbSet<BookGenres> BookGenres { get; set; }
 
+        /// <summary>
+        /// Configures the entity models and enum mappings.
+        /// </summary>
+        /// <param name="modelBuilder">The model builder used to configure the database schema.</param>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasPostgresEnum<DealType>("deal_type_t");
@@ -59,11 +81,14 @@ namespace LitShare.DAL.Context
         }
 
         /// <summary>
-        /// Глобальні налаштування драйвера Npgsql.
+        /// Configures global settings for the Npgsql driver.
         /// </summary>
         private static void ConfigureMapper()
         {
-            if (mapperConfigured) return;
+            if (mapperConfigured)
+            {
+                return;
+            }
 
             AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
