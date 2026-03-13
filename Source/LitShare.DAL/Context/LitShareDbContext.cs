@@ -68,14 +68,46 @@ namespace LitShare.DAL.Context
             modelBuilder.HasPostgresEnum<DealType>("deal_type_t");
             modelBuilder.HasPostgresEnum<RoleType>("role_t");
 
-            modelBuilder.Entity<Users>(entity =>
+            modelBuilder.Entity<Posts>()
+                .HasOne(p => p.User)
+                .WithMany(u => u.Posts)
+                .HasForeignKey(p => p.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Complaints>()
+                .HasOne(c => c.Post)
+                .WithMany(p => p.Complaints)
+                .HasForeignKey(c => c.PostId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Complaints>()
+                .HasOne(c => c.Complainant)
+                .WithMany(u => u.Complaints)
+                .HasForeignKey(c => c.ComplainantId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<BookGenres>(entity =>
             {
-                entity.Property(u => u.Role)
-                      .HasColumnType("role_t");
+                entity.HasKey(bg => new { bg.PostId, bg.GenreId });
+
+                entity.HasOne(bg => bg.Post)
+                      .WithMany(p => p.BookGenres)
+                      .HasForeignKey(bg => bg.PostId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(bg => bg.Genre)
+                      .WithMany(g => g.BookGenres)
+                      .HasForeignKey(bg => bg.GenreId)
+                      .OnDelete(DeleteBehavior.Cascade);
             });
 
-            modelBuilder.Entity<BookGenres>()
-                .HasKey(bg => new { bg.PostId, bg.GenreId });
+            modelBuilder.Entity<Users>()
+                .Property(u => u.Role)
+                .HasColumnType("role_t");
+
+            modelBuilder.Entity<Posts>()
+                .Property(p => p.DealType)
+                .HasColumnType("deal_type_t");
 
             base.OnModelCreating(modelBuilder);
         }

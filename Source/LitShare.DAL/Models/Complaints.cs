@@ -17,7 +17,7 @@ namespace LitShare.DAL.Models
         /// Gets or sets the unique identifier (primary key) of the complaint.
         /// </summary>
         [Key]
-        [Column("id")] // PostgreSQL Fix: Явне мапування на нижній регістр
+        [Column("id")]
         public int Id { get; set; }
 
         /// <summary>

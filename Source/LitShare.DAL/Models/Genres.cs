@@ -25,5 +25,10 @@ namespace LitShare.DAL.Models
         /// </summary>
         [Column("name")]
         public string? Name { get; set; }
+
+        /// <summary>
+        /// Gets or sets the collection of book-genre mappings associated with this genre.
+        /// </summary>
+        public virtual ICollection<BookGenres>? BookGenres { get; set; }
     }
 }

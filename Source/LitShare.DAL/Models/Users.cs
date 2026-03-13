@@ -6,25 +6,6 @@ namespace LitShare.DAL.Models
 {
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
-    using NpgsqlTypes;
-
-    /// <summary>
-    /// Defines the possible roles a user can have within the application.
-    /// </summary>
-    public enum RoleType
-    {
-        /// <summary>
-        /// Standard application user role. Maps to 'user' in the database.
-        /// </summary>
-        [PgName("user")]
-        User,
-
-        /// <summary>
-        /// Administrative user role with elevated privileges. Maps to 'admin' in the database.
-        /// </summary>
-        [PgName("admin")]
-        Admin,
-    }
 
     /// <summary>
     /// Represents a registered user account in the application.
@@ -103,5 +84,10 @@ namespace LitShare.DAL.Models
         /// Gets or sets the collection of posts created by this user.
         /// </summary>
         public ICollection<Posts>? Posts { get; set; }
+
+        /// <summary>
+        /// Gets or sets the collection of complaints created by this user.
+        /// </summary>
+        public ICollection<Complaints>? Complaints { get; set; }
     }
 }

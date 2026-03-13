@@ -42,7 +42,7 @@ namespace LitShare.DAL.Models
         /// Gets or sets the deal type for this listing (e.g., sale, exchange, free).
         /// </summary>
         [Column("deal_type")]
-        public DealType DealType { get; set; } // SA1300 Fix
+        public DealType DealType { get; set; }
 
         /// <summary>
         /// Gets or sets the detailed description of the post or item.
@@ -66,5 +66,10 @@ namespace LitShare.DAL.Models
         /// Gets or sets the collection of genre mappings associated with this post.
         /// </summary>
         public virtual ICollection<BookGenres> BookGenres { get; set; } = new List<BookGenres>();
+
+        /// <summary>
+        /// Gets or sets the collection of complaints associated with this post.
+        /// </summary>
+        public virtual ICollection<Complaints>? Complaints { get; set; }
     }
 }
