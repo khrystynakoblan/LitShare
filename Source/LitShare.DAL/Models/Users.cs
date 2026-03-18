@@ -47,8 +47,8 @@ namespace LitShare.DAL.Models
         /// Gets or sets the hashed password of the user.
         /// </summary>
         [Required]
-        [Column("hashedPassword")]
-        public string? HashedPassword { get; set; }
+        [Column("password_hash")]
+        public string? PasswordHash { get; set; }
 
         /// <summary>
         /// Gets or sets optional biographical information about the user.
