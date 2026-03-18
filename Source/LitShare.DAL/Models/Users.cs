@@ -23,26 +23,32 @@ namespace LitShare.DAL.Models
         /// <summary>
         /// Gets or sets the full name of the user.
         /// </summary>
+        [Required]
+        [MaxLength(50)]
         [Column("name")]
         public string? Name { get; set; }
 
         /// <summary>
         /// Gets or sets the email address of the user (used for login/contact).
         /// </summary>
+        [Required]
+        [MaxLength(255)]
         [Column("email")]
         public string? Email { get; set; }
 
         /// <summary>
         /// Gets or sets the phone number for user contact.
         /// </summary>
+        [MaxLength(20)]
         [Column("phone")]
         public string? Phone { get; set; }
 
         /// <summary>
         /// Gets or sets the hashed password of the user.
         /// </summary>
-        [Column("password")]
-        public string? Password { get; set; }
+        [Required]
+        [Column("hashedPassword")]
+        public string? HashedPassword { get; set; }
 
         /// <summary>
         /// Gets or sets optional biographical information about the user.
@@ -53,18 +59,21 @@ namespace LitShare.DAL.Models
         /// <summary>
         /// Gets or sets the user's administrative region or oblast.
         /// </summary>
+        [MaxLength(100)]
         [Column("region")]
         public string? Region { get; set; }
 
         /// <summary>
         /// Gets or sets the user's district (raion).
         /// </summary>
+        [MaxLength(100)]
         [Column("district")]
         public string? District { get; set; }
 
         /// <summary>
         /// Gets or sets the user's current city or town.
         /// </summary>
+        [MaxLength(100)]
         [Column("city")]
         public string? City { get; set; }
 

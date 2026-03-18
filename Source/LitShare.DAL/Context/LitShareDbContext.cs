@@ -68,6 +68,10 @@ namespace LitShare.DAL.Context
             modelBuilder.HasPostgresEnum<DealType>("deal_type_t");
             modelBuilder.HasPostgresEnum<RoleType>("role_t");
 
+            modelBuilder.Entity<Users>().HasIndex(u => u.Email).IsUnique();
+            modelBuilder.Entity<Users>().Property(u => u.Role).HasDefaultValue(RoleType.User);
+            modelBuilder.Entity<Complaints>().Property(c => c.Date).HasDefaultValueSql("CURRENT_TIMESTAMP");
+
             modelBuilder.Entity<Posts>()
                 .HasOne(p => p.User)
                 .WithMany(u => u.Posts)

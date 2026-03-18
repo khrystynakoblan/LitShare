@@ -23,6 +23,8 @@ namespace LitShare.DAL.Models
         /// <summary>
         /// Gets or sets the name of the genre.
         /// </summary>
+        [Required]
+        [MaxLength(50)]
         [Column("name")]
         public string? Name { get; set; }
 

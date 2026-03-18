@@ -29,12 +29,16 @@ namespace LitShare.DAL.Models
         /// <summary>
         /// Gets or sets the title of the post or book.
         /// </summary>
+        [Required]
+        [MaxLength(50)]
         [Column("title")]
         public string? Title { get; set; }
 
         /// <summary>
         /// Gets or sets the author of the book.
         /// </summary>
+        [Required]
+        [MaxLength(50)]
         [Column("author")]
         public string? Author { get; set; }
 
