@@ -103,10 +103,6 @@
             Assert.True(result);
         }
 
-        // ---------------------------------------------------------------
-        // НЕГАТИВНІ СЦЕНАРІЇ
-        // ---------------------------------------------------------------
-
         [Fact]
         public async Task RegisterAsync_WhenEmailAlreadyTaken_ReturnsFalse()
         {
