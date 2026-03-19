@@ -26,5 +26,11 @@
             await this.context.Users.AddAsync(user);
             await this.context.SaveChangesAsync();
         }
+
+        public async Task<Users?> GetByEmailAsync(string email)
+        {
+            return await this.context.Users
+                .FirstOrDefaultAsync(u => u.Email == email);
+        }
     }
 }
