@@ -1,4 +1,5 @@
-﻿using LitShare.BLL.DTOs;
+﻿using System.Threading.Tasks;
+using LitShare.BLL.DTOs;
 
 namespace LitShare.BLL.Services.Interfaces
 {
