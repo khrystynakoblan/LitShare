@@ -15,11 +15,13 @@ namespace LitShare.Web.Models
         public string Author { get; set; } = string.Empty;
 
         [Display(Name = "Жанр")]
+        [Range(1, int.MaxValue, ErrorMessage = "Оберіть жанр")]
         public int GenreId { get; set; }
 
         public List<SelectListItem>? Genres { get; set; }
 
         [Display(Name = "Тип угоди")]
+        [Range(1, int.MaxValue, ErrorMessage = "Оберіть тип угоди")]
         public int DealTypeId { get; set; }
 
         public List<SelectListItem>? DealTypes { get; set; }
