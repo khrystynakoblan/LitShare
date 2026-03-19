@@ -1,6 +1,7 @@
 ﻿using LitShare.DAL.Context;
 using LitShare.DAL.Models;
 using LitShare.DAL.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace LitShare.DAL.Repositories
 {
@@ -16,8 +17,28 @@ namespace LitShare.DAL.Repositories
         public async Task AddAsync(Posts post)
         {
             await this.context.Posts.AddAsync(post);
+        }
 
+        public async Task SaveChangesAsync()
+        {
             await this.context.SaveChangesAsync();
+        }
+
+        public async Task<Posts?> GetByIdAsync(int id)
+        {
+<<<<<<< HEAD
+            return await this.context.Posts
+                .Include(p => p.BookGenres)
+                .FirstOrDefaultAsync(p => p.Id == id);
+=======
+            return await this.context.Posts.Include(p => p.BookGenres).FirstOrDefaultAsync(p => p.Id == id);
+>>>>>>> 0e154bf (Add edit post feature with unit tests)
+        }
+
+        public Task UpdateAsync(Posts post)
+        {
+            this.context.Posts.Update(post);
+            return Task.CompletedTask;
         }
     }
 }

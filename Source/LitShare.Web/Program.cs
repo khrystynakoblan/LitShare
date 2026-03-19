@@ -56,6 +56,14 @@ try
 
     builder.Services.AddScoped<IGenreService, GenreService>();
 
+    builder.Services.AddScoped<IPostRepository, PostRepository>();
+
+    builder.Services.AddScoped<ICreatePostService, CreatePostService>();
+
+    builder.Services.AddScoped<IGenreRepository, GenreRepository>();
+
+    builder.Services.AddScoped<IEditPostService, EditPostService>();
+
     builder.Services.AddControllersWithViews();
 
     var app = builder.Build();
