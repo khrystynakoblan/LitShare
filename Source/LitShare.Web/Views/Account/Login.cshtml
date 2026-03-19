@@ -1,0 +1,18 @@
+﻿@{
+    ViewData["Title"] = "Вхід";
+}
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6 col-lg-5">
+        <h2 class="mb-4 text-center">Вхід</h2>
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success" role="alert">
+                @TempData["SuccessMessage"]
+            </div>
+        }
+
+        <p class="text-muted text-center">Логін буде реалізовано.</p>
+    </div>
+</div>

@@ -1,9 +1,10 @@
-// <copyright file="Program.cs" company="PlaceholderCompany">
-// Copyright (c) PlaceholderCompany. All rights reserved.
-// </copyright>
-
+using LitShare.BLL.Services;
+using LitShare.BLL.Services.Interfaces;
 using LitShare.DAL.Context;
 using LitShare.DAL.Models;
+using LitShare.DAL.Repositories;
+using LitShare.DAL.Repositories.Interfaces;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using Serilog;
@@ -33,6 +34,12 @@ try
 
     builder.Services.AddDbContext<LitShareDbContext>(options =>
         options.UseNpgsql(dataSource));
+
+    builder.Services.AddScoped<IPasswordHasher<Users>, PasswordHasher<Users>>();
+
+    builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+    builder.Services.AddScoped<IRegisterService, RegisterService>();
 
     builder.Services.AddControllersWithViews();
 
