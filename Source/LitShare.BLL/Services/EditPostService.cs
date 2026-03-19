@@ -20,6 +20,29 @@
             this.logger = logger;
         }
 
+        public async Task<PostViewDto?> GetPostByIdAsync(int id)
+        {
+            this.logger.LogInformation("Fetching post with ID: {Id}", id);
+
+            var post = await this.postRepository.GetByIdAsync(id);
+
+            if (post == null)
+            {
+                return null;
+            }
+
+            return new PostViewDto
+            {
+                Id = post.Id,
+                Title = post.Title ?? string.Empty,
+                Author = post.Author ?? string.Empty,
+                Description = post.Description,
+                DealType = post.DealType,
+                PhotoUrl = post.PhotoUrl,
+                GenreId = post.BookGenres.FirstOrDefault()?.GenreId ?? 0,
+            };
+        }
+
         public async Task EditPostAsync(EditPostDto dto)
         {
             this.logger.LogInformation("Starting post edit for post ID: {PostId}", dto.PostId);

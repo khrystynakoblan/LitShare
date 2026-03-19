@@ -6,11 +6,9 @@
 
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>LitShare</h2>
-        <a href="#" class="text-decoration-none text-dark">Мій профіль</a>
+        <h2 class="fw-normal">Редагувати оголошення</h2>
+        <a asp-controller="Profile" asp-action="Index" class="text-decoration-none text-dark">Мій профіль</a>
     </div>
-
-    <h3 class="text-center mb-4">Редагувати оголошення</h3>
 
     <form asp-action="Edit" method="post" enctype="multipart/form-data">
         <input type="hidden" asp-for="Id" />

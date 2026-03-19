@@ -1,11 +1,13 @@
 ﻿namespace LitShare.Tests.Services
 {
     using System;
+    using System.Collections.Generic;
     using System.Threading.Tasks;
     using LitShare.BLL.DTOs;
     using LitShare.BLL.Services;
     using LitShare.DAL.Models;
     using LitShare.DAL.Repositories.Interfaces;
+    using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Logging;
     using Moq;
     using Xunit;
@@ -13,16 +15,21 @@
     public class CreatePostServiceTests
     {
         private readonly Mock<IPostRepository> postRepositoryMock;
+        private readonly Mock<IWebHostEnvironment> environmentMock;
         private readonly Mock<ILogger<CreatePostService>> loggerMock;
         private readonly CreatePostService sut;
 
         public CreatePostServiceTests()
         {
             this.postRepositoryMock = new Mock<IPostRepository>();
+            this.environmentMock = new Mock<IWebHostEnvironment>();
             this.loggerMock = new Mock<ILogger<CreatePostService>>();
+
+            this.environmentMock.Setup(e => e.WebRootPath).Returns("C:/fake_wwwroot");
 
             this.sut = new CreatePostService(
                 this.postRepositoryMock.Object,
+                this.environmentMock.Object,
                 this.loggerMock.Object);
         }
 
@@ -90,14 +97,18 @@
         }
 
         [Fact]
-        public async Task CreatePostAsync_NullPhotoUrl_SavesSuccessfully()
+        public async Task CreatePostAsync_NoImageFile_SetsPhotoUrlToNull()
         {
             var dto = ValidDto();
-            dto.PhotoUrl = null;
+            dto.ImageFile = null;
+            Posts? capturedPost = null;
+            this.postRepositoryMock.Setup(r => r.AddAsync(It.IsAny<Posts>()))
+                .Callback<Posts>(p => capturedPost = p)
+                .Returns(Task.CompletedTask);
 
-            var result = await this.sut.CreatePostAsync(dto, 1);
+            await this.sut.CreatePostAsync(dto, 1);
 
-            this.postRepositoryMock.Verify(r => r.AddAsync(It.Is<Posts>(p => p.PhotoUrl == null)), Times.Once);
+            Assert.Null(capturedPost!.PhotoUrl);
         }
 
         [Fact]
@@ -154,7 +165,7 @@
             Description = "Test Description",
             GenreId = 1,
             DealTypeId = (int)DealType.Exchange,
-            PhotoUrl = "test.jpg"
+            ImageFile = null,
         };
 
         private void VerifyLog(LogLevel level, string messagePart)
