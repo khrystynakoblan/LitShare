@@ -1,0 +1,94 @@
+﻿namespace LitShare.BLL.Services
+{
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Threading.Tasks;
+    using LitShare.BLL.DTOs;
+    using LitShare.BLL.Services.Interfaces;
+    using LitShare.DAL.Models;
+    using LitShare.DAL.Repositories.Interfaces;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.Extensions.Logging;
+
+    public class CreatePostService : ICreatePostService
+    {
+        private readonly IPostRepository postRepository;
+        private readonly IWebHostEnvironment environment;
+        private readonly ILogger<CreatePostService> logger;
+
+        public CreatePostService(
+            IPostRepository postRepository,
+            IWebHostEnvironment environment,
+            ILogger<CreatePostService> logger)
+        {
+            this.postRepository = postRepository;
+            this.environment = environment;
+            this.logger = logger;
+        }
+
+        public async Task<int> CreatePostAsync(CreatePostDto dto, int userId)
+        {
+            this.logger.LogInformation("Starting post creation for user ID: {UserId}. Title: {Title}", userId, dto.Title);
+
+            try
+            {
+                string? photoUrl = await this.SaveImageAsync(dto);
+
+                var newPost = new Posts
+                {
+                    UserId = userId,
+                    Title = dto.Title,
+                    Author = dto.Author,
+                    DealType = (DealType)dto.DealTypeId,
+                    Description = dto.Description,
+                    PhotoUrl = photoUrl,
+                    BookGenres = new List<BookGenres>
+                    {
+                        new BookGenres { GenreId = dto.GenreId },
+                    },
+                };
+
+                await this.postRepository.AddAsync(newPost);
+                await this.postRepository.SaveChangesAsync();
+
+                this.logger.LogInformation("Successfully created post with ID: {PostId} for user ID: {UserId}", newPost.Id, userId);
+                return newPost.Id;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "Failed to create post for user ID: {UserId}. Error: {Message}", userId, ex.Message);
+                throw;
+            }
+        }
+
+        private async Task<string?> SaveImageAsync(CreatePostDto dto)
+        {
+            if (dto.ImageFile == null || dto.ImageFile.Length == 0)
+            {
+                return null;
+            }
+
+            this.logger.LogInformation("Processing image upload: {FileName}", dto.ImageFile.FileName);
+
+            string uploadsFolder = Path.Combine(this.environment.WebRootPath, "images", "posts");
+
+            if (!Directory.Exists(uploadsFolder))
+            {
+                Directory.CreateDirectory(uploadsFolder);
+                this.logger.LogInformation("Created directory for post images: {Path}", uploadsFolder);
+            }
+
+            string savedFileName = Guid.NewGuid().ToString() + Path.GetExtension(dto.ImageFile.FileName);
+            string filePath = Path.Combine(uploadsFolder, savedFileName);
+
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                await dto.ImageFile.CopyToAsync(fileStream);
+            }
+
+            this.logger.LogInformation("Image saved as: {SavedName}", savedFileName);
+            return "/images/posts/" + savedFileName;
+        }
+    }
+}

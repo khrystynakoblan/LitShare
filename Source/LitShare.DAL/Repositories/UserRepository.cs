@@ -33,5 +33,10 @@
                 .AsNoTracking()
                 .FirstOrDefaultAsync(u => u.Id == id);
         }
+        public async Task<Users?> GetByEmailAsync(string email)
+        {
+            return await this.context.Users
+                .FirstOrDefaultAsync(u => u.Email == email);
+        }
     }
 }

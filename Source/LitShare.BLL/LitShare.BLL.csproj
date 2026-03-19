@@ -7,6 +7,10 @@
 	<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\LitShare.DAL\LitShare.DAL.csproj" />
   </ItemGroup>

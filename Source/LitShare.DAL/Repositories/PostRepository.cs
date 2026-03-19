@@ -1,0 +1,40 @@
+﻿using LitShare.DAL.Context;
+using LitShare.DAL.Models;
+using LitShare.DAL.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
+
+namespace LitShare.DAL.Repositories
+{
+    public class PostRepository : IPostRepository
+    {
+        private readonly LitShareDbContext context;
+
+        public PostRepository(LitShareDbContext context)
+        {
+            this.context = context;
+        }
+
+        public async Task AddAsync(Posts post)
+        {
+            await this.context.Posts.AddAsync(post);
+        }
+
+        public async Task SaveChangesAsync()
+        {
+            await this.context.SaveChangesAsync();
+        }
+
+        public async Task<Posts?> GetByIdAsync(int id)
+        {
+            return await this.context.Posts
+                .Include(p => p.BookGenres)
+                .FirstOrDefaultAsync(p => p.Id == id);
+        }
+
+        public Task UpdateAsync(Posts post)
+        {
+            this.context.Posts.Update(post);
+            return Task.CompletedTask;
+        }
+    }
+}

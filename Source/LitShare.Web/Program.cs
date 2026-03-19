@@ -29,17 +29,40 @@ try
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
     var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
     dataSourceBuilder.MapEnum<DealType>("deal_type_t");
-    dataSourceBuilder.MapEnum<RoleType>("role_t");
+    _ = dataSourceBuilder.MapEnum<RoleType>("role_t");
     var dataSource = dataSourceBuilder.Build();
 
     builder.Services.AddDbContext<LitShareDbContext>(options =>
         options.UseNpgsql(dataSource));
 
     builder.Services.AddScoped<IPasswordHasher<Users>, PasswordHasher<Users>>();
-
     builder.Services.AddScoped<IUserRepository, UserRepository>();
-
     builder.Services.AddScoped<IRegisterService, RegisterService>();
+    builder.Services.AddScoped<ILoginService, LoginService>();
+
+    builder.Services.AddDistributedMemoryCache();
+    builder.Services.AddSession(options =>
+    {
+        options.IdleTimeout = TimeSpan.FromMinutes(30);
+        options.Cookie.HttpOnly = true;
+        options.Cookie.IsEssential = true;
+    });
+
+    builder.Services.AddScoped<IPostRepository, PostRepository>();
+
+    builder.Services.AddScoped<ICreatePostService, CreatePostService>();
+
+    builder.Services.AddScoped<IGenreRepository, GenreRepository>();
+
+    builder.Services.AddScoped<IGenreService, GenreService>();
+
+    builder.Services.AddScoped<IPostRepository, PostRepository>();
+
+    builder.Services.AddScoped<ICreatePostService, CreatePostService>();
+
+    builder.Services.AddScoped<IGenreRepository, GenreRepository>();
+
+    builder.Services.AddScoped<IEditPostService, EditPostService>();
 
     builder.Services.AddScoped<ProfileService>();
 
@@ -64,11 +87,12 @@ try
     app.UseHttpsRedirection();
     app.UseStaticFiles();
     app.UseRouting();
+    app.UseSession();
     app.UseAuthorization();
 
     app.MapControllerRoute(
         name: "default",
-        pattern: "{controller=Home}/{action=Index}/{id?}");
+        pattern: "{controller=Account}/{action=Register}/{id?}");
 
     app.Run();
 }

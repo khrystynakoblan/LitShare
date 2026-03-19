@@ -1,0 +1,112 @@
+﻿@model LitShare.Web.Models.CreatePostModel
+
+@{
+    ViewData["Title"] = "Нове оголошення";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-normal">Нове оголошення</h2>
+        <a asp-controller="Profile" asp-action="Index" class="text-decoration-none text-dark">Мій профіль</a>
+    </div>
+
+    <form asp-action="CreatePost" method="post" enctype="multipart/form-data">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+        <div class="row">
+            <div class="col-md-4 text-center">
+                <div id="imagePreviewContainer" class="border rounded bg-light d-flex align-items-center justify-content-center mb-3" 
+                     style="height: 350px; border-style: dashed !important; overflow: hidden;">
+
+                    <div id="placeholderContent" class="text-muted">
+                        <i class="bi bi-image" style="font-size: 4rem;"></i>
+                        <p>Виберіть фото</p>
+                    </div>
+
+                    <img id="imagePreview" src="#" alt="Прев'ю" style="display: none; width: 100%; height: 100%; object-fit: cover;" />
+                </div>
+
+                <input type="file" asp-for="ImageFile" id="imageInput" class="d-none" accept="image/*" />
+                <button type="button" class="btn btn-dark w-100 py-2" onclick="document.getElementById('imageInput').click();">
+                    Додати фото
+                </button>
+                <span asp-validation-for="ImageFile" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-8">
+                <div class="mb-3 row">
+                    <label asp-for="Title" class="col-sm-2 col-form-label text-start">Назва книги:</label>
+                    <div class="col-sm-10">
+                        <input asp-for="Title" class="form-control" placeholder="Введіть назву" />
+                        <span asp-validation-for="Title" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3 row">
+                    <label asp-for="Author" class="col-sm-2 col-form-label text-start">Автор книги:</label>
+                    <div class="col-sm-10">
+                        <input asp-for="Author" class="form-control" placeholder="Введіть автора" />
+                        <span asp-validation-for="Author" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3 row">
+                    <label asp-for="GenreId" class="col-sm-2 col-form-label text-start">Жанр:</label>
+                    <div class="col-sm-10">
+                        <select asp-for="GenreId" asp-items="Model.Genres" class="form-select" >
+                            <option value="">Оберіть жанр</option>
+                        </select>
+                        <span asp-validation-for="GenreId" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3 row">
+                    <label asp-for="DealTypeId" class="col-sm-2 col-form-label text-start">Тип угоди:</label>
+                    <div class="col-sm-10">
+                        <select asp-for="DealTypeId" asp-items="Model.DealTypes" class="form-select">
+                            <option value="">Оберіть тип угоди</option>
+                        </select>
+                        <span asp-validation-for="DealTypeId" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12 text-center">
+                <h4 class="fw-normal mb-3">Опис</h4>
+                <textarea asp-for="Description" class="form-control mb-4" rows="8" placeholder="Додайте опис книги..."></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="row gx-2 mb-5">
+            <div class="col-6">
+                <button type="submit" class="btn btn-dark w-100 py-2 fw-bold">Зберегти</button>
+            </div>
+            <div class="col-6">
+                <a asp-action="Index" asp-controller="Home" class="btn btn-outline-dark w-100 py-2">Відхилити</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+        <script>
+            document.getElementById('imageInput').onchange = function (evt) {
+                const [file] = this.files;
+                if (file) {
+                    const preview = document.getElementById('imagePreview');
+                    const placeholder = document.getElementById('placeholderContent');
+
+                    preview.src = URL.createObjectURL(file);
+                    preview.style.display = 'block';
+                    placeholder.style.display = 'none';
+                }
+            };
+        </script>
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
