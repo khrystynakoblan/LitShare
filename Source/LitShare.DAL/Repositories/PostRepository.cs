@@ -26,13 +26,9 @@ namespace LitShare.DAL.Repositories
 
         public async Task<Posts?> GetByIdAsync(int id)
         {
-<<<<<<< HEAD
             return await this.context.Posts
                 .Include(p => p.BookGenres)
                 .FirstOrDefaultAsync(p => p.Id == id);
-=======
-            return await this.context.Posts.Include(p => p.BookGenres).FirstOrDefaultAsync(p => p.Id == id);
->>>>>>> 0e154bf (Add edit post feature with unit tests)
         }
 
         public Task UpdateAsync(Posts post)
