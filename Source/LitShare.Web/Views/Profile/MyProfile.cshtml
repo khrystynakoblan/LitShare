@@ -1,0 +1,67 @@
+@model LitShare.Web.Models.ProfileViewModel
+
+@{
+    ViewData["Title"] = "Мій профіль";
+}
+
+<div class="container-fluid mt-4">
+
+    <div class="border rounded p-4 mx-auto" style="max-width: 1200px;">
+
+        <div class="row g-4">
+
+            <!-- LEFT -->
+            <div class="col-md-4">
+
+                <div class="border rounded p-4 text-center">
+
+                    <img src="@(string.IsNullOrEmpty(Model.PhotoUrl) 
+                            ? "https://cdn-icons-png.flaticon.com/512/149/149071.png" 
+                            : Model.PhotoUrl)"
+                         alt="Фото профілю"
+                         class="rounded-circle mb-3"
+                         style="width:140px; height:140px; object-fit:cover;" />
+
+                    <h5 class="fw-bold">@Model.Name</h5>
+                </div>
+
+                <div class="mt-4 d-grid gap-2">
+                    <a asp-controller="Profile" asp-action="AddBook" class="btn btn-dark">Додати книгу</a>
+                    <a asp-controller="Profile" asp-action="MyBooks" class="btn btn-dark">Мої книги</a>
+                    <a asp-controller="Profile" asp-action="EditProfile" class="btn btn-dark">Редагувати профіль</a>
+                    <a asp-controller="Profile" asp-action="DeleteAccount" class="btn btn-outline-danger">Видалити акаунт</a>
+                </div>
+
+            </div>
+
+            <!-- RIGHT -->
+            <div class="col-md-8">
+
+                <div class="border rounded p-4 mb-4">
+                    <h5 class="text-center fw-bold mb-4">Основна інформація</h5>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Ім'я:</strong> @Model.Name</p>
+                            <p><strong>Контактні дані:</strong> @Model.Email</p>
+                            <p><strong>Email:</strong> @Model.Email</p>
+                        </div>
+
+                        <div class="col-md-6">
+                            <p><strong>Область:</strong> @Model.Region</p>
+                            <p><strong>Район:</strong> @Model.District</p>
+                            <p><strong>Місто:</strong> @Model.City</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="border rounded p-4">
+                    <h5 class="text-center fw-bold mb-3">Про себе</h5>
+                    <p>@Model.About</p>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>

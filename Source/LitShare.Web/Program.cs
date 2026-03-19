@@ -64,7 +64,11 @@ try
 
     builder.Services.AddScoped<IEditPostService, EditPostService>();
 
+    builder.Services.AddScoped<ProfileService>();
+
     builder.Services.AddControllersWithViews();
+
+    builder.Services.AddScoped<IProfileService, ProfileService>();
 
     var app = builder.Build();
 
