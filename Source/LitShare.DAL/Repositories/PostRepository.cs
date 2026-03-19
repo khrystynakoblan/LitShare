@@ -16,10 +16,7 @@ namespace LitShare.DAL.Repositories
         public async Task AddAsync(Posts post)
         {
             await this.context.Posts.AddAsync(post);
-        }
 
-        public async Task SaveChangesAsync()
-        {
             await this.context.SaveChangesAsync();
         }
     }

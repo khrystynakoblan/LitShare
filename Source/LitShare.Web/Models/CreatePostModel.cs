@@ -14,12 +14,14 @@ namespace LitShare.Web.Models
         public string Author { get; set; } = string.Empty;
 
         [Display(Name = "Жанр")]
-        public int GenreId { get; set; }
+        [Required(ErrorMessage = "Оберіть жанр")]
+        public int? GenreId { get; set; }
 
         public List<SelectListItem>? Genres { get; set; }
 
         [Display(Name = "Тип угоди")]
-        public int DealTypeId { get; set; }
+        [Required(ErrorMessage = "Оберіть тип угоди")]
+        public int? DealTypeId { get; set; }
 
         public List<SelectListItem>? DealTypes { get; set; }
 
