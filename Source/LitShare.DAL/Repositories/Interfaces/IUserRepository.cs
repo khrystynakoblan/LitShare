@@ -7,5 +7,7 @@
         Task<bool> ExistsByEmailAsync(string email);
 
         Task AddAsync(Users user);
+
+        Task<Users?> GetByIdAsync(int id);
     }
 }

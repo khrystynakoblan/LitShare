@@ -41,7 +41,11 @@ try
 
     builder.Services.AddScoped<IRegisterService, RegisterService>();
 
+    builder.Services.AddScoped<ProfileService>();
+
     builder.Services.AddControllersWithViews();
+
+    builder.Services.AddScoped<IProfileService, ProfileService>();
 
     var app = builder.Build();
 

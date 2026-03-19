@@ -26,5 +26,12 @@
             await this.context.Users.AddAsync(user);
             await this.context.SaveChangesAsync();
         }
+
+        public async Task<Users?> GetByIdAsync(int id)
+        {
+            return await this.context.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Id == id);
+        }
     }
 }
