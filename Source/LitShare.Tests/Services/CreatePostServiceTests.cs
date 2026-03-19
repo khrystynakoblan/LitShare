@@ -1,16 +1,11 @@
 ﻿namespace LitShare.Tests.Services
 {
     using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Text;
     using System.Threading.Tasks;
     using LitShare.BLL.DTOs;
     using LitShare.BLL.Services;
     using LitShare.DAL.Models;
     using LitShare.DAL.Repositories.Interfaces;
-    using Microsoft.AspNetCore.Hosting;
-    using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Logging;
     using Moq;
     using Xunit;
@@ -18,21 +13,16 @@
     public class CreatePostServiceTests
     {
         private readonly Mock<IPostRepository> postRepositoryMock;
-        private readonly Mock<IWebHostEnvironment> environmentMock;
         private readonly Mock<ILogger<CreatePostService>> loggerMock;
         private readonly CreatePostService sut;
 
         public CreatePostServiceTests()
         {
             this.postRepositoryMock = new Mock<IPostRepository>();
-            this.environmentMock = new Mock<IWebHostEnvironment>();
             this.loggerMock = new Mock<ILogger<CreatePostService>>();
-
-            this.environmentMock.Setup(m => m.WebRootPath).Returns("C:/fake_wwwroot");
 
             this.sut = new CreatePostService(
                 this.postRepositoryMock.Object,
-                this.environmentMock.Object,
                 this.loggerMock.Object);
         }
 
@@ -45,7 +35,7 @@
                 .Callback<Posts>(p => p.Id = expectedId)
                 .Returns(Task.CompletedTask);
 
-            var result = await this.sut.CreatePostAsync(dto, null, 1);
+            var result = await this.sut.CreatePostAsync(dto, 1);
 
             Assert.Equal(expectedId, result);
         }
@@ -59,112 +49,112 @@
                 .Callback<Posts>(p => capturedPost = p)
                 .Returns(Task.CompletedTask);
 
-            await this.sut.CreatePostAsync(dto, null, 99);
+            await this.sut.CreatePostAsync(dto, 99);
 
             Assert.NotNull(capturedPost);
             Assert.Equal(dto.Title, capturedPost!.Title);
             Assert.Equal(dto.Author, capturedPost.Author);
+            Assert.Equal(dto.Description, capturedPost.Description);
             Assert.Equal(99, capturedPost.UserId);
         }
 
         [Fact]
-        public async Task CreatePostAsync_WithImage_GeneratesAndSetsPhotoUrl()
+        public async Task CreatePostAsync_ValidData_MapsDealTypeEnumCorrectly()
         {
             var dto = ValidDto();
-            var fileMock = new Mock<IFormFile>();
-            var ms = new MemoryStream(Encoding.UTF8.GetBytes("fake content"));
-
-            fileMock.Setup(_ => _.OpenReadStream()).Returns(ms);
-            fileMock.Setup(_ => _.FileName).Returns("test_image.png");
-            fileMock.Setup(_ => _.Length).Returns(ms.Length);
-
+            dto.DealTypeId = (int)DealType.Donation;
             Posts? capturedPost = null;
             this.postRepositoryMock.Setup(r => r.AddAsync(It.IsAny<Posts>()))
                 .Callback<Posts>(p => capturedPost = p)
                 .Returns(Task.CompletedTask);
 
-            await this.sut.CreatePostAsync(dto, fileMock.Object, 1);
+            await this.sut.CreatePostAsync(dto, 1);
 
-            Assert.NotNull(capturedPost?.PhotoUrl);
-            Assert.Contains("/images/posts/", capturedPost!.PhotoUrl);
-            Assert.EndsWith(".png", capturedPost.PhotoUrl);
-        }
-
-        [Fact]
-        public async Task CreatePostAsync_NoImage_SetsPhotoUrlToNull()
-        {
-            var dto = ValidDto();
-            Posts? capturedPost = null;
-            this.postRepositoryMock.Setup(r => r.AddAsync(It.IsAny<Posts>()))
-                .Callback<Posts>(p => capturedPost = p)
-                .Returns(Task.CompletedTask);
-
-            await this.sut.CreatePostAsync(dto, null, 1);
-
-            Assert.Null(capturedPost!.PhotoUrl);
+            Assert.Equal(DealType.Donation, capturedPost!.DealType);
         }
 
         [Fact]
         public async Task CreatePostAsync_ValidData_CreatesGenreRelation()
         {
             var dto = ValidDto();
-            dto.GenreId = 15;
+            dto.GenreId = 12;
             Posts? capturedPost = null;
             this.postRepositoryMock.Setup(r => r.AddAsync(It.IsAny<Posts>()))
                 .Callback<Posts>(p => capturedPost = p)
                 .Returns(Task.CompletedTask);
 
-            await this.sut.CreatePostAsync(dto, null, 1);
+            await this.sut.CreatePostAsync(dto, 1);
 
-            var genreRelation = Assert.Single(capturedPost!.BookGenres);
-            Assert.Equal(15, genreRelation.GenreId);
+            var genre = Assert.Single(capturedPost!.BookGenres);
+            Assert.Equal(12, genre.GenreId);
         }
 
         [Fact]
-        public async Task CreatePostAsync_ValidData_MapsDealTypeCorrectly()
+        public async Task CreatePostAsync_NullPhotoUrl_SavesSuccessfully()
         {
             var dto = ValidDto();
-            dto.DealTypeId = (int)DealType.Exchange;
-            Posts? capturedPost = null;
-            this.postRepositoryMock.Setup(r => r.AddAsync(It.IsAny<Posts>()))
-                .Callback<Posts>(p => capturedPost = p)
-                .Returns(Task.CompletedTask);
+            dto.PhotoUrl = null;
 
-            await this.sut.CreatePostAsync(dto, null, 1);
+            var result = await this.sut.CreatePostAsync(dto, 1);
 
-            Assert.Equal(DealType.Exchange, capturedPost!.DealType);
+            this.postRepositoryMock.Verify(r => r.AddAsync(It.Is<Posts>(p => p.PhotoUrl == null)), Times.Once);
+        }
+
+        [Fact]
+        public async Task CreatePostAsync_ValidData_CallsSaveAsyncExactlyOnce()
+        {
+            await this.sut.CreatePostAsync(ValidDto(), 1);
+
+            this.postRepositoryMock.Verify(r => r.SaveChangesAsync(), Times.Once);
+        }
+
+        [Fact]
+        public async Task CreatePostAsync_ValidData_LogsStartMessage()
+        {
+            var dto = ValidDto();
+
+            await this.sut.CreatePostAsync(dto, 1);
+
+            this.VerifyLog(LogLevel.Information, $"Starting post creation for user ID: 1. Title: {dto.Title}");
         }
 
         [Fact]
         public async Task CreatePostAsync_Success_LogsSuccessMessage()
         {
-            var dto = ValidDto();
-            this.postRepositoryMock.Setup(r => r.AddAsync(It.IsAny<Posts>()))
-                .Returns(Task.CompletedTask);
-
-            await this.sut.CreatePostAsync(dto, null, 1);
+            await this.sut.CreatePostAsync(ValidDto(), 1);
 
             this.VerifyLog(LogLevel.Information, "Successfully created post");
         }
 
         [Fact]
-        public async Task CreatePostAsync_RepositoryFail_LogsErrorAndThrows()
+        public async Task CreatePostAsync_RepositoryFail_LogsError()
         {
             var dto = ValidDto();
-            var exception = new Exception("Critical Database Error");
+            var exception = new Exception("DB Crash");
             this.postRepositoryMock.Setup(r => r.AddAsync(It.IsAny<Posts>())).ThrowsAsync(exception);
 
-            await Assert.ThrowsAsync<Exception>(() => this.sut.CreatePostAsync(dto, null, 1));
+            await Assert.ThrowsAsync<Exception>(() => this.sut.CreatePostAsync(dto, 1));
+
             this.VerifyLog(LogLevel.Error, "Failed to create post");
+        }
+
+        [Fact]
+        public async Task CreatePostAsync_RepositoryFail_PropagatesException()
+        {
+            this.postRepositoryMock.Setup(r => r.AddAsync(It.IsAny<Posts>()))
+                .ThrowsAsync(new InvalidOperationException("Fatal error"));
+
+            await Assert.ThrowsAsync<InvalidOperationException>(() => this.sut.CreatePostAsync(ValidDto(), 1));
         }
 
         private static CreatePostDto ValidDto() => new CreatePostDto
         {
-            Title = "Clean Architecture",
-            Author = "Robert C. Martin",
-            Description = "A handbook of agile software craftsmanship.",
+            Title = "Test Book",
+            Author = "Test Author",
+            Description = "Test Description",
             GenreId = 1,
-            DealTypeId = 1
+            DealTypeId = (int)DealType.Exchange,
+            PhotoUrl = "test.jpg"
         };
 
         private void VerifyLog(LogLevel level, string messagePart)

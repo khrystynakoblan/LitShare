@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace LitShare.Web.Models
@@ -14,14 +15,12 @@ namespace LitShare.Web.Models
         public string Author { get; set; } = string.Empty;
 
         [Display(Name = "Жанр")]
-        [Required(ErrorMessage = "Оберіть жанр")]
-        public int? GenreId { get; set; }
+        public int GenreId { get; set; }
 
         public List<SelectListItem>? Genres { get; set; }
 
         [Display(Name = "Тип угоди")]
-        [Required(ErrorMessage = "Оберіть тип угоди")]
-        public int? DealTypeId { get; set; }
+        public int DealTypeId { get; set; }
 
         public List<SelectListItem>? DealTypes { get; set; }
 
