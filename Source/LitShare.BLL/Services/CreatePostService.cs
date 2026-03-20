@@ -1,8 +1,8 @@
 ﻿namespace LitShare.BLL.Services
 {
     using System;
-    using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Threading.Tasks;
     using LitShare.BLL.DTOs;
     using LitShare.BLL.Services.Interfaces;
@@ -43,10 +43,7 @@
                     DealType = (DealType)dto.DealTypeId,
                     Description = dto.Description,
                     PhotoUrl = photoUrl,
-                    BookGenres = new List<BookGenres>
-                    {
-                        new BookGenres { GenreId = dto.GenreId },
-                    },
+                    BookGenres = dto.GenreIds.Select(genreId => new BookGenres { GenreId = genreId }).ToList(),
                 };
 
                 await this.postRepository.AddAsync(newPost);

@@ -81,10 +81,10 @@
         }
 
         [Fact]
-        public async Task CreatePostAsync_ValidData_CreatesGenreRelation()
+        public async Task CreatePostAsync_ValidData_CreatesGenreRelations()
         {
             var dto = ValidDto();
-            dto.GenreId = 12;
+            dto.GenreIds = new List<int> { 12, 13 };
             Posts? capturedPost = null;
             this.postRepositoryMock.Setup(r => r.AddAsync(It.IsAny<Posts>()))
                 .Callback<Posts>(p => capturedPost = p)
@@ -92,8 +92,9 @@
 
             await this.sut.CreatePostAsync(dto, 1);
 
-            var genre = Assert.Single(capturedPost!.BookGenres);
-            Assert.Equal(12, genre.GenreId);
+            Assert.Equal(2, capturedPost!.BookGenres.Count);
+            Assert.Contains(capturedPost.BookGenres, bg => bg.GenreId == 12);
+            Assert.Contains(capturedPost.BookGenres, bg => bg.GenreId == 13);
         }
 
         [Fact]
@@ -163,7 +164,7 @@
             Title = "Test Book",
             Author = "Test Author",
             Description = "Test Description",
-            GenreId = 1,
+            GenreIds = new List<int> { 1 },
             DealTypeId = (int)DealType.Exchange,
             ImageFile = null,
         };

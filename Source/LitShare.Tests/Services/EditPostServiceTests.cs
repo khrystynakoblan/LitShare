@@ -7,7 +7,6 @@
     using LitShare.BLL.Services;
     using LitShare.DAL.Models;
     using LitShare.DAL.Repositories.Interfaces;
-    using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Logging;
     using Moq;
     using Xunit;
@@ -15,23 +14,16 @@
     public class EditPostServiceTests
     {
         private readonly Mock<IPostRepository> postRepositoryMock;
-        private readonly Mock<IWebHostEnvironment> environmentMock;
         private readonly Mock<ILogger<EditPostService>> loggerMock;
         private readonly EditPostService sut;
 
         public EditPostServiceTests()
         {
             this.postRepositoryMock = new Mock<IPostRepository>();
-            this.environmentMock = new Mock<IWebHostEnvironment>();
             this.loggerMock = new Mock<ILogger<EditPostService>>();
-
-            this.environmentMock
-                .Setup(e => e.WebRootPath)
-                .Returns("C:/fake_wwwroot");
 
             this.sut = new EditPostService(
                 this.postRepositoryMock.Object,
-                this.environmentMock.Object,
                 this.loggerMock.Object);
         }
 
@@ -63,17 +55,18 @@
         }
 
         [Fact]
-        public async Task EditPostAsync_ValidData_UpdatesGenreCorrectly()
+        public async Task EditPostAsync_ValidData_UpdatesGenresCorrectly()
         {
             var dto = ValidDto();
-            dto.GenreId = 5;
+            dto.GenreIds = new List<int> { 5, 6 };
             var post = ExistingPost();
             this.SetupGetById(post);
 
             await this.sut.EditPostAsync(dto);
 
-            var genre = Assert.Single(post.BookGenres);
-            Assert.Equal(5, genre.GenreId);
+            Assert.Equal(2, post.BookGenres.Count);
+            Assert.Contains(post.BookGenres, bg => bg.GenreId == 5);
+            Assert.Contains(post.BookGenres, bg => bg.GenreId == 6);
         }
 
         [Fact]
@@ -117,19 +110,20 @@
         }
 
         [Fact]
-        public async Task EditPostAsync_ValidData_ReplacesOldGenreWithNew()
+        public async Task EditPostAsync_ValidData_ReplacesOldGenresWithNew()
         {
             var post = ExistingPost();
             post.BookGenres.Add(new BookGenres { GenreId = 99 });
             this.SetupGetById(post);
 
             var dto = ValidDto();
-            dto.GenreId = 7;
+            dto.GenreIds = new List<int> { 7, 8 };
 
             await this.sut.EditPostAsync(dto);
 
-            var genre = Assert.Single(post.BookGenres);
-            Assert.Equal(7, genre.GenreId);
+            Assert.Equal(2, post.BookGenres.Count);
+            Assert.Contains(post.BookGenres, bg => bg.GenreId == 7);
+            Assert.Contains(post.BookGenres, bg => bg.GenreId == 8);
         }
 
         [Fact]
@@ -144,21 +138,6 @@
             this.postRepositoryMock.Verify(
                 r => r.UpdateAsync(It.Is<Posts>(p => p.Description == null)),
                 Times.Once);
-        }
-
-        [Fact]
-        public async Task EditPostAsync_NoNewPhoto_KeepsExistingPhotoUrl()
-        {
-            var post = ExistingPost();
-            post.PhotoUrl = "/images/posts/existing.jpg";
-            this.SetupGetById(post);
-
-            var dto = ValidDto();
-            dto.NewPhoto = null;
-
-            await this.sut.EditPostAsync(dto);
-
-            Assert.Equal("/images/posts/existing.jpg", post.PhotoUrl);
         }
 
         [Fact]
@@ -231,9 +210,8 @@
             Title = "Updated Title",
             Author = "Updated Author",
             Description = "Updated Description",
-            GenreId = 3,
+            GenreIds = new List<int> { 3 },
             DealTypeId = (int)DealType.Exchange,
-            NewPhoto = null,
         };
 
         private static Posts ExistingPost() => new Posts

@@ -1,5 +1,6 @@
 ﻿namespace LitShare.BLL.DTOs
 {
+    using System.Collections.Generic;
     using LitShare.DAL.Models;
 
     public class PostViewDto
@@ -16,6 +17,6 @@
 
         public string? PhotoUrl { get; set; }
 
-        public int GenreId { get; set; }
+        public List<int> GenreIds { get; set; } = new List<int>();
     }
 }

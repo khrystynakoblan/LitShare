@@ -1,5 +1,6 @@
 ﻿namespace LitShare.BLL.DTOs
 {
+    using System.Collections.Generic;
     using Microsoft.AspNetCore.Http;
 
     public class CreatePostDto
@@ -10,7 +11,7 @@
 
         public string Author { get; set; } = string.Empty;
 
-        public int GenreId { get; set; }
+        public List<int> GenreIds { get; set; } = new List<int>();
 
         public int DealTypeId { get; set; }
 

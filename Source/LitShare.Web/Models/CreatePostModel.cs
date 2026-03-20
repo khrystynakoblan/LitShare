@@ -1,9 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Rendering;
-
-namespace LitShare.Web.Models
+﻿namespace LitShare.Web.Models
 {
+    using System.Collections.Generic;
+    using System.ComponentModel.DataAnnotations;
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.Mvc.Rendering;
+
     public class CreatePostModel
     {
         [Display(Name = "Назва книги")]
@@ -14,11 +15,10 @@ namespace LitShare.Web.Models
         [Required(ErrorMessage = "Введіть автора")]
         public string Author { get; set; } = string.Empty;
 
-        [Display(Name = "Жанр")]
-        [Range(1, int.MaxValue, ErrorMessage = "Оберіть жанр")]
-        public int GenreId { get; set; }
+        [Display(Name = "Жанри")]
+        public List<int> SelectedGenreIds { get; set; } = new List<int>();
 
-        public List<SelectListItem>? Genres { get; set; }
+        public MultiSelectList? Genres { get; set; }
 
         [Display(Name = "Тип угоди")]
         [Range(1, int.MaxValue, ErrorMessage = "Оберіть тип угоди")]

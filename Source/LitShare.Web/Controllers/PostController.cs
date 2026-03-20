@@ -1,6 +1,7 @@
 ﻿namespace LitShare.Web.Controllers
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
     using LitShare.BLL.DTOs;
@@ -65,7 +66,7 @@
                 {
                     Title = model.Title,
                     Author = model.Author,
-                    GenreId = model.GenreId,
+                    GenreIds = model.SelectedGenreIds,
                     DealTypeId = model.DealTypeId,
                     Description = model.Description,
                     ImageFile = model.ImageFile,
@@ -88,23 +89,22 @@
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            var post = await this.postRepository.GetByIdAsync(id);
+            var post = await this.editPostService.GetPostByIdAsync(id);
             if (post == null)
             {
                 return this.NotFound();
             }
 
-            var currentGenreId = post.BookGenres.FirstOrDefault()?.GenreId ?? 0;
             var model = new PostEditViewModel
             {
                 Id = post.Id,
-                Title = post.Title ?? string.Empty,
-                Author = post.Author ?? string.Empty,
+                Title = post.Title,
+                Author = post.Author,
                 Description = post.Description,
                 DealType = post.DealType,
                 PhotoUrl = post.PhotoUrl,
-                SelectedGenreId = currentGenreId,
-                Genres = await this.BuildGenreSelectListAsync(currentGenreId),
+                SelectedGenreIds = post.GenreIds,
+                Genres = await this.BuildGenreMultiSelectListAsync(post.GenreIds),
                 DealTypes = this.BuildDealTypeSelectList((int)post.DealType),
             };
 
@@ -122,7 +122,7 @@
 
             if (!this.ModelState.IsValid)
             {
-                model.Genres = await this.BuildGenreSelectListAsync(model.SelectedGenreId);
+                model.Genres = await this.BuildGenreMultiSelectListAsync(model.SelectedGenreIds);
                 model.DealTypes = this.BuildDealTypeSelectList((int)model.DealType);
                 return this.View("~/Views/Post/Edit.cshtml", model);
             }
@@ -136,8 +136,7 @@
                     Author = model.Author,
                     Description = model.Description,
                     DealTypeId = (int)model.DealType,
-                    GenreId = model.SelectedGenreId,
-                    NewPhoto = model.NewPhoto,
+                    GenreIds = model.SelectedGenreIds,
                 };
 
                 await this.editPostService.EditPostAsync(dto);
@@ -153,7 +152,7 @@
             {
                 this.logger.LogError(ex, "An error occurred while editing the post.");
                 this.ModelState.AddModelError(string.Empty, "Сталася помилка при збереженні в базу даних.");
-                model.Genres = await this.BuildGenreSelectListAsync(model.SelectedGenreId);
+                model.Genres = await this.BuildGenreMultiSelectListAsync(model.SelectedGenreIds);
                 model.DealTypes = this.BuildDealTypeSelectList((int)model.DealType);
                 return this.View("~/Views/Post/Edit.cshtml", model);
             }
@@ -178,11 +177,7 @@
             this.logger.LogInformation("Populating selection lists from database.");
             var genres = await this.genreService.GetAllGenresAsync();
 
-            model.Genres = genres.Select(g => new SelectListItem
-            {
-                Value = g.Id.ToString(),
-                Text = g.Name,
-            }).ToList();
+            model.Genres = new MultiSelectList(genres, "Id", "Name", model.SelectedGenreIds);
 
             model.DealTypes = Enum.GetValues(typeof(DealType))
                 .Cast<DealType>()
@@ -191,6 +186,12 @@
                     Value = ((int)d).ToString(),
                     Text = d == DealType.Exchange ? "Обмін" : "Дарування",
                 }).ToList();
+        }
+
+        private async Task<MultiSelectList> BuildGenreMultiSelectListAsync(List<int> selectedGenreIds)
+        {
+            var genres = await this.genreService.GetAllGenresAsync();
+            return new MultiSelectList(genres, "Id", "Name", selectedGenreIds);
         }
     }
 }

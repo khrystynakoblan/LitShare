@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-
-namespace LitShare.BLL.DTOs
+﻿namespace LitShare.BLL.DTOs
 {
+    using System.Collections.Generic;
+    using Microsoft.AspNetCore.Http;
+
     public class EditPostDto
     {
         public int PostId { get; set; }
@@ -12,7 +13,7 @@ namespace LitShare.BLL.DTOs
 
         public string? Description { get; set; }
 
-        public int GenreId { get; set; }
+        public List<int> GenreIds { get; set; } = new List<int>();
 
         public int DealTypeId { get; set; }
 

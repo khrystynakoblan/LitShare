@@ -4,6 +4,21 @@
     ViewData["Title"] = "Нове оголошення";
 }
 
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+    .select2-container--default .select2-selection--multiple {
+        border: 1px solid #dee2e6;
+        min-height: 38px;
+        border-radius: 0.375rem;
+    }
+
+    .select2-container--default.select2-container--focus .select2-selection--multiple {
+        border-color: #86b7fe;
+        outline: 0;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+</style>
+
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-normal">Нове оголошення</h2>
@@ -15,17 +30,14 @@
 
         <div class="row">
             <div class="col-md-4 text-center">
-                <div id="imagePreviewContainer" class="border rounded bg-light d-flex align-items-center justify-content-center mb-3" 
+                <div id="imagePreviewContainer" class="border rounded bg-light d-flex align-items-center justify-content-center mb-3"
                      style="height: 350px; border-style: dashed !important; overflow: hidden;">
-
                     <div id="placeholderContent" class="text-muted">
                         <i class="bi bi-image" style="font-size: 4rem;"></i>
                         <p>Виберіть фото</p>
                     </div>
-
                     <img id="imagePreview" src="#" alt="Прев'ю" style="display: none; width: 100%; height: 100%; object-fit: cover;" />
                 </div>
-
                 <input type="file" asp-for="ImageFile" id="imageInput" class="d-none" accept="image/*" />
                 <button type="button" class="btn btn-dark w-100 py-2" onclick="document.getElementById('imageInput').click();">
                     Додати фото
@@ -51,12 +63,11 @@
                 </div>
 
                 <div class="mb-3 row">
-                    <label asp-for="GenreId" class="col-sm-2 col-form-label text-start">Жанр:</label>
+                    <label asp-for="SelectedGenreIds" class="col-sm-2 col-form-label text-start">Жанри:</label>
                     <div class="col-sm-10">
-                        <select asp-for="GenreId" asp-items="Model.Genres" class="form-select" >
-                            <option value="">Оберіть жанр</option>
+                        <select asp-for="SelectedGenreIds" asp-items="Model.Genres" class="form-select js-select2" multiple="multiple" data-placeholder="Оберіть жанри">
                         </select>
-                        <span asp-validation-for="GenreId" class="text-danger"></span>
+                        <span asp-validation-for="SelectedGenreIds" class="text-danger"></span>
                     </div>
                 </div>
 
@@ -92,19 +103,28 @@
 </div>
 
 @section Scripts {
-        <script>
-            document.getElementById('imageInput').onchange = function (evt) {
-                const [file] = this.files;
-                if (file) {
-                    const preview = document.getElementById('imagePreview');
-                    const placeholder = document.getElementById('placeholderContent');
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-                    preview.src = URL.createObjectURL(file);
-                    preview.style.display = 'block';
-                    placeholder.style.display = 'none';
-                }
-            };
-        </script>
+    <script>
+        $(document).ready(function() {
+            $('.js-select2').select2({
+                closeOnSelect: false,
+                width: '100%'
+            });
+        });
+
+        document.getElementById('imageInput').onchange = function (evt) {
+            const [file] = this.files;
+            if (file) {
+                const preview = document.getElementById('imagePreview');
+                const placeholder = document.getElementById('placeholderContent');
+                preview.src = URL.createObjectURL(file);
+                preview.style.display = 'block';
+                placeholder.style.display = 'none';
+            }
+        };
+    </script>
 
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
