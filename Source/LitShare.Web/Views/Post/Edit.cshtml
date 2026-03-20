@@ -1,33 +1,40 @@
 ﻿@model LitShare.Web.Models.PostEditViewModel
-
 @{
     ViewData["Title"] = "Редагувати оголошення";
 }
-
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-normal">Редагувати оголошення</h2>
         <a asp-controller="Profile" asp-action="Index" class="text-decoration-none text-dark">Мій профіль</a>
     </div>
-
     <form asp-action="Edit" method="post" enctype="multipart/form-data">
         <input type="hidden" asp-for="Id" />
-
         <div class="row">
             <div class="col-md-4 text-center">
-                <div class="border p-3 mb-2" style="height: 250px; background-color: #f8f9fa;">
+                <div id="imagePreviewContainer" class="border mb-2 d-flex align-items-center justify-content-center"
+                     style="height: 250px; background-color: #f8f9fa; overflow: hidden;">
                     @if (!string.IsNullOrEmpty(Model.PhotoUrl))
                     {
-                        <img src="@Model.PhotoUrl" class="img-fluid h-100" alt="Book cover" />
+                        <img id="imagePreview" src="@Model.PhotoUrl"
+                             style="width: 100%; height: 100%; object-fit: cover;" alt="Book cover" />
                     }
                     else
                     {
-                        <i class="bi bi-image text-muted" style="font-size: 4rem;"></i>
+                        <img id="imagePreview" src="#"
+                             style="display: none; width: 100%; height: 100%; object-fit: cover;" alt="Book cover" />
+                        <div id="placeholderContent" class="text-muted">
+                            <i class="bi bi-image" style="font-size: 4rem;"></i>
+                        </div>
                     }
                 </div>
-                <button type="button" class="btn btn-dark w-100">Змінити фото</button>
+                <input type="file" asp-for="NewPhoto" id="imageInput"
+                       class="d-none" accept="image/*" />
+                <button type="button" class="btn btn-dark w-100"
+                        onclick="document.getElementById('imageInput').click();">
+                    Змінити фото
+                </button>
+                <span asp-validation-for="NewPhoto" class="text-danger"></span>
             </div>
-
             <div class="col-md-8">
                 <div class="mb-3 row">
                     <label asp-for="Title" class="col-sm-3 col-form-label"></label>
@@ -36,7 +43,6 @@
                         <span asp-validation-for="Title" class="text-danger"></span>
                     </div>
                 </div>
-
                 <div class="mb-3 row">
                     <label asp-for="Author" class="col-sm-3 col-form-label"></label>
                     <div class="col-sm-9">
@@ -44,7 +50,6 @@
                         <span asp-validation-for="Author" class="text-danger"></span>
                     </div>
                 </div>
-
                 <div class="mb-3 row">
                     <label asp-for="SelectedGenreId" class="col-sm-3 col-form-label">Жанр:</label>
                     <div class="col-sm-9">
@@ -53,7 +58,6 @@
                         </select>
                     </div>
                 </div>
-
                 <div class="mb-3 row">
                     <label asp-for="DealType" class="col-sm-3 col-form-label">Тип угоди:</label>
                     <div class="col-sm-9">
@@ -62,12 +66,10 @@
                 </div>
             </div>
         </div>
-
         <div class="mt-4">
             <h4 class="text-center mb-3">Опис</h4>
             <textarea asp-for="Description" class="form-control" rows="6"></textarea>
         </div>
-
         <div class="row mt-4">
             <div class="col-6">
                 <button type="submit" class="btn btn-dark w-100 py-2">Зберегти</button>
@@ -78,8 +80,23 @@
         </div>
     </form>
 </div>
-
 @section Scripts {
+    <script>
+        document.getElementById('imageInput').onchange = function () {
+            const [file] = this.files;
+            if (file) {
+                const preview = document.getElementById('imagePreview');
+                const placeholder = document.getElementById('placeholderContent');
+
+                preview.src = URL.createObjectURL(file);
+                preview.style.display = 'block';
+
+                if (placeholder) {
+                    placeholder.style.display = 'none';
+                }
+            }
+        };
+    </script>
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }

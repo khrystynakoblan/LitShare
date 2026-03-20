@@ -1,4 +1,6 @@
-﻿namespace LitShare.BLL.DTOs
+﻿using Microsoft.AspNetCore.Http;
+
+namespace LitShare.BLL.DTOs
 {
     public class EditPostDto
     {
@@ -13,5 +15,7 @@
         public int GenreId { get; set; }
 
         public int DealTypeId { get; set; }
+
+        public IFormFile? NewPhoto { get; set; }
     }
 }

@@ -7,6 +7,7 @@
     using LitShare.BLL.Services;
     using LitShare.DAL.Models;
     using LitShare.DAL.Repositories.Interfaces;
+    using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Logging;
     using Moq;
     using Xunit;
@@ -14,16 +15,23 @@
     public class EditPostServiceTests
     {
         private readonly Mock<IPostRepository> postRepositoryMock;
+        private readonly Mock<IWebHostEnvironment> environmentMock;
         private readonly Mock<ILogger<EditPostService>> loggerMock;
         private readonly EditPostService sut;
 
         public EditPostServiceTests()
         {
             this.postRepositoryMock = new Mock<IPostRepository>();
+            this.environmentMock = new Mock<IWebHostEnvironment>();
             this.loggerMock = new Mock<ILogger<EditPostService>>();
+
+            this.environmentMock
+                .Setup(e => e.WebRootPath)
+                .Returns("C:/fake_wwwroot");
 
             this.sut = new EditPostService(
                 this.postRepositoryMock.Object,
+                this.environmentMock.Object,
                 this.loggerMock.Object);
         }
 
@@ -112,7 +120,7 @@
         public async Task EditPostAsync_ValidData_ReplacesOldGenreWithNew()
         {
             var post = ExistingPost();
-            post.BookGenres.Add(new BookGenres { GenreId = 99 }); // старий жанр
+            post.BookGenres.Add(new BookGenres { GenreId = 99 });
             this.SetupGetById(post);
 
             var dto = ValidDto();
@@ -133,7 +141,24 @@
 
             await this.sut.EditPostAsync(dto);
 
-            this.postRepositoryMock.Verify(r => r.UpdateAsync(It.Is<Posts>(p => p.Description == null)), Times.Once);
+            this.postRepositoryMock.Verify(
+                r => r.UpdateAsync(It.Is<Posts>(p => p.Description == null)),
+                Times.Once);
+        }
+
+        [Fact]
+        public async Task EditPostAsync_NoNewPhoto_KeepsExistingPhotoUrl()
+        {
+            var post = ExistingPost();
+            post.PhotoUrl = "/images/posts/existing.jpg";
+            this.SetupGetById(post);
+
+            var dto = ValidDto();
+            dto.NewPhoto = null;
+
+            await this.sut.EditPostAsync(dto);
+
+            Assert.Equal("/images/posts/existing.jpg", post.PhotoUrl);
         }
 
         [Fact]
@@ -207,7 +232,8 @@
             Author = "Updated Author",
             Description = "Updated Description",
             GenreId = 3,
-            DealTypeId = (int)DealType.Exchange
+            DealTypeId = (int)DealType.Exchange,
+            NewPhoto = null,
         };
 
         private static Posts ExistingPost() => new Posts
@@ -217,7 +243,7 @@
             Author = "Old Author",
             Description = "Old Description",
             DealType = DealType.Exchange,
-            BookGenres = new List<BookGenres>()
+            BookGenres = new List<BookGenres>(),
         };
 
         private void SetupGetById(Posts post)
