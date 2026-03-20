@@ -1,14 +1,7 @@
-﻿// <copyright file="DealType.cs" company="PlaceholderCompany">
-// Copyright (c) PlaceholderCompany. All rights reserved.
-// </copyright>
-
-namespace LitShare.DAL.Models
+﻿namespace LitShare.DAL.Models
 {
     using NpgsqlTypes;
 
-    /// <summary>
-    /// Specifies the type of transaction or arrangement for sharing a book or post.
-    /// </summary>
     public enum DealType
     {
         /// <summary>

@@ -1,14 +1,7 @@
-﻿// <copyright file="RoleType.cs" company="PlaceholderCompany">
-// Copyright (c) PlaceholderCompany. All rights reserved.
-// </copyright>
-
-namespace LitShare.DAL.Models
+﻿namespace LitShare.DAL.Models
 {
     using NpgsqlTypes;
 
-    /// <summary>
-    /// Defines the possible roles a user can have within the application.
-    /// </summary>
     public enum RoleType
     {
         /// <summary>

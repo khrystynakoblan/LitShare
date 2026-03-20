@@ -7,12 +7,14 @@
         <h2 class="fw-normal">Редагувати оголошення</h2>
         <a asp-controller="Profile" asp-action="Index" class="text-decoration-none text-dark">Мій профіль</a>
     </div>
+
     <form asp-action="Edit" method="post" enctype="multipart/form-data">
         <input type="hidden" asp-for="Id" />
+
         <div class="row">
             <div class="col-md-4 text-center">
                 <div id="imagePreviewContainer" class="border mb-2 d-flex align-items-center justify-content-center"
-                     style="height: 250px; background-color: #f8f9fa; overflow: hidden;">
+                     style="height: 350px; background-color: #f8f9fa; overflow: hidden;">
                     @if (!string.IsNullOrEmpty(Model.PhotoUrl))
                     {
                         <img id="imagePreview" src="@Model.PhotoUrl"
@@ -35,6 +37,7 @@
                 </button>
                 <span asp-validation-for="NewPhoto" class="text-danger"></span>
             </div>
+
             <div class="col-md-8">
                 <div class="mb-3 row">
                     <label asp-for="Title" class="col-sm-3 col-form-label"></label>
@@ -65,6 +68,7 @@
                     </div>
                 </div>
             </div>
+
         </div>
         <div class="mt-4">
             <h4 class="text-center mb-3">Опис</h4>
@@ -80,6 +84,7 @@
         </div>
     </form>
 </div>
+
 @section Scripts {
     <script>
         document.getElementById('imageInput').onchange = function () {

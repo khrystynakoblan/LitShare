@@ -1,36 +1,20 @@
-﻿// <copyright file="Genres.cs" company="PlaceholderCompany">
-// Copyright (c) PlaceholderCompany. All rights reserved.
-// </copyright>
-
-namespace LitShare.DAL.Models
+﻿namespace LitShare.DAL.Models
 {
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
 
-    /// <summary>
-    /// Represents a classification tag or genre for books/posts.
-    /// </summary>
     [Table("genres")]
     public class Genres
     {
-        /// <summary>
-        /// Gets or sets the unique identifier (primary key) of the genre.
-        /// </summary>
         [Key]
         [Column("id")]
         public int Id { get; set; }
 
-        /// <summary>
-        /// Gets or sets the name of the genre.
-        /// </summary>
         [Required]
         [MaxLength(50)]
         [Column("name")]
         public string? Name { get; set; }
 
-        /// <summary>
-        /// Gets or sets the collection of book-genre mappings associated with this genre.
-        /// </summary>
         public virtual ICollection<BookGenres>? BookGenres { get; set; }
     }
 }

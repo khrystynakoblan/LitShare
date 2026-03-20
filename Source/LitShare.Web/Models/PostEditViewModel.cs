@@ -5,9 +5,6 @@
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc.Rendering;
 
-    /// <summary>
-    /// ViewModel for editing a book post.
-    /// </summary>
     public class PostEditViewModel
     {
         public int Id { get; set; }
