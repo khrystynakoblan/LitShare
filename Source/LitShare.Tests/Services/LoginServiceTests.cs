@@ -1,5 +1,7 @@
 ﻿namespace LitShare.Tests.Services
 {
+    using System;
+    using System.Threading.Tasks;
     using LitShare.BLL.DTOs;
     using LitShare.BLL.Services;
     using LitShare.DAL.Models;
@@ -29,15 +31,19 @@
         }
 
         [Fact]
-        public async Task LoginAsync_WithValidCredentials_ReturnsTrue()
+        public async Task LoginAsync_WithValidCredentials_ReturnsSuccessWithUserId()
         {
             var dto = ValidDto();
-            this.SetupUserFound(dto.Email);
+            int expectedUserId = 5;
+            this.SetupUserFound(dto.Email, expectedUserId);
             this.SetupPasswordValid(dto.Password);
 
-            bool result = await this.sut.LoginAsync(dto);
+            // БУЛО: bool result = ...
+            // СТАЛО:
+            var result = await this.sut.LoginAsync(dto);
 
-            Assert.True(result);
+            Assert.True(result.IsSuccess);
+            Assert.Equal(expectedUserId, result.Value);
         }
 
         [Fact]
@@ -58,16 +64,17 @@
         }
 
         [Fact]
-        public async Task LoginAsync_WhenUserNotFound_ReturnsFalse()
+        public async Task LoginAsync_WhenUserNotFound_ReturnsFailure()
         {
             var dto = ValidDto();
             this.userRepositoryMock
                 .Setup(r => r.GetByEmailAsync(dto.Email))
                 .ReturnsAsync((Users?)null);
 
-            bool result = await this.sut.LoginAsync(dto);
+            var result = await this.sut.LoginAsync(dto);
 
-            Assert.False(result);
+            Assert.False(result.IsSuccess);
+            Assert.Equal("Невірний email або пароль.", result.Error);
         }
 
         [Fact]
@@ -89,7 +96,7 @@
         }
 
         [Fact]
-        public async Task LoginAsync_WhenPasswordIsWrong_ReturnsFalse()
+        public async Task LoginAsync_WhenPasswordIsWrong_ReturnsFailure()
         {
             var dto = ValidDto();
             this.SetupUserFound(dto.Email);
@@ -100,13 +107,14 @@
                     dto.Password))
                 .Returns(PasswordVerificationResult.Failed);
 
-            bool result = await this.sut.LoginAsync(dto);
+            var result = await this.sut.LoginAsync(dto);
 
-            Assert.False(result);
+            Assert.False(result.IsSuccess);
+            Assert.Equal("Невірний email або пароль.", result.Error);
         }
 
         [Fact]
-        public async Task LoginAsync_WhenUserHasNoPasswordHash_ReturnsFalse()
+        public async Task LoginAsync_WhenUserHasNoPasswordHash_ReturnsFailure()
         {
             var dto = ValidDto();
             this.userRepositoryMock
@@ -117,9 +125,9 @@
                     PasswordHash = string.Empty,
                 });
 
-            bool result = await this.sut.LoginAsync(dto);
+            var result = await this.sut.LoginAsync(dto);
 
-            Assert.False(result);
+            Assert.False(result.IsSuccess);
         }
 
         [Fact]
@@ -145,34 +153,35 @@
         }
 
         [Fact]
-        public async Task LoginAsync_WithNullDto_ThrowsArgumentNullException()
+        public async Task LoginAsync_WithNullDto_ReturnsFailure()
         {
-            await Assert.ThrowsAsync<ArgumentNullException>(
-                () => this.sut.LoginAsync(null!));
+            var result = await this.sut.LoginAsync(null!);
+            Assert.False(result.IsSuccess);
+            Assert.Equal("Дані порожні.", result.Error);
         }
 
         [Theory]
         [InlineData("")]
         [InlineData("   ")]
-        public async Task LoginAsync_WithEmptyEmail_ThrowsArgumentException(string emptyEmail)
+        public async Task LoginAsync_WithEmptyEmail_ReturnsFailure(string emptyEmail)
         {
             var dto = ValidDto();
             dto.Email = emptyEmail;
 
-            await Assert.ThrowsAsync<ArgumentException>(
-                () => this.sut.LoginAsync(dto));
+            var result = await this.sut.LoginAsync(dto);
+            Assert.False(result.IsSuccess);
         }
 
         [Theory]
         [InlineData("")]
         [InlineData("   ")]
-        public async Task LoginAsync_WithEmptyPassword_ThrowsArgumentException(string emptyPassword)
+        public async Task LoginAsync_WithEmptyPassword_ReturnsFailure(string emptyPassword)
         {
             var dto = ValidDto();
             dto.Password = emptyPassword;
 
-            await Assert.ThrowsAsync<ArgumentException>(
-                () => this.sut.LoginAsync(dto));
+            var result = await this.sut.LoginAsync(dto);
+            Assert.False(result.IsSuccess);
         }
 
         [Fact]
@@ -188,7 +197,7 @@
         }
 
         [Fact]
-        public async Task LoginAsync_WithRehashNeeded_ReturnsTrue()
+        public async Task LoginAsync_WithRehashNeeded_ReturnsSuccess()
         {
             var dto = ValidDto();
             this.SetupUserFound(dto.Email);
@@ -199,9 +208,9 @@
                     dto.Password))
                 .Returns(PasswordVerificationResult.SuccessRehashNeeded);
 
-            bool result = await this.sut.LoginAsync(dto);
+            var result = await this.sut.LoginAsync(dto);
 
-            Assert.True(result);
+            Assert.True(result.IsSuccess);
         }
 
         private static LoginDto ValidDto() => new LoginDto
@@ -210,12 +219,13 @@
             Password = "SecurePass123!",
         };
 
-        private void SetupUserFound(string email)
+        private void SetupUserFound(string email, int expectedId = 1)
         {
             this.userRepositoryMock
                 .Setup(r => r.GetByEmailAsync(email))
                 .ReturnsAsync(new Users
                 {
+                    Id = expectedId,
                     Email = email,
                     PasswordHash = "hashed_password_value",
                 });

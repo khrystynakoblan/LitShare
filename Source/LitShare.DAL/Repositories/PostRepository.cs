@@ -14,6 +14,14 @@ namespace LitShare.DAL.Repositories
             this.context = context;
         }
 
+        public async Task<IEnumerable<Posts>> GetAllAsync()
+        {
+            return await this.context.Posts
+                .AsNoTracking()
+                .Include(p => p.User)
+                .ToListAsync();
+        }
+
         public async Task AddAsync(Posts post)
         {
             await this.context.Posts.AddAsync(post);

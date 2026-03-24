@@ -4,6 +4,8 @@ using LitShare.DAL.Context;
 using LitShare.DAL.Models;
 using LitShare.DAL.Repositories;
 using LitShare.DAL.Repositories.Interfaces;
+using LitShare.Web.Middleware;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
@@ -35,6 +37,9 @@ try
     builder.Services.AddDbContext<LitShareDbContext>(options =>
         options.UseNpgsql(dataSource));
 
+    builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+    builder.Services.AddProblemDetails();
+
     builder.Services.AddScoped<IPasswordHasher<Users>, PasswordHasher<Users>>();
     builder.Services.AddScoped<IUserRepository, UserRepository>();
     builder.Services.AddScoped<IRegisterService, RegisterService>();
@@ -49,14 +54,11 @@ try
     });
 
     builder.Services.AddScoped<IPostRepository, PostRepository>();
-
     builder.Services.AddScoped<ICreatePostService, CreatePostService>();
-
     builder.Services.AddScoped<IGenreRepository, GenreRepository>();
-
     builder.Services.AddScoped<IGenreService, GenreService>();
-
     builder.Services.AddScoped<IEditPostService, EditPostService>();
+    builder.Services.AddScoped<IHomeService, HomeService>();
 
     builder.Services.AddScoped<ProfileService>();
 
@@ -64,11 +66,19 @@ try
 
     builder.Services.AddScoped<IProfileService, ProfileService>();
 
+    builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+        .AddCookie(options =>
+        {
+            options.LoginPath = "/Account/Login";
+            options.ExpireTimeSpan = TimeSpan.FromDays(7);
+        });
+
     var app = builder.Build();
+
+    app.UseExceptionHandler();
 
     if (!app.Environment.IsDevelopment())
     {
-        app.UseExceptionHandler("/Home/Error");
         app.UseHsts();
     }
 
@@ -82,11 +92,12 @@ try
     app.UseStaticFiles();
     app.UseRouting();
     app.UseSession();
+    app.UseAuthentication();
     app.UseAuthorization();
 
     app.MapControllerRoute(
         name: "default",
-        pattern: "{controller=Account}/{action=Register}/{id?}");
+        pattern: "{controller=Home}/{action=Index}/{id?}");
 
     app.Run();
 }

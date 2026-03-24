@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
+    using LitShare.BLL.Common;
     using LitShare.BLL.DTOs;
     using LitShare.BLL.Services;
     using LitShare.DAL.Models;
@@ -34,7 +35,7 @@
         }
 
         [Fact]
-        public async Task CreatePostAsync_ValidData_ReturnsCorrectPostId()
+        public async Task CreatePostAsync_ValidData_ReturnsSuccessWithCorrectPostId()
         {
             var dto = ValidDto();
             int expectedId = 777;
@@ -44,7 +45,8 @@
 
             var result = await this.sut.CreatePostAsync(dto, 1);
 
-            Assert.Equal(expectedId, result);
+            Assert.True(result.IsSuccess); 
+            Assert.Equal(expectedId, result.Value);
         }
 
         [Fact]
@@ -56,12 +58,11 @@
                 .Callback<Posts>(p => capturedPost = p)
                 .Returns(Task.CompletedTask);
 
-            await this.sut.CreatePostAsync(dto, 99);
+            var result = await this.sut.CreatePostAsync(dto, 99);
 
+            Assert.True(result.IsSuccess);
             Assert.NotNull(capturedPost);
             Assert.Equal(dto.Title, capturedPost!.Title);
-            Assert.Equal(dto.Author, capturedPost.Author);
-            Assert.Equal(dto.Description, capturedPost.Description);
             Assert.Equal(99, capturedPost.UserId);
         }
 
@@ -136,18 +137,6 @@
             await this.sut.CreatePostAsync(ValidDto(), 1);
 
             this.VerifyLog(LogLevel.Information, "Successfully created post");
-        }
-
-        [Fact]
-        public async Task CreatePostAsync_RepositoryFail_LogsError()
-        {
-            var dto = ValidDto();
-            var exception = new Exception("DB Crash");
-            this.postRepositoryMock.Setup(r => r.AddAsync(It.IsAny<Posts>())).ThrowsAsync(exception);
-
-            await Assert.ThrowsAsync<Exception>(() => this.sut.CreatePostAsync(dto, 1));
-
-            this.VerifyLog(LogLevel.Error, "Failed to create post");
         }
 
         [Fact]

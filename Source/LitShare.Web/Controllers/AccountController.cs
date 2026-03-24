@@ -1,8 +1,11 @@
 ﻿namespace LitShare.Web.Controllers
 {
+    using System.Security.Claims;
     using LitShare.BLL.DTOs;
     using LitShare.BLL.Services.Interfaces;
     using LitShare.Web.Models;
+    using Microsoft.AspNetCore.Authentication;
+    using Microsoft.AspNetCore.Authentication.Cookies;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
 
@@ -34,79 +37,36 @@
         {
             if (!this.ModelState.IsValid)
             {
-                this.logger.LogWarning(
-                    "Registration form validation failed. Email: {Email}",
-                    model.Email);
                 return this.View(model);
             }
 
-            this.logger.LogInformation(
-                "Registration POST request received. Email: {Email}",
-                model.Email);
-
-            try
+            var dto = new RegisterDto
             {
-                var dto = new RegisterDto
-                {
-                    Name = model.Name,
-                    Email = model.Email,
-                    Password = model.Password,
-                    Phone = model.Phone,
-                    Region = model.Region,
-                    District = model.District,
-                    City = model.City,
-                };
+                Name = model.Name,
+                Email = model.Email,
+                Password = model.Password,
+                Phone = model.Phone,
+                Region = model.Region,
+                District = model.District,
+                City = model.City,
+            };
 
-                bool success = await this.registerService.RegisterAsync(dto);
+            var result = await this.registerService.RegisterAsync(dto);
 
-                if (!success)
-                {
-                    this.logger.LogWarning(
-                        "Registration failed: email {Email} is already taken.",
-                        model.Email);
-
-                    this.ModelState.AddModelError(
-                        nameof(model.Email),
-                        "Цей email вже зареєстрований у системі.");
-
-                    return this.View(model);
-                }
-
-                this.logger.LogInformation(
-                    "Registration successful. Redirecting to Login. Email: {Email}",
-                    model.Email);
-
-                this.TempData["SuccessMessage"] = "Реєстрацію успішно завершено! Будь ласка, увійдіть.";
-                return this.RedirectToAction(nameof(this.Login));
-            }
-            catch (ArgumentException ex)
+            if (result.IsFailure)
             {
-                this.logger.LogWarning(
-                    "Service validation error during registration. Email: {Email}",
-                    model.Email);
-
-                this.ModelState.AddModelError(string.Empty, ex.Message);
+                this.ModelState.AddModelError(string.Empty, result.Error);
                 return this.View(model);
             }
-            catch (Exception ex)
-            {
-                this.logger.LogError(
-                    ex,
-                    "Unexpected error during registration. Email: {Email}",
-                    model.Email);
 
-                this.ModelState.AddModelError(
-                    string.Empty,
-                    "Виникла непередбачена помилка. Спробуйте пізніше.");
-
-                return this.View(model);
-            }
+            this.TempData["SuccessMessage"] = "Реєстрацію успішно завершено! Будь ласка, увійдіть.";
+            return this.RedirectToAction(nameof(this.Login));
         }
 
         [HttpGet]
         public IActionResult Login()
         {
-            if (this.HttpContext.Session.GetString("UserEmail") != null)
+            if (this.User.Identity != null && this.User.Identity.IsAuthenticated)
             {
                 return this.RedirectToAction("Index", "Home");
             }
@@ -119,79 +79,45 @@
         {
             if (!this.ModelState.IsValid)
             {
-                this.logger.LogWarning(
-                    "Login form validation failed. Email: {Email}",
-                    model.Email);
                 return this.View(model);
             }
 
-            this.logger.LogInformation(
-                "Login POST request received. Email: {Email}",
-                model.Email);
-
-            try
+            var dto = new LoginDto
             {
-                var dto = new LoginDto
-                {
-                    Email = model.Email,
-                    Password = model.Password,
-                };
+                Email = model.Email,
+                Password = model.Password,
+            };
 
-                bool success = await this.loginService.LoginAsync(dto);
+            var loginResult = await this.loginService.LoginAsync(dto);
 
-                if (!success)
-                {
-                    this.logger.LogWarning(
-                        "Login failed: invalid credentials. Email: {Email}",
-                        model.Email);
-
-                    this.ModelState.AddModelError(
-                        string.Empty,
-                        "Невірний email або пароль.");
-
-                    return this.View(model);
-                }
-
-                this.HttpContext.Session.SetString("UserEmail", model.Email);
-
-                this.logger.LogInformation(
-                    "Login successful. Redirecting to Home. Email: {Email}",
-                    model.Email);
-
-                return this.RedirectToAction("Index", "Home");
-            }
-            catch (ArgumentException ex)
+            if (loginResult.IsFailure)
             {
-                this.logger.LogWarning(
-                    "Service validation error during login. Email: {Email}",
-                    model.Email);
-
-                this.ModelState.AddModelError(string.Empty, ex.Message);
+                this.ModelState.AddModelError(string.Empty, loginResult.Error);
                 return this.View(model);
             }
-            catch (Exception ex)
+
+            var claims = new List<Claim>
             {
-                this.logger.LogError(
-                    ex,
-                    "Unexpected error during login. Email: {Email}",
-                    model.Email);
+                new Claim(ClaimTypes.NameIdentifier, loginResult.Value.ToString()),
+                new Claim(ClaimTypes.Email, model.Email)
+            };
 
-                this.ModelState.AddModelError(
-                    string.Empty,
-                    "Виникла непередбачена помилка. Спробуйте пізніше.");
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
-                return this.View(model);
-            }
+            await this.HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(claimsIdentity));
+
+            return this.RedirectToAction("Index", "Home");
         }
 
         [HttpPost]
-        public IActionResult Logout()
+        public async Task<IActionResult> Logout()
         {
-            this.logger.LogInformation(
-                "User logged out. Email: {Email}",
-                this.HttpContext.Session.GetString("UserEmail"));
+            this.logger.LogInformation("User logged out.");
 
-            this.HttpContext.Session.Clear();
+            await this.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
             return this.RedirectToAction(nameof(this.Login));
         }
     }

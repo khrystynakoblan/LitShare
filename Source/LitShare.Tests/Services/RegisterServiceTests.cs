@@ -1,5 +1,7 @@
 ﻿namespace LitShare.Tests.Services
 {
+    using System;
+    using System.Threading.Tasks;
     using LitShare.BLL.DTOs;
     using LitShare.BLL.Services;
     using LitShare.DAL.Models;
@@ -29,15 +31,16 @@
         }
 
         [Fact]
-        public async Task RegisterAsync_WithValidDto_ReturnsTrue()
+        public async Task RegisterAsync_WithValidDto_ReturnsSuccess()
         {
             var dto = ValidDto();
             this.SetupEmailFree(dto.Email);
             this.SetupHasher(dto.Password);
 
-            bool result = await this.sut.RegisterAsync(dto);
+            var result = await this.sut.RegisterAsync(dto);
 
-            Assert.True(result);
+            Assert.True(result.IsSuccess);
+            Assert.True(result.Value); 
         }
 
         [Fact]
@@ -88,7 +91,7 @@
         }
 
         [Fact]
-        public async Task RegisterAsync_WithNullOptionalFields_ReturnsTrue()
+        public async Task RegisterAsync_WithNullOptionalFields_ReturnsSuccess()
         {
             var dto = ValidDto();
             dto.Phone = null;
@@ -98,22 +101,23 @@
             this.SetupEmailFree(dto.Email);
             this.SetupHasher(dto.Password);
 
-            bool result = await this.sut.RegisterAsync(dto);
+            var result = await this.sut.RegisterAsync(dto);
 
-            Assert.True(result);
+            Assert.True(result.IsSuccess);
         }
 
         [Fact]
-        public async Task RegisterAsync_WhenEmailAlreadyTaken_ReturnsFalse()
+        public async Task RegisterAsync_WhenEmailAlreadyTaken_ReturnsFailure()
         {
             var dto = ValidDto();
             this.userRepositoryMock
                 .Setup(r => r.ExistsByEmailAsync(dto.Email))
                 .ReturnsAsync(true);
 
-            bool result = await this.sut.RegisterAsync(dto);
+            var result = await this.sut.RegisterAsync(dto);
 
-            Assert.False(result);
+            Assert.False(result.IsSuccess);
+            Assert.Equal("Цей email вже зареєстрований у системі.", result.Error);
         }
 
         [Fact]
@@ -132,48 +136,46 @@
         }
 
         [Fact]
-        public async Task RegisterAsync_WithNullDto_ThrowsArgumentNullException()
+        public async Task RegisterAsync_WithNullDto_ReturnsFailure()
         {
-            await Assert.ThrowsAsync<ArgumentNullException>(
-                () => this.sut.RegisterAsync(null!));
+            var result = await this.sut.RegisterAsync(null!);
+            Assert.False(result.IsSuccess);
         }
 
         [Theory]
         [InlineData("")]
         [InlineData("   ")]
-        public async Task RegisterAsync_WithEmptyEmail_ThrowsArgumentException(string emptyEmail)
+        public async Task RegisterAsync_WithEmptyEmail_ReturnsFailure(string emptyEmail)
         {
             var dto = ValidDto();
             dto.Email = emptyEmail;
 
-            await Assert.ThrowsAsync<ArgumentException>(
-                () => this.sut.RegisterAsync(dto));
+            var result = await this.sut.RegisterAsync(dto);
+            Assert.False(result.IsSuccess);
         }
 
         [Theory]
         [InlineData("")]
         [InlineData("   ")]
-        public async Task RegisterAsync_WithEmptyPassword_ThrowsArgumentException(string emptyPassword)
+        public async Task RegisterAsync_WithEmptyPassword_ReturnsFailure(string emptyPassword)
         {
             var dto = ValidDto();
             dto.Password = emptyPassword;
 
-            await Assert.ThrowsAsync<ArgumentException>(
-                () => this.sut.RegisterAsync(dto));
+            var result = await this.sut.RegisterAsync(dto);
+            Assert.False(result.IsSuccess);
         }
 
         [Theory]
         [InlineData("")]
         [InlineData("   ")]
-        public async Task RegisterAsync_WithEmptyName_ThrowsArgumentException(string emptyName)
+        public async Task RegisterAsync_WithEmptyName_ReturnsFailure(string emptyName)
         {
-            
             var dto = ValidDto();
             dto.Name = emptyName;
 
-            
-            await Assert.ThrowsAsync<ArgumentException>(
-                () => this.sut.RegisterAsync(dto));
+            var result = await this.sut.RegisterAsync(dto);
+            Assert.False(result.IsSuccess);
         }
 
         [Fact]

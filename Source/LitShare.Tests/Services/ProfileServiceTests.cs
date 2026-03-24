@@ -1,4 +1,4 @@
-using LitShare.BLL.Services;
+﻿using LitShare.BLL.Services;
 using LitShare.DAL.Models;
 using LitShare.DAL.Repositories.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -24,7 +24,7 @@ namespace LitShare.Tests.Services
         }
 
         [Fact]
-        public async Task GetUserByIdAsync_WhenUserExists_ReturnsUser()
+        public async Task GetUserByIdAsync_WhenUserExists_ReturnsSuccessWithUser()
         {
             var user = new Users { Id = 1, Name = "Test" };
 
@@ -34,12 +34,13 @@ namespace LitShare.Tests.Services
 
             var result = await this.sut.GetUserByIdAsync(1);
 
-            Assert.NotNull(result);
-            Assert.Equal("Test", result!.Name);
+            Assert.True(result.IsSuccess);
+            Assert.NotNull(result.Value);
+            Assert.Equal("Test", result.Value.Name);
         }
 
         [Fact]
-        public async Task GetUserByIdAsync_WhenUserDoesNotExist_ReturnsNull()
+        public async Task GetUserByIdAsync_WhenUserDoesNotExist_ReturnsFailure()
         {
             this.userRepositoryMock
                 .Setup(r => r.GetByIdAsync(1))
@@ -47,7 +48,8 @@ namespace LitShare.Tests.Services
 
             var result = await this.sut.GetUserByIdAsync(1);
 
-            Assert.Null(result);
+            Assert.False(result.IsSuccess);
+            Assert.Equal("Користувача не знайдено.", result.Error);
         }
 
         [Fact]

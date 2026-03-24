@@ -1,5 +1,6 @@
 ﻿namespace LitShare.BLL.Services
 {
+    using LitShare.BLL.Common;
     using LitShare.BLL.DTOs;
     using LitShare.BLL.Services.Interfaces;
     using LitShare.DAL.Models;
@@ -23,34 +24,26 @@
             this.logger = logger;
         }
 
-        public async Task<bool> LoginAsync(LoginDto dto)
+        public async Task<Result<int>> LoginAsync(LoginDto dto)
         {
-            ArgumentNullException.ThrowIfNull(dto);
-
-            if (string.IsNullOrWhiteSpace(dto.Email))
+            if (dto == null)
             {
-                throw new ArgumentException("Email не може бути порожнім.", nameof(dto));
+                return Result<int>.Failure("Дані порожні.");
             }
 
-            if (string.IsNullOrWhiteSpace(dto.Password))
+            if (string.IsNullOrWhiteSpace(dto.Email) || string.IsNullOrWhiteSpace(dto.Password))
             {
-                throw new ArgumentException("Пароль не може бути порожнім.", nameof(dto));
+                return Result<int>.Failure("Email та пароль не можуть бути порожніми.");
             }
 
             this.logger.LogInformation("Login attempt. Email: {Email}", dto.Email);
 
             var user = await this.userRepository.GetByEmailAsync(dto.Email);
 
-            if (user is null)
+            if (user is null || string.IsNullOrEmpty(user.PasswordHash))
             {
-                this.logger.LogWarning("Login failed: user not found. Email: {Email}", dto.Email);
-                return false;
-            }
-
-            if (string.IsNullOrEmpty(user.PasswordHash))
-            {
-                this.logger.LogWarning("Login failed: user has no password hash. Email: {Email}", dto.Email);
-                return false;
+                this.logger.LogWarning("Login failed. Email: {Email}", dto.Email);
+                return Result<int>.Failure("Невірний email або пароль.");
             }
 
             var result = this.passwordHasher.VerifyHashedPassword(user, user.PasswordHash, dto.Password);
@@ -58,11 +51,11 @@
             if (result == PasswordVerificationResult.Failed)
             {
                 this.logger.LogWarning("Login failed: wrong password. Email: {Email}", dto.Email);
-                return false;
+                return Result<int>.Failure("Невірний email або пароль.");
             }
 
             this.logger.LogInformation("Login successful. Email: {Email}", dto.Email);
-            return true;
+            return Result<int>.Success(user.Id);
         }
     }
 }

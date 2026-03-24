@@ -4,6 +4,7 @@
     using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
+    using LitShare.BLL.Common;
     using LitShare.BLL.DTOs;
     using LitShare.BLL.Services.Interfaces;
     using LitShare.DAL.Models;
@@ -27,36 +28,29 @@
             this.logger = logger;
         }
 
-        public async Task<int> CreatePostAsync(CreatePostDto dto, int userId)
+        public async Task<Result<int>> CreatePostAsync(CreatePostDto dto, int userId)
         {
             this.logger.LogInformation("Starting post creation for user ID: {UserId}. Title: {Title}", userId, dto.Title);
 
-            try
+            string? photoUrl = await this.SaveImageAsync(dto);
+
+            var newPost = new Posts
             {
-                string? photoUrl = await this.SaveImageAsync(dto);
+                UserId = userId,
+                Title = dto.Title,
+                Author = dto.Author,
+                DealType = (DealType)dto.DealTypeId,
+                Description = dto.Description,
+                PhotoUrl = photoUrl,
+                BookGenres = dto.GenreIds.Select(genreId => new BookGenres { GenreId = genreId }).ToList(),
+            };
 
-                var newPost = new Posts
-                {
-                    UserId = userId,
-                    Title = dto.Title,
-                    Author = dto.Author,
-                    DealType = (DealType)dto.DealTypeId,
-                    Description = dto.Description,
-                    PhotoUrl = photoUrl,
-                    BookGenres = dto.GenreIds.Select(genreId => new BookGenres { GenreId = genreId }).ToList(),
-                };
+            await this.postRepository.AddAsync(newPost);
+            await this.postRepository.SaveChangesAsync();
 
-                await this.postRepository.AddAsync(newPost);
-                await this.postRepository.SaveChangesAsync();
+            this.logger.LogInformation("Successfully created post with ID: {PostId} for user ID: {UserId}", newPost.Id, userId);
 
-                this.logger.LogInformation("Successfully created post with ID: {PostId} for user ID: {UserId}", newPost.Id, userId);
-                return newPost.Id;
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(ex, "Failed to create post for user ID: {UserId}. Error: {Message}", userId, ex.Message);
-                throw;
-            }
+            return Result<int>.Success(newPost.Id);
         }
 
         private async Task<string?> SaveImageAsync(CreatePostDto dto)

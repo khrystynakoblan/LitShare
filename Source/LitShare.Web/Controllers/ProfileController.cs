@@ -1,10 +1,14 @@
 namespace LitShare.Web.Controllers
 {
+    using System.Security.Claims;
     using LitShare.BLL.Services.Interfaces;
     using LitShare.Web.Models;
+    using Microsoft.AspNetCore.Authorization;
+    using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
 
+    [Authorize]
     public class ProfileController : Controller
     {
         private readonly IProfileService profileService;
@@ -25,15 +29,15 @@ namespace LitShare.Web.Controllers
 
             this.logger.LogInformation("Opening profile page. UserId: {UserId}", userId);
 
-            var user = await this.profileService.GetUserByIdAsync(userId);
+            var result = await this.profileService.GetUserByIdAsync(userId);
 
-            if (user == null)
+            if (result.IsFailure)
             {
                 this.logger.LogWarning("User not found. UserId: {UserId}", userId);
-                return this.Content("User not found");
+                return this.Content(result.Error);
             }
 
-            this.logger.LogInformation("User profile loaded. UserId: {UserId}", userId);
+            var user = result.Value!;
 
             var model = new ProfileViewModel
             {
@@ -47,12 +51,6 @@ namespace LitShare.Web.Controllers
             };
 
             return this.View(model);
-        }
-
-        public IActionResult AddBook()
-        {
-            this.logger.LogInformation("User opened AddBook page");
-            return this.Content("Сторінка 'Додати книгу' ще не готова");
         }
 
         public IActionResult MyBooks()
@@ -75,7 +73,8 @@ namespace LitShare.Web.Controllers
 
         private int GetCurrentUserId()
         {
-            return 1;
+            var userIdString = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return int.Parse(userIdString!);
         }
     }
 }

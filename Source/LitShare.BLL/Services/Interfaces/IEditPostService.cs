@@ -1,12 +1,13 @@
 ﻿namespace LitShare.BLL.Services.Interfaces
 {
     using System.Threading.Tasks;
+    using LitShare.BLL.Common;
     using LitShare.BLL.DTOs;
 
     public interface IEditPostService
     {
-        Task<PostViewDto?> GetPostByIdAsync(int id);
+        Task<Result<PostViewDto>> GetPostByIdAsync(int id, int currentUserId);
 
-        Task EditPostAsync(EditPostDto dto);
+        Task<Result<bool>> EditPostAsync(EditPostDto dto, int currentUserId);
     }
 }

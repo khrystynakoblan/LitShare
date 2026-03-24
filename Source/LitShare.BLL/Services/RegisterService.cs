@@ -1,5 +1,6 @@
 ﻿namespace LitShare.BLL.Services
 {
+    using LitShare.BLL.Common;
     using LitShare.BLL.DTOs;
     using LitShare.BLL.Services.Interfaces;
     using LitShare.DAL.Models;
@@ -23,35 +24,36 @@
             this.logger = logger;
         }
 
-        public async Task<bool> RegisterAsync(RegisterDto dto)
+        public async Task<Result<bool>> RegisterAsync(RegisterDto dto)
         {
-            ArgumentNullException.ThrowIfNull(dto);
+            if (dto == null)
+            {
+                return Result<bool>.Failure("Дані для реєстрації порожні.");
+            }
 
             if (string.IsNullOrWhiteSpace(dto.Name))
             {
-                throw new ArgumentException("Ім'я не може бути порожнім.", nameof(dto));
+                return Result<bool>.Failure("Ім'я не може бути порожнім.");
             }
 
             if (string.IsNullOrWhiteSpace(dto.Email))
             {
-                throw new ArgumentException("Email не може бути порожнім.", nameof(dto));
+                return Result<bool>.Failure("Email не може бути порожнім.");
             }
 
             if (string.IsNullOrWhiteSpace(dto.Password))
             {
-                throw new ArgumentException("Пароль не може бути порожнім.", nameof(dto));
+                return Result<bool>.Failure("Пароль не може бути порожнім.");
             }
 
-            this.logger.LogInformation(
-                "Registration attempt. Email: {Email}", dto.Email);
+            this.logger.LogInformation("Registration attempt. Email: {Email}", dto.Email);
 
             bool emailTaken = await this.userRepository.ExistsByEmailAsync(dto.Email);
 
             if (emailTaken)
             {
-                this.logger.LogWarning(
-                    "Registration rejected: email {Email} is already taken.", dto.Email);
-                return false;
+                this.logger.LogWarning("Registration rejected: email {Email} is already taken.", dto.Email);
+                return Result<bool>.Failure("Цей email вже зареєстрований у системі.");
             }
 
             var user = new Users
@@ -69,10 +71,9 @@
 
             await this.userRepository.AddAsync(user);
 
-            this.logger.LogInformation(
-                "User registered successfully. Email: {Email}", dto.Email);
+            this.logger.LogInformation("User registered successfully. Email: {Email}", dto.Email);
 
-            return true;
+            return Result<bool>.Success(true);
         }
     }
 }

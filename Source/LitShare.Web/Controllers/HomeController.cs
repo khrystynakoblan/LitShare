@@ -1,35 +1,48 @@
-using System.Diagnostics;
-using LitShare.Web.Models;
-using Microsoft.AspNetCore.Mvc;
-
 namespace LitShare.Web.Controllers
 {
+    using LitShare.BLL.Services.Interfaces;
+    using LitShare.Web.Models;
+    using Microsoft.AspNetCore.Authorization;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.Extensions.Logging;
+
+    [Authorize]
     public class HomeController : Controller
     {
+        private readonly IHomeService homeService;
         private readonly ILogger<HomeController> logger;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(IHomeService homeService, ILogger<HomeController> logger)
         {
+            this.homeService = homeService;
             this.logger = logger;
         }
 
-        public IActionResult Index()
+        [HttpGet]
+        public async Task<IActionResult> Index()
         {
-            return View();
+            this.logger.LogInformation("User navigated to home page.");
+
+            var result = await this.homeService.GetAllPostsAsync();
+
+            if (result.IsFailure)
+            {
+                this.logger.LogWarning("Failed to load posts: {Error}", result.Error);
+                return this.View(new HomeViewModel());
+            }
+
+            var model = new HomeViewModel
+            {
+                Posts = result.Value!,
+            };
+
+            return this.View(model);
         }
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        [HttpGet]
         public IActionResult Error()
         {
-            return View(new ErrorViewModel
-            {
-                RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier,
-            });
+            return this.View();
         }
     }
 }

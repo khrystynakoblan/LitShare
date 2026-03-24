@@ -1,5 +1,6 @@
-namespace LitShare.BLL.Services
+﻿namespace LitShare.BLL.Services
 {
+    using LitShare.BLL.Common;
     using LitShare.BLL.Services.Interfaces;
     using LitShare.DAL.Models;
     using LitShare.DAL.Repositories.Interfaces;
@@ -18,28 +19,19 @@ namespace LitShare.BLL.Services
             this.logger = logger;
         }
 
-        public async Task<Users?> GetUserByIdAsync(int id)
+        public async Task<Result<Users>> GetUserByIdAsync(int id)
         {
-            this.logger.LogInformation(
-                "Fetching user profile. UserId: {UserId}",
-                id);
-
+            this.logger.LogInformation("Fetching user profile. UserId: {UserId}", id);
             var user = await this.userRepository.GetByIdAsync(id);
 
             if (user == null)
             {
-                this.logger.LogWarning(
-                    "User not found. UserId: {UserId}",
-                    id);
-
-                return null;
+                this.logger.LogWarning("User not found. UserId: {UserId}", id);
+                return Result<Users>.Failure("Користувача не знайдено.");
             }
 
-            this.logger.LogInformation(
-                "User profile loaded successfully. UserId: {UserId}",
-                id);
-
-            return user;
+            this.logger.LogInformation("User profile loaded successfully. UserId: {UserId}", id);
+            return Result<Users>.Success(user);
         }
     }
 }

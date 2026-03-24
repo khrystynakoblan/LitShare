@@ -3,8 +3,8 @@
     using LitShare.BLL.Common;
     using LitShare.BLL.DTOs;
 
-    public interface ILoginService
+    public interface IHomeService
     {
-        Task<Result<int>> LoginAsync(LoginDto dto);
+        Task<Result<List<PostCardDto>>> GetAllPostsAsync();
     }
 }

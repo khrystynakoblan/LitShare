@@ -17,6 +17,8 @@
         private readonly Mock<ILogger<EditPostService>> loggerMock;
         private readonly EditPostService sut;
 
+        private const int CurrentUserId = 10; 
+
         public EditPostServiceTests()
         {
             this.postRepositoryMock = new Mock<IPostRepository>();
@@ -31,11 +33,12 @@
         public async Task EditPostAsync_ValidData_UpdatesBasicFieldsCorrectly()
         {
             var dto = ValidDto();
-            var post = ExistingPost();
+            var post = ExistingPost(CurrentUserId);
             this.SetupGetById(post);
 
-            await this.sut.EditPostAsync(dto);
+            var result = await this.sut.EditPostAsync(dto, CurrentUserId);
 
+            Assert.True(result.IsSuccess);
             Assert.Equal(dto.Title, post.Title);
             Assert.Equal(dto.Author, post.Author);
             Assert.Equal(dto.Description, post.Description);
@@ -46,11 +49,12 @@
         {
             var dto = ValidDto();
             dto.DealTypeId = (int)DealType.Donation;
-            var post = ExistingPost();
+            var post = ExistingPost(CurrentUserId);
             this.SetupGetById(post);
 
-            await this.sut.EditPostAsync(dto);
+            var result = await this.sut.EditPostAsync(dto, CurrentUserId);
 
+            Assert.True(result.IsSuccess);
             Assert.Equal(DealType.Donation, post.DealType);
         }
 
@@ -59,11 +63,12 @@
         {
             var dto = ValidDto();
             dto.GenreIds = new List<int> { 5, 6 };
-            var post = ExistingPost();
+            var post = ExistingPost(CurrentUserId);
             this.SetupGetById(post);
 
-            await this.sut.EditPostAsync(dto);
+            var result = await this.sut.EditPostAsync(dto, CurrentUserId);
 
+            Assert.True(result.IsSuccess);
             Assert.Equal(2, post.BookGenres.Count);
             Assert.Contains(post.BookGenres, bg => bg.GenreId == 5);
             Assert.Contains(post.BookGenres, bg => bg.GenreId == 6);
@@ -72,9 +77,9 @@
         [Fact]
         public async Task EditPostAsync_ValidData_CallsUpdateAsyncOnce()
         {
-            this.SetupGetById(ExistingPost());
+            this.SetupGetById(ExistingPost(CurrentUserId));
 
-            await this.sut.EditPostAsync(ValidDto());
+            await this.sut.EditPostAsync(ValidDto(), CurrentUserId);
 
             this.postRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<Posts>()), Times.Once);
         }
@@ -82,9 +87,9 @@
         [Fact]
         public async Task EditPostAsync_ValidData_CallsSaveChangesAsyncOnce()
         {
-            this.SetupGetById(ExistingPost());
+            this.SetupGetById(ExistingPost(CurrentUserId));
 
-            await this.sut.EditPostAsync(ValidDto());
+            await this.sut.EditPostAsync(ValidDto(), CurrentUserId);
 
             this.postRepositoryMock.Verify(r => r.SaveChangesAsync(), Times.Once);
         }
@@ -92,9 +97,9 @@
         [Fact]
         public async Task EditPostAsync_ValidData_LogsStartMessage()
         {
-            this.SetupGetById(ExistingPost());
+            this.SetupGetById(ExistingPost(CurrentUserId));
 
-            await this.sut.EditPostAsync(ValidDto());
+            await this.sut.EditPostAsync(ValidDto(), CurrentUserId);
 
             this.VerifyLog(LogLevel.Information, "Starting post edit for post ID: 1");
         }
@@ -102,9 +107,9 @@
         [Fact]
         public async Task EditPostAsync_ValidData_LogsSuccessMessage()
         {
-            this.SetupGetById(ExistingPost());
+            this.SetupGetById(ExistingPost(CurrentUserId));
 
-            await this.sut.EditPostAsync(ValidDto());
+            await this.sut.EditPostAsync(ValidDto(), CurrentUserId);
 
             this.VerifyLog(LogLevel.Information, "Successfully edited post with ID: 1");
         }
@@ -112,15 +117,16 @@
         [Fact]
         public async Task EditPostAsync_ValidData_ReplacesOldGenresWithNew()
         {
-            var post = ExistingPost();
+            var post = ExistingPost(CurrentUserId);
             post.BookGenres.Add(new BookGenres { GenreId = 99 });
             this.SetupGetById(post);
 
             var dto = ValidDto();
             dto.GenreIds = new List<int> { 7, 8 };
 
-            await this.sut.EditPostAsync(dto);
+            var result = await this.sut.EditPostAsync(dto, CurrentUserId);
 
+            Assert.True(result.IsSuccess);
             Assert.Equal(2, post.BookGenres.Count);
             Assert.Contains(post.BookGenres, bg => bg.GenreId == 7);
             Assert.Contains(post.BookGenres, bg => bg.GenreId == 8);
@@ -131,24 +137,41 @@
         {
             var dto = ValidDto();
             dto.Description = null;
-            this.SetupGetById(ExistingPost());
+            this.SetupGetById(ExistingPost(CurrentUserId));
 
-            await this.sut.EditPostAsync(dto);
+            var result = await this.sut.EditPostAsync(dto, CurrentUserId);
 
+            Assert.True(result.IsSuccess);
             this.postRepositoryMock.Verify(
                 r => r.UpdateAsync(It.Is<Posts>(p => p.Description == null)),
                 Times.Once);
         }
 
         [Fact]
-        public async Task EditPostAsync_PostNotFound_ThrowsInvalidOperationException()
+        public async Task EditPostAsync_OtherUserPost_ReturnsUnauthorized()
+        {
+            var dto = ValidDto();
+            var post = ExistingPost(999);
+            this.SetupGetById(post);
+
+            var result = await this.sut.EditPostAsync(dto, CurrentUserId);
+
+            Assert.False(result.IsSuccess);
+            Assert.True(result.IsUnauthorized);
+            this.postRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<Posts>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task EditPostAsync_PostNotFound_ReturnsFailureResult()
         {
             this.postRepositoryMock
                 .Setup(r => r.GetByIdAsync(It.IsAny<int>()))
                 .ReturnsAsync((Posts?)null);
 
-            await Assert.ThrowsAsync<InvalidOperationException>(
-                () => this.sut.EditPostAsync(ValidDto()));
+            var result = await this.sut.EditPostAsync(ValidDto(), CurrentUserId);
+
+            Assert.False(result.IsSuccess);
+            Assert.Equal("Оголошення не знайдено.", result.Error);
         }
 
         [Fact]
@@ -158,8 +181,7 @@
                 .Setup(r => r.GetByIdAsync(It.IsAny<int>()))
                 .ReturnsAsync((Posts?)null);
 
-            await Assert.ThrowsAsync<InvalidOperationException>(
-                () => this.sut.EditPostAsync(ValidDto()));
+            await this.sut.EditPostAsync(ValidDto(), CurrentUserId);
 
             this.VerifyLog(LogLevel.Warning, "Post with ID: 1 was not found");
         }
@@ -171,37 +193,22 @@
                 .Setup(r => r.GetByIdAsync(It.IsAny<int>()))
                 .ReturnsAsync((Posts?)null);
 
-            await Assert.ThrowsAsync<InvalidOperationException>(
-                () => this.sut.EditPostAsync(ValidDto()));
+            await this.sut.EditPostAsync(ValidDto(), CurrentUserId);
 
             this.postRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<Posts>()), Times.Never);
             this.postRepositoryMock.Verify(r => r.SaveChangesAsync(), Times.Never);
         }
 
         [Fact]
-        public async Task EditPostAsync_RepositoryFail_LogsError()
-        {
-            this.SetupGetById(ExistingPost());
-            this.postRepositoryMock
-                .Setup(r => r.UpdateAsync(It.IsAny<Posts>()))
-                .ThrowsAsync(new Exception("DB Crash"));
-
-            await Assert.ThrowsAsync<Exception>(
-                () => this.sut.EditPostAsync(ValidDto()));
-
-            this.VerifyLog(LogLevel.Error, "Failed to edit post with ID: 1");
-        }
-
-        [Fact]
         public async Task EditPostAsync_RepositoryFail_PropagatesException()
         {
-            this.SetupGetById(ExistingPost());
+            this.SetupGetById(ExistingPost(CurrentUserId));
             this.postRepositoryMock
                 .Setup(r => r.UpdateAsync(It.IsAny<Posts>()))
                 .ThrowsAsync(new InvalidOperationException("Fatal error"));
 
             await Assert.ThrowsAsync<InvalidOperationException>(
-                () => this.sut.EditPostAsync(ValidDto()));
+                () => this.sut.EditPostAsync(ValidDto(), CurrentUserId));
         }
 
         private static EditPostDto ValidDto() => new EditPostDto
@@ -214,9 +221,10 @@
             DealTypeId = (int)DealType.Exchange,
         };
 
-        private static Posts ExistingPost() => new Posts
+        private static Posts ExistingPost(int userId) => new Posts
         {
             Id = 1,
+            UserId = userId,
             Title = "Old Title",
             Author = "Old Author",
             Description = "Old Description",

@@ -5,6 +5,8 @@ namespace LitShare.DAL.Repositories.Interfaces
 {
     public interface IPostRepository
     {
+        Task<IEnumerable<Posts>> GetAllAsync();
+
         Task AddAsync(Posts post);
 
         Task SaveChangesAsync();

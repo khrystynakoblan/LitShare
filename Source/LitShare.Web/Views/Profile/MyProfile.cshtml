@@ -14,8 +14,8 @@
 
                 <div class="border rounded p-4 text-center">
 
-                    <img src="@(string.IsNullOrEmpty(Model.PhotoUrl) 
-                            ? "https://cdn-icons-png.flaticon.com/512/149/149071.png" 
+                    <img src="@(string.IsNullOrEmpty(Model.PhotoUrl)
+                            ? "https://cdn-icons-png.flaticon.com/512/149/149071.png"
                             : Model.PhotoUrl)"
                          alt="Фото профілю"
                          class="rounded-circle mb-3"
@@ -25,7 +25,7 @@
                 </div>
 
                 <div class="mt-4 d-grid gap-2">
-                    <a asp-controller="Profile" asp-action="AddBook" class="btn btn-dark">Додати книгу</a>
+                    <a asp-controller="Post" asp-action="CreatePost" class="btn btn-dark">Додати книгу</a>
                     <a asp-controller="Profile" asp-action="MyBooks" class="btn btn-dark">Мої книги</a>
                     <a asp-controller="Profile" asp-action="EditProfile" class="btn btn-dark">Редагувати профіль</a>
                     <a asp-controller="Profile" asp-action="DeleteAccount" class="btn btn-outline-danger">Видалити акаунт</a>
