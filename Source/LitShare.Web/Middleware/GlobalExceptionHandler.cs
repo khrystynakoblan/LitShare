@@ -1,7 +1,11 @@
 ﻿namespace LitShare.Web.Middleware
 {
+    using System;
+    using System.Threading;
+    using System.Threading.Tasks;
     using Microsoft.AspNetCore.Diagnostics;
-    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.Extensions.Logging;
 
     public class GlobalExceptionHandler : IExceptionHandler
     {
@@ -12,7 +16,7 @@
             this.logger = logger;
         }
 
-        public async ValueTask<bool> TryHandleAsync(
+        public ValueTask<bool> TryHandleAsync(
             HttpContext httpContext,
             Exception exception,
             CancellationToken cancellationToken)
@@ -22,22 +26,9 @@
                 "Unhandled exception occurred. Path: {Path}",
                 httpContext.Request.Path);
 
-            httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
+            httpContext.Response.Redirect("/Home/Error");
 
-            if (!httpContext.Request.Path.StartsWithSegments("/api"))
-            {
-                httpContext.Response.Redirect("/Home/Error");
-                return true;
-            }
-
-            var problemDetails = new ProblemDetails
-            {
-                Status = StatusCodes.Status500InternalServerError,
-                Title = "An unexpected error occurred.",
-            };
-
-            await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
-            return true;
+            return ValueTask.FromResult(true);
         }
     }
 }
