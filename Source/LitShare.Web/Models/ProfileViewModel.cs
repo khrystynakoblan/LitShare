@@ -1,3 +1,5 @@
+using LitShare.BLL.DTOs;
+
 namespace LitShare.Web.Models
 {
     public class ProfileViewModel
@@ -15,5 +17,7 @@ namespace LitShare.Web.Models
         public string About { get; set; } = string.Empty;
 
         public string? PhotoUrl { get; set; }
+
+        public IEnumerable<PostCardDto> UserBooks { get; set; } = new List<PostCardDto>();
     }
 }

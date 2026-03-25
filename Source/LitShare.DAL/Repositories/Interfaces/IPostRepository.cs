@@ -13,6 +13,8 @@ namespace LitShare.DAL.Repositories.Interfaces
 
         Task<Posts?> GetByIdAsync(int id);
 
+        Task<IEnumerable<Posts>> GetByUserIdAsync(int userId);
+
         Task UpdateAsync(Posts post);
     }
 }

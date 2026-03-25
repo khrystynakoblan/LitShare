@@ -39,6 +39,14 @@ namespace LitShare.DAL.Repositories
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
 
+        public async Task<IEnumerable<Posts>> GetByUserIdAsync(int userId)
+        {
+            return await this.context.Posts
+                .Include(p => p.User)
+                .Where(p => p.UserId == userId)
+                .ToListAsync();
+        }
+
         public Task UpdateAsync(Posts post)
         {
             this.context.Posts.Update(post);
