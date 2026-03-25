@@ -1,24 +1,29 @@
 namespace LitShare.Web.Controllers
 {
     using System.Security.Claims;
+    using LitShare.BLL.DTOs;
     using LitShare.BLL.Services.Interfaces;
     using LitShare.Web.Models;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
+    using static System.Reflection.Metadata.BlobBuilder;
 
     [Authorize]
     public class ProfileController : Controller
     {
         private readonly IProfileService profileService;
+        private readonly IPostService postService;
         private readonly ILogger<ProfileController> logger;
 
         public ProfileController(
             IProfileService profileService,
+            IPostService postService,
             ILogger<ProfileController> logger)
         {
             this.profileService = profileService;
+            this.postService = postService;
             this.logger = logger;
         }
 
@@ -49,6 +54,49 @@ namespace LitShare.Web.Controllers
                 PhotoUrl = user.PhotoUrl,
                 About = user.About ?? string.Empty
             };
+
+            return this.View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GuestProfile(int id)
+        {
+            this.logger.LogInformation("Request to view guest profile. Target UserId: {UserId}", id);
+
+            var result = await this.profileService.GetUserByIdAsync(id);
+
+            if (result.IsFailure)
+            {
+                this.logger.LogWarning("Guest profile not found. UserId: {UserId}. Reason: {Error}", id, result.Error);
+                return this.NotFound("Користувача не знайдено");
+            }
+
+            var user = result.Value!;
+
+            this.logger.LogInformation("User found: {UserName}. Fetching books for UserId: {UserId}", user.Name, id);
+
+            var booksResult = await this.postService.GetPostsByUserIdAsync(id);
+
+            if (booksResult.IsFailure)
+            {
+                this.logger.LogError("Failed to fetch books for UserId: {UserId}. Error: {Error}", id, booksResult.Error);
+            }
+
+            var books = booksResult.IsSuccess ? booksResult.Value! : new List<PostCardDto>();
+
+            var model = new ProfileViewModel
+            {
+                Name = user.Name ?? "Користувач",
+                Email = user.Email ?? string.Empty,
+                Region = user.Region ?? "Не вказано",
+                District = user.District ?? "Не вказано",
+                City = user.City ?? "Не вказано",
+                PhotoUrl = user.PhotoUrl,
+                About = user.About ?? "Інформація відсутня",
+                UserBooks = books
+            };
+
+            this.logger.LogInformation("Successfully loaded guest profile for {UserName} (ID: {UserId}) with {BookCount} books.", user.Name, id, books.Count());
 
             return this.View(model);
         }

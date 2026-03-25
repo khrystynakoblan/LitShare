@@ -59,6 +59,7 @@ try
     builder.Services.AddScoped<IGenreService, GenreService>();
     builder.Services.AddScoped<IEditPostService, EditPostService>();
     builder.Services.AddScoped<IHomeService, HomeService>();
+    builder.Services.AddScoped<IPostService, PostService>();
 
     builder.Services.AddControllersWithViews();
 
