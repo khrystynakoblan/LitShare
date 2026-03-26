@@ -6,6 +6,6 @@
     {
         public List<PostCardDto> Posts { get; set; } = new List<PostCardDto>();
 
-        public int TotalCount => this.Posts.Count();
+        public int TotalCount => this.Posts.Count;
     }
 }

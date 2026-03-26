@@ -37,7 +37,14 @@
         public async Task<Users?> GetByEmailAsync(string email)
         {
             return await this.context.Users
+                .AsNoTracking()
                 .FirstOrDefaultAsync(u => u.Email == email);
+        }
+
+        public async Task UpdateAsync(Users user)
+        {
+            this.context.Users.Update(user);
+            await this.context.SaveChangesAsync();
         }
     }
 }

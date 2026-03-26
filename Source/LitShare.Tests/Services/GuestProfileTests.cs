@@ -37,7 +37,7 @@ namespace LitShare.Tests.Controllers
         public async Task GuestProfile_FullSuccess_MapsAllFieldsCorrectly()
         {
             int userId = 1;
-            var user = new Users { Id = userId, Name = "User1", City = "City1" };
+            var user = new Users { Id = userId, Name = "User1", City = "City1", Phone = "+380970000000" };
             var books = new List<PostCardDto> { new PostCardDto { Title = "Book1" } };
 
             _profileServiceMock.Setup(s => s.GetUserByIdAsync(userId)).ReturnsAsync(Result<Users>.Success(user));
@@ -48,6 +48,7 @@ namespace LitShare.Tests.Controllers
             var viewResult = Assert.IsType<ViewResult>(result);
             var model = Assert.IsType<ProfileViewModel>(viewResult.Model);
             Assert.Equal("User1", model.Name);
+            Assert.Equal("+380970000000", model.Phone);
             Assert.Single(model.UserBooks);
         }
 

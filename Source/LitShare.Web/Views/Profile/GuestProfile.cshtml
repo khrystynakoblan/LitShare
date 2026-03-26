@@ -19,10 +19,27 @@
                         <p class="fw-bold">@Model.Name</p>
                         <p class="mb-1 text-muted small text-uppercase mt-3">Email:</p>
                         <p>@Model.Email</p>
+
+                     <p class="mb-1 text-muted small text-uppercase mt-3">Контактні дані:</p>
+                    @if (Model.Phone != "Номер не вказано")
+                    {
+                            <p class="fw-bold">
+                                <a href="tel:@Model.Phone" class="text-decoration-none text-dark"> @Model.Phone
+                                </a>
+                            </p>
+                    }
+                    else
+                    {
+                            <p class="text-muted small">@Model.Phone</p>
+                    }
                     </div>
                     <div class="col-sm-6">
-                        <p class="mb-1 text-muted small text-uppercase">Локація:</p>
-                        <p>@Model.Region, @Model.City</p>
+                        <p class="mb-1 text-muted small text-uppercase">Область:</p>
+                        <p>@Model.Region</p>
+                        <p class="mb-1 text-muted small text-uppercase">Район:</p>
+                        <p>@Model.District</p>
+                        <p class="mb-1 text-muted small text-uppercase">Місто:</p>
+                        <p>@Model.City</p>
                     </div>
                 </div>
             </div>

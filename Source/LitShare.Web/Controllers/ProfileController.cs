@@ -5,10 +5,8 @@ namespace LitShare.Web.Controllers
     using LitShare.BLL.Services.Interfaces;
     using LitShare.Web.Models;
     using Microsoft.AspNetCore.Authorization;
-    using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
-    using static System.Reflection.Metadata.BlobBuilder;
 
     [Authorize]
     public class ProfileController : Controller
@@ -48,6 +46,7 @@ namespace LitShare.Web.Controllers
             {
                 Name = user.Name ?? string.Empty,
                 Email = user.Email ?? string.Empty,
+                Phone = user.Phone ?? string.Empty,
                 Region = user.Region ?? string.Empty,
                 District = user.District ?? string.Empty,
                 City = user.City ?? string.Empty,
@@ -73,14 +72,7 @@ namespace LitShare.Web.Controllers
 
             var user = result.Value!;
 
-            this.logger.LogInformation("User found: {UserName}. Fetching books for UserId: {UserId}", user.Name, id);
-
             var booksResult = await this.postService.GetPostsByUserIdAsync(id);
-
-            if (booksResult.IsFailure)
-            {
-                this.logger.LogError("Failed to fetch books for UserId: {UserId}. Error: {Error}", id, booksResult.Error);
-            }
 
             var books = booksResult.IsSuccess ? booksResult.Value! : new List<PostCardDto>();
 
@@ -92,11 +84,10 @@ namespace LitShare.Web.Controllers
                 District = user.District ?? "Не вказано",
                 City = user.City ?? "Не вказано",
                 PhotoUrl = user.PhotoUrl,
+                Phone = user.Phone ?? "Номер не вказано",
                 About = user.About ?? "Інформація відсутня",
                 UserBooks = books
             };
-
-            this.logger.LogInformation("Successfully loaded guest profile for {UserName} (ID: {UserId}) with {BookCount} books.", user.Name, id, books.Count());
 
             return this.View(model);
         }
@@ -107,10 +98,107 @@ namespace LitShare.Web.Controllers
             return this.Content("Сторінка 'Мої книги' ще не готова");
         }
 
-        public IActionResult EditProfile()
+        [HttpGet]
+        public async Task<IActionResult> EditProfile()
         {
-            this.logger.LogInformation("User opened EditProfile page");
-            return this.Content("Сторінка 'Редагувати профіль' ще не готова");
+            var userId = this.GetCurrentUserId();
+
+            this.logger.LogInformation("Opening EditProfile page. UserId: {UserId}", userId);
+
+            var result = await this.profileService.GetUserByIdAsync(userId);
+
+            if (result.IsFailure)
+            {
+                return this.Content(result.Error);
+            }
+
+            var user = result.Value!;
+
+            var model = new ProfileViewModel
+            {
+                Name = user.Name ?? string.Empty,
+                Email = user.Email ?? string.Empty,
+                Phone = user.Phone ?? string.Empty,
+                Region = user.Region ?? string.Empty,
+                District = user.District ?? string.Empty,
+                City = user.City ?? string.Empty,
+                About = user.About ?? string.Empty,
+                PhotoUrl = user.PhotoUrl
+            };
+
+            return this.View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditProfile(ProfileViewModel model)
+        {
+            var userId = this.GetCurrentUserId();
+
+            this.logger.LogInformation("User updating profile. UserId: {UserId}", userId);
+
+            if (!ModelState.IsValid)
+            {
+                return this.View(model);
+            }
+
+            var dto = new UpdateProfileDto
+            {
+                Email = model.Email,
+                Region = model.Region,
+                Phone = model.Phone,
+                District = model.District,
+                City = model.City,
+                About = model.About,
+                PhotoUrl = model.PhotoUrl
+            };
+
+            var result = await this.profileService.UpdateProfileAsync(userId, dto);
+
+            if (result.IsFailure)
+            {
+                this.logger.LogWarning("Profile update failed. UserId: {UserId}, Error: {Error}", userId, result.Error);
+                this.ModelState.AddModelError(string.Empty, result.Error);
+                return this.View(model);
+            }
+
+            this.logger.LogInformation("Profile updated successfully. UserId: {UserId}", userId);
+
+            return this.RedirectToAction("MyProfile");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GenerateAvatar()
+        {
+            var userId = this.GetCurrentUserId();
+
+            this.logger.LogInformation("User clicked generate avatar. UserId: {UserId}", userId);
+
+            var result = await this.profileService.GetUserByIdAsync(userId);
+
+            if (result.IsFailure)
+            {
+                return this.Content(result.Error);
+            }
+
+            var user = result.Value!;
+
+            var seed = Guid.NewGuid().ToString();
+            var tempAvatar = $"https://api.dicebear.com/7.x/bottts/svg?seed={seed}";
+
+            var model = new ProfileViewModel
+            {
+                Name = user.Name ?? string.Empty,
+                Email = user.Email ?? string.Empty,
+                Phone = user.Phone ?? string.Empty,
+                Region = user.Region ?? string.Empty,
+                District = user.District ?? string.Empty,
+                City = user.City ?? string.Empty,
+                About = user.About ?? string.Empty,
+                PhotoUrl = tempAvatar,
+                UserBooks = new List<PostCardDto>()
+            };
+
+            return this.View("EditProfile", model);
         }
 
         public IActionResult DeleteAccount()

@@ -32,7 +32,7 @@
                 PhotoUrl = p.PhotoUrl,
             }).ToList();
 
-            this.logger.LogInformation("Successfully fetched {Count} posts.", postCards.Count());
+            this.logger.LogInformation("Successfully fetched {Count} posts.", postCards.Count);
 
             return Result<List<PostCardDto>>.Success(postCards);
         }
