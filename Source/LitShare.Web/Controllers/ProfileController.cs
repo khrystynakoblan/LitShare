@@ -5,10 +5,8 @@ namespace LitShare.Web.Controllers
     using LitShare.BLL.Services.Interfaces;
     using LitShare.Web.Models;
     using Microsoft.AspNetCore.Authorization;
-    using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
-    using static System.Reflection.Metadata.BlobBuilder;
 
     [Authorize]
     public class ProfileController : Controller
@@ -74,14 +72,7 @@ namespace LitShare.Web.Controllers
 
             var user = result.Value!;
 
-            this.logger.LogInformation("User found: {UserName}. Fetching books for UserId: {UserId}", user.Name, id);
-
             var booksResult = await this.postService.GetPostsByUserIdAsync(id);
-
-            if (booksResult.IsFailure)
-            {
-                this.logger.LogError("Failed to fetch books for UserId: {UserId}. Error: {Error}", id, booksResult.Error);
-            }
 
             var books = booksResult.IsSuccess ? booksResult.Value! : new List<PostCardDto>();
 
@@ -97,8 +88,6 @@ namespace LitShare.Web.Controllers
                 About = user.About ?? "Інформація відсутня",
                 UserBooks = books
             };
-
-            this.logger.LogInformation("Successfully loaded guest profile for {UserName} (ID: {UserId}) with {BookCount} books.", user.Name, id, books.Count());
 
             return this.View(model);
         }
@@ -149,7 +138,7 @@ namespace LitShare.Web.Controllers
 
             if (!ModelState.IsValid)
             {
-                return View(model);
+                return this.View(model);
             }
 
             var dto = new UpdateProfileDto
@@ -159,7 +148,8 @@ namespace LitShare.Web.Controllers
                 Phone = model.Phone,
                 District = model.District,
                 City = model.City,
-                About = model.About
+                About = model.About,
+                PhotoUrl = model.PhotoUrl
             };
 
             var result = await this.profileService.UpdateProfileAsync(userId, dto);
@@ -167,13 +157,13 @@ namespace LitShare.Web.Controllers
             if (result.IsFailure)
             {
                 this.logger.LogWarning("Profile update failed. UserId: {UserId}, Error: {Error}", userId, result.Error);
-
-                ModelState.AddModelError(string.Empty, result.Error);
-                return View(model);
+                this.ModelState.AddModelError(string.Empty, result.Error);
+                return this.View(model);
             }
 
             this.logger.LogInformation("Profile updated successfully. UserId: {UserId}", userId);
-            return RedirectToAction("MyProfile");
+
+            return this.RedirectToAction("MyProfile");
         }
 
         [HttpPost]
@@ -183,15 +173,32 @@ namespace LitShare.Web.Controllers
 
             this.logger.LogInformation("User clicked generate avatar. UserId: {UserId}", userId);
 
-            var result = await this.profileService.GenerateRandomAvatarAsync(userId);
+            var result = await this.profileService.GetUserByIdAsync(userId);
 
             if (result.IsFailure)
             {
-                this.logger.LogWarning("Avatar generation failed. UserId: {UserId}", userId);
                 return this.Content(result.Error);
             }
 
-            return RedirectToAction("EditProfile");
+            var user = result.Value!;
+
+            var seed = Guid.NewGuid().ToString();
+            var tempAvatar = $"https://api.dicebear.com/7.x/bottts/svg?seed={seed}";
+
+            var model = new ProfileViewModel
+            {
+                Name = user.Name ?? string.Empty,
+                Email = user.Email ?? string.Empty,
+                Phone = user.Phone ?? string.Empty,
+                Region = user.Region ?? string.Empty,
+                District = user.District ?? string.Empty,
+                City = user.City ?? string.Empty,
+                About = user.About ?? string.Empty,
+                PhotoUrl = tempAvatar,
+                UserBooks = new List<PostCardDto>()
+            };
+
+            return this.View("EditProfile", model);
         }
 
         public IActionResult DeleteAccount()

@@ -62,9 +62,7 @@ namespace LitShare.Tests.Services
 
             await sut.GetUserByIdAsync(1);
 
-            userRepositoryMock.Verify(
-                r => r.GetByIdAsync(1),
-                Times.Once);
+            userRepositoryMock.Verify(r => r.GetByIdAsync(1), Times.Once);
         }
 
         [Fact]
@@ -94,7 +92,8 @@ namespace LitShare.Tests.Services
                 City = "Lviv",
                 District = "District",
                 Region = "Region",
-                About = "About"
+                About = "About",
+                PhotoUrl = "avatar-url"
             };
 
             var result = await sut.UpdateProfileAsync(1, dto);
@@ -107,6 +106,7 @@ namespace LitShare.Tests.Services
             Assert.Equal(dto.District, user.District);
             Assert.Equal(dto.Region, user.Region);
             Assert.Equal(dto.About, user.About);
+            Assert.Equal(dto.PhotoUrl, user.PhotoUrl);
 
             userRepositoryMock.Verify(r => r.UpdateAsync(user), Times.Once);
         }
@@ -156,42 +156,7 @@ namespace LitShare.Tests.Services
         }
 
         [Fact]
-        public async Task GenerateRandomAvatarAsync_WhenUserExists_UpdatesPhotoUrl()
-        {
-            var user = new Users { Id = 1, PhotoUrl = "old" };
-
-            userRepositoryMock
-                .Setup(r => r.GetByIdAsync(1))
-                .ReturnsAsync(user);
-
-            var result = await sut.GenerateRandomAvatarAsync(1);
-
-            Assert.True(result.IsSuccess);
-            Assert.NotNull(user.PhotoUrl);
-            Assert.NotEqual("old", user.PhotoUrl);
-            Assert.Contains("dicebear", user.PhotoUrl);
-
-            userRepositoryMock.Verify(r => r.UpdateAsync(user), Times.Once);
-        }
-
-        [Fact]
-        public async Task GenerateRandomAvatarAsync_WhenUserNotFound_ReturnsFailure()
-        {
-            userRepositoryMock
-                .Setup(r => r.GetByIdAsync(It.IsAny<int>()))
-                .ReturnsAsync((Users?)null);
-
-            var result = await sut.GenerateRandomAvatarAsync(1);
-
-            Assert.False(result.IsSuccess);
-
-            userRepositoryMock.Verify(
-                r => r.UpdateAsync(It.IsAny<Users>()),
-                Times.Never);
-        }
-
-        [Fact]
-        public async Task GenerateRandomAvatarAsync_WhenRepositoryThrows_PropagatesException()
+        public async Task UpdateProfileAsync_WithEmptyFields_UpdatesCorrectly()
         {
             var user = new Users { Id = 1 };
 
@@ -199,12 +164,28 @@ namespace LitShare.Tests.Services
                 .Setup(r => r.GetByIdAsync(1))
                 .ReturnsAsync(user);
 
-            userRepositoryMock
-                .Setup(r => r.UpdateAsync(user))
-                .ThrowsAsync(new Exception());
+            var dto = new UpdateProfileDto
+            {
+                Email = "",
+                Phone = "",
+                City = "",
+                District = "",
+                Region = "",
+                About = "",
+                PhotoUrl = ""
+            };
 
-            await Assert.ThrowsAsync<Exception>(
-                () => sut.GenerateRandomAvatarAsync(1));
+            var result = await sut.UpdateProfileAsync(1, dto);
+
+            Assert.True(result.IsSuccess);
+
+            Assert.Equal(dto.Email, user.Email);
+            Assert.Equal(dto.Phone, user.Phone);
+            Assert.Equal(dto.City, user.City);
+            Assert.Equal(dto.District, user.District);
+            Assert.Equal(dto.Region, user.Region);
+            Assert.Equal(dto.About, user.About);
+            Assert.Equal(dto.PhotoUrl, user.PhotoUrl);
         }
     }
 }

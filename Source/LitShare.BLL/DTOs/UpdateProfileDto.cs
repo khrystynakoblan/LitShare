@@ -13,5 +13,7 @@ namespace LitShare.BLL.DTOs
         public string City { get; set; } = string.Empty;
 
         public string About { get; set; } = string.Empty;
+
+        public string? PhotoUrl { get; set; }
     }
 }

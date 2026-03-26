@@ -9,7 +9,5 @@ namespace LitShare.BLL.Services.Interfaces
         Task<Result<Users>> GetUserByIdAsync(int id);
 
         Task<Result<bool>> UpdateProfileAsync(int userId, UpdateProfileDto dto);
-
-        Task<Result<bool>> GenerateRandomAvatarAsync(int userId);
     }
 }

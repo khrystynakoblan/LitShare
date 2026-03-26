@@ -31,6 +31,8 @@
             <div class="col-md-8">
                 <div class="border rounded p-4">
                     <form asp-controller="Profile" asp-action="EditProfile" method="post">
+
+                        <input type="hidden" asp-for="PhotoUrl" />
                         
                         <h4 class="fw-bold mb-4">Основна інформація</h4>
 

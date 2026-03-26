@@ -53,33 +53,11 @@
             user.District = dto.District;
             user.City = dto.City;
             user.About = dto.About;
+            user.PhotoUrl = dto.PhotoUrl;
 
             await this.userRepository.UpdateAsync(user);
 
             this.logger.LogInformation("Profile updated successfully. UserId: {UserId}", userId);
-
-            return Result<bool>.Success(true);
-        }
-
-        public async Task<Result<bool>> GenerateRandomAvatarAsync(int userId)
-        {
-            this.logger.LogInformation("Generating random avatar. UserId: {UserId}", userId);
-
-            var user = await this.userRepository.GetByIdAsync(userId);
-
-            if (user == null)
-            {
-                this.logger.LogWarning("User not found while generating avatar. UserId: {UserId}", userId);
-                return Result<bool>.Failure("Користувача не знайдено.");
-            }
-
-            var seed = Guid.NewGuid().ToString();
-
-            user.PhotoUrl = $"https://api.dicebear.com/7.x/bottts/svg?seed={seed}";
-
-            await this.userRepository.UpdateAsync(user);
-
-            this.logger.LogInformation("Avatar generated successfully. UserId: {UserId}", userId);
 
             return Result<bool>.Success(true);
         }
