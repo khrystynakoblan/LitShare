@@ -14,6 +14,8 @@ namespace LitShare.Web.Models
 
         public string City { get; set; } = string.Empty;
 
+        public string? Phone { get; set; }
+
         public string About { get; set; } = string.Empty;
 
         public string? PhotoUrl { get; set; }

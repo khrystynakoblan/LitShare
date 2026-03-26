@@ -92,6 +92,7 @@ namespace LitShare.Web.Controllers
                 District = user.District ?? "Не вказано",
                 City = user.City ?? "Не вказано",
                 PhotoUrl = user.PhotoUrl,
+                Phone = user.Phone ?? "Номер не вказано",
                 About = user.About ?? "Інформація відсутня",
                 UserBooks = books
             };
