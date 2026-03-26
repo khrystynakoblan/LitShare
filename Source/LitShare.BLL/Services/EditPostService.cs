@@ -1,6 +1,7 @@
 ﻿namespace LitShare.BLL.Services
 {
     using System;
+    using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
     using LitShare.BLL.Common;
@@ -8,36 +9,37 @@
     using LitShare.BLL.Services.Interfaces;
     using LitShare.DAL.Models;
     using LitShare.DAL.Repositories.Interfaces;
+    using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Logging;
 
     public class EditPostService : IEditPostService
     {
         private readonly IPostRepository postRepository;
+        private readonly IWebHostEnvironment environment;
         private readonly ILogger<EditPostService> logger;
 
         public EditPostService(
             IPostRepository postRepository,
+            IWebHostEnvironment environment,
             ILogger<EditPostService> logger)
         {
             this.postRepository = postRepository;
+            this.environment = environment;
             this.logger = logger;
         }
 
         public async Task<Result<PostViewDto>> GetPostByIdAsync(int id, int currentUserId)
         {
-            this.logger.LogInformation("Fetching post with ID: {Id} for User: {UserId}", id, currentUserId);
             var post = await this.postRepository.GetByIdAsync(id);
 
             if (post == null)
             {
-                this.logger.LogWarning("Post not found. ID: {Id}", id);
                 return Result<PostViewDto>.Failure("Оголошення не знайдено.");
             }
 
             if (post.UserId != currentUserId)
             {
-                this.logger.LogWarning("User {UserId} attempted to access post {PostId} belonging to user {OwnerId}", currentUserId, id, post.UserId);
-                return Result<PostViewDto>.Unauthorized("У вас немає прав для редагування цього оголошення.");
+                return Result<PostViewDto>.Unauthorized("Доступ заборонено.");
             }
 
             var dto = new PostViewDto
@@ -62,13 +64,11 @@
 
             if (post == null)
             {
-                this.logger.LogWarning("Post with ID: {PostId} was not found", dto.PostId);
                 return Result<bool>.Failure("Оголошення не знайдено.");
             }
 
             if (post.UserId != currentUserId)
             {
-                this.logger.LogWarning("User {UserId} attempted to edit post {PostId} belonging to user {OwnerId}", currentUserId, dto.PostId, post.UserId);
                 return Result<bool>.Unauthorized("У вас немає прав для редагування цього оголошення.");
             }
 
@@ -76,6 +76,15 @@
             post.Author = dto.Author;
             post.Description = dto.Description;
             post.DealType = (DealType)dto.DealTypeId;
+
+            if (dto.NewPhoto != null && dto.NewPhoto.Length > 0)
+            {
+                string? newPhotoUrl = await this.SaveImageAsync(dto);
+                if (newPhotoUrl != null)
+                {
+                    post.PhotoUrl = newPhotoUrl;
+                }
+            }
 
             post.BookGenres.Clear();
             foreach (var genreId in dto.GenreIds)
@@ -88,6 +97,31 @@
 
             this.logger.LogInformation("Successfully edited post with ID: {PostId}", dto.PostId);
             return Result<bool>.Success(true);
+        }
+
+        private async Task<string?> SaveImageAsync(EditPostDto dto)
+        {
+            if (dto.NewPhoto == null || dto.NewPhoto.Length == 0)
+            {
+                return null;
+            }
+
+            string uploadsFolder = Path.Combine(this.environment.WebRootPath, "images", "posts");
+
+            if (!Directory.Exists(uploadsFolder))
+            {
+                Directory.CreateDirectory(uploadsFolder);
+            }
+
+            string savedFileName = Guid.NewGuid().ToString() + Path.GetExtension(dto.NewPhoto.FileName);
+            string filePath = Path.Combine(uploadsFolder, savedFileName);
+
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                await dto.NewPhoto.CopyToAsync(fileStream);
+            }
+
+            return "/images/posts/" + savedFileName;
         }
     }
 }

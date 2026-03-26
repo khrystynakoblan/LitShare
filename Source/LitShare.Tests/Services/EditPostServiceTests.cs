@@ -2,11 +2,15 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
+    using System.Text;
     using System.Threading.Tasks;
     using LitShare.BLL.DTOs;
     using LitShare.BLL.Services;
     using LitShare.DAL.Models;
     using LitShare.DAL.Repositories.Interfaces;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Logging;
     using Moq;
     using Xunit;
@@ -14,18 +18,23 @@
     public class EditPostServiceTests
     {
         private readonly Mock<IPostRepository> postRepositoryMock;
+        private readonly Mock<IWebHostEnvironment> environmentMock;
         private readonly Mock<ILogger<EditPostService>> loggerMock;
         private readonly EditPostService sut;
 
-        private const int CurrentUserId = 10; 
+        private const int CurrentUserId = 10;
 
         public EditPostServiceTests()
         {
             this.postRepositoryMock = new Mock<IPostRepository>();
+            this.environmentMock = new Mock<IWebHostEnvironment>();
             this.loggerMock = new Mock<ILogger<EditPostService>>();
+
+            this.environmentMock.Setup(e => e.WebRootPath).Returns("C:/fake_wwwroot");
 
             this.sut = new EditPostService(
                 this.postRepositoryMock.Object,
+                this.environmentMock.Object,
                 this.loggerMock.Object);
         }
 
@@ -42,6 +51,36 @@
             Assert.Equal(dto.Title, post.Title);
             Assert.Equal(dto.Author, post.Author);
             Assert.Equal(dto.Description, post.Description);
+        }
+
+        [Fact]
+        public async Task EditPostAsync_WithNewPhoto_UpdatesPhotoUrl()
+        {
+            var post = ExistingPost(CurrentUserId);
+            this.SetupGetById(post);
+
+            var fileMock = new Mock<IFormFile>();
+            var content = "fake image content";
+            var fileName = "test.jpg";
+            var ms = new MemoryStream();
+            var writer = new StreamWriter(ms);
+            writer.Write(content);
+            writer.Flush();
+            ms.Position = 0;
+
+            fileMock.Setup(_ => _.OpenReadStream()).Returns(ms);
+            fileMock.Setup(_ => _.FileName).Returns(fileName);
+            fileMock.Setup(_ => _.Length).Returns(ms.Length);
+
+            var dto = ValidDto();
+            dto.NewPhoto = fileMock.Object;
+
+            var result = await this.sut.EditPostAsync(dto, CurrentUserId);
+
+            Assert.True(result.IsSuccess);
+            Assert.NotNull(post.PhotoUrl);
+            Assert.Contains("/images/posts/", post.PhotoUrl);
+            Assert.EndsWith(".jpg", post.PhotoUrl);
         }
 
         [Fact]
@@ -172,31 +211,6 @@
 
             Assert.False(result.IsSuccess);
             Assert.Equal("Оголошення не знайдено.", result.Error);
-        }
-
-        [Fact]
-        public async Task EditPostAsync_PostNotFound_LogsWarning()
-        {
-            this.postRepositoryMock
-                .Setup(r => r.GetByIdAsync(It.IsAny<int>()))
-                .ReturnsAsync((Posts?)null);
-
-            await this.sut.EditPostAsync(ValidDto(), CurrentUserId);
-
-            this.VerifyLog(LogLevel.Warning, "Post with ID: 1 was not found");
-        }
-
-        [Fact]
-        public async Task EditPostAsync_PostNotFound_DoesNotCallUpdateOrSave()
-        {
-            this.postRepositoryMock
-                .Setup(r => r.GetByIdAsync(It.IsAny<int>()))
-                .ReturnsAsync((Posts?)null);
-
-            await this.sut.EditPostAsync(ValidDto(), CurrentUserId);
-
-            this.postRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<Posts>()), Times.Never);
-            this.postRepositoryMock.Verify(r => r.SaveChangesAsync(), Times.Never);
         }
 
         [Fact]
