@@ -20,17 +20,20 @@
         private readonly ICreatePostService createPostService;
         private readonly IEditPostService editPostService;
         private readonly IGenreService genreService;
+        private readonly IPostService postService;
         private readonly ILogger<PostController> logger;
 
         public PostController(
             ICreatePostService createPostService,
             IEditPostService editPostService,
             IGenreService genreService,
+            IPostService postService,
             ILogger<PostController> logger)
         {
             this.createPostService = createPostService;
             this.editPostService = editPostService;
             this.genreService = genreService;
+            this.postService = postService;
             this.logger = logger;
         }
 
@@ -151,6 +154,35 @@
             }
 
             return this.RedirectToAction("Index", "Home");
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> Details(int id)
+        {
+            this.logger.LogInformation("Navigating to Details page for post ID: {Id}", id);
+
+            var result = await this.postService.GetPostDetailsAsync(id);
+
+            if (result.IsFailure)
+            {
+                return this.NotFound();
+            }
+
+            var post = result.Value!;
+            var model = new PostDetailsViewModel
+            {
+                Id = post.Id,
+                Title = post.Title,
+                Author = post.Author,
+                Description = post.Description,
+                PhotoUrl = post.PhotoUrl,
+                DealType = post.DealType,
+                Genres = post.Genres,
+                UserId = post.UserId,
+            };
+
+            return this.View(model);
         }
 
         private SelectList BuildDealTypeSelectList(int? selectedValue = null)

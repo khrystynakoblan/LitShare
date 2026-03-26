@@ -52,5 +52,14 @@ namespace LitShare.DAL.Repositories
             this.context.Posts.Update(post);
             return Task.CompletedTask;
         }
+
+        public async Task<Posts?> GetByIdWithGenresAsync(int id)
+        {
+            return await this.context.Posts
+                .Include(p => p.BookGenres)
+                    .ThenInclude(bg => bg.Genre)
+                .Include(p => p.User)
+                .FirstOrDefaultAsync(p => p.Id == id);
+        }
     }
 }

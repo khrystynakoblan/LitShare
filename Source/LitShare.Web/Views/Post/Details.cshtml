@@ -1,0 +1,54 @@
+﻿@model LitShare.Web.Models.PostDetailsViewModel
+
+@{
+    ViewData["Title"] = "Оголошення";
+}
+
+<div class="container mt-4">
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="bg-secondary-subtle d-flex align-items-center justify-content-center"
+                 style="height: 400px;">
+                @if (!string.IsNullOrEmpty(Model.PhotoUrl))
+                {
+                    <img src="@Model.PhotoUrl" class="img-fluid h-100 w-100"
+                         style="object-fit: cover;" alt="Book cover" />
+                }
+                else
+                {
+                    <i class="bi bi-image text-muted" style="font-size: 5rem;"></i>
+                }
+            </div>
+        </div>
+
+        <div class="col-md-8 ps-5">
+            <h3 class="fw-bold mb-1">@Model.Title</h3>
+            <p class="text-muted mb-3">@Model.Author</p>
+
+            <p>
+                <strong>Жанр:</strong>
+                @string.Join(", ", Model.Genres)
+            </p>
+
+            <p class="fw-bold mb-1">Опис</p>
+            <p>@Model.Description</p>
+
+            <p>
+                <strong>Тип угоди:</strong>
+                @(Model.DealType == LitShare.DAL.Models.DealType.Exchange ? "Обмін" : "Дарування")
+            </p>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mt-3">
+        <a asp-controller="Profile" asp-action="GuestProfile" asp-route-id="@Model.UserId"
+           class="btn btn-dark px-4 py-2">
+            Профіль користувача
+        </a>
+        <a asp-controller="Complaint" asp-action="Create" asp-route-postId="@Model.Id"
+           class="btn btn-dark px-4 py-2 text-center">
+            Поскаржитися<br />на оголошення
+        </a>
+    </div>
+</div>

@@ -1,9 +1,7 @@
 ﻿@model LitShare.Web.Models.ProfileViewModel
-
 @{
     ViewData["Title"] = "Профіль користувача";
 }
-
 <div class="container mt-4">
     <div class="border rounded p-0 overflow-hidden shadow-sm">
         <div class="row g-0">
@@ -13,7 +11,6 @@
                      style="width:160px; height:160px; object-fit:cover; border: 4px solid white;" />
                 <h4 class="fw-bold">@Model.Name</h4>
             </div>
-
             <div class="col-md-8 p-4 bg-white">
                 <h5 class="fw-bold mb-4 text-center text-md-start">Основна інформація:</h5>
                 <div class="row">
@@ -48,12 +45,10 @@
             </div>
         </div>
     </div>
-
     <div class="border rounded p-4 mt-4 bg-white shadow-sm">
         <h5 class="fw-bold mb-3">Про себе:</h5>
         <p class="text-muted">@(string.IsNullOrEmpty(Model.About) ? "Користувач не залишив опису." : Model.About)</p>
     </div>
-
     <div class="mt-5">
         <h5 class="fw-bold mb-4">Книги користувача:</h5>
         <div class="row row-cols-2 row-cols-md-5 g-4">
@@ -61,40 +56,44 @@
             {
                 @foreach (var book in Model.UserBooks)
                 {
-                            <div class="col text-center">
-                                <div class="card h-100 border-0 shadow-sm">
-                                    <div class="bg-light rounded d-flex align-items-center justify-content-center overflow-hidden" style="aspect-ratio: 3/4;">
-                                @if (!string.IsNullOrEmpty(book.PhotoUrl))
-                                {
-                                                <img src="@book.PhotoUrl" class="w-100 h-100" style="object-fit: cover;" alt="@book.Title" />
-                                }
-                                else
-                                {
-                                                <i class="bi bi-book text-muted fs-1"></i>
-                                }
-                                    </div>
-                                    <div class="card-body px-0 py-2">
-                                        <p class="mb-0 fw-bold small text-truncate" title="@book.Title">@book.Title</p>
-                                        <p class="mb-0 text-muted extra-small">@book.Author</p>
-                                @if (!string.IsNullOrEmpty(book.City))
-                                {
-                                                <p class="mb-0 text-muted extra-small"><i class="bi bi-geo-alt"></i> @book.City</p>
-                                }
-                                    </div>
+                    <div class="col text-center">
+                        <a asp-controller="Post" asp-action="Details" asp-route-id="@book.Id"
+                           class="text-decoration-none text-dark">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="bg-light rounded d-flex align-items-center justify-content-center overflow-hidden" style="aspect-ratio: 3/4;">
+                                    @if (!string.IsNullOrEmpty(book.PhotoUrl))
+                                    {
+                                        <img src="@book.PhotoUrl" class="w-100 h-100" style="object-fit: cover;" alt="@book.Title" />
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-book text-muted fs-1"></i>
+                                    }
+                                </div>
+                                <div class="card-body px-0 py-2">
+                                    <p class="mb-0 fw-bold small text-truncate" title="@book.Title">@book.Title</p>
+                                    <p class="mb-0 text-muted extra-small">@book.Author</p>
+                                    @if (!string.IsNullOrEmpty(book.City))
+                                    {
+                                        <p class="mb-0 text-muted extra-small"><i class="bi bi-geo-alt"></i> @book.City</p>
+                                    }
                                 </div>
                             </div>
+                        </a>
+                    </div>
                 }
             }
             else
             {
-                    <div class="col-12 text-center py-5">
-                        <p class="text-muted">Цей користувач ще не додав жодної книги.</p>
-                    </div>
+                <div class="col-12 text-center py-5">
+                    <p class="text-muted">Цей користувач ще не додав жодної книги.</p>
+                </div>
             }
         </div>
     </div>
 </div>
-
 <style>
-    .extra-small { font-size: 0.75rem; }
+    .extra-small {
+        font-size: 0.75rem;
+    }
 </style>

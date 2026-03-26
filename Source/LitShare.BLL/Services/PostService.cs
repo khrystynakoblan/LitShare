@@ -34,5 +34,34 @@ namespace LitShare.BLL.Services
 
             return Result<IEnumerable<PostCardDto>>.Success(dtos);
         }
+
+        public async Task<Result<PostDetailsDto>> GetPostDetailsAsync(int id)
+        {
+            this.logger.LogInformation("BLL: Fetching post details for ID: {Id}", id);
+
+            var post = await this.postRepository.GetByIdWithGenresAsync(id);
+
+            if (post == null)
+            {
+                this.logger.LogWarning("BLL: Post with ID: {Id} was not found", id);
+                return Result<PostDetailsDto>.Failure($"Post with ID {id} not found");
+            }
+
+            this.logger.LogInformation("BLL: Successfully fetched post details for ID: {Id}", id);
+
+            return Result<PostDetailsDto>.Success(new PostDetailsDto
+            {
+                Id = post.Id,
+                Title = post.Title ?? string.Empty,
+                Author = post.Author ?? string.Empty,
+                Description = post.Description,
+                PhotoUrl = post.PhotoUrl,
+                DealType = post.DealType,
+                Genres = post.BookGenres
+                    .Select(bg => bg.Genre?.Name ?? string.Empty)
+                    .ToList(),
+                UserId = post.UserId,
+            });
+        }
     }
 }

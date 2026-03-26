@@ -75,7 +75,7 @@
                     <label asp-for="DealTypeId" class="col-sm-2 col-form-label text-start">Тип угоди:</label>
                     <div class="col-sm-10">
                         <select asp-for="DealTypeId" asp-items="Model.DealTypes" class="form-select">
-                            <option value="">Оберіть тип угоди</option>
+                            <option value="0">Оберіть тип угоди</option>
                         </select>
                         <span asp-validation-for="DealTypeId" class="text-danger"></span>
                     </div>
