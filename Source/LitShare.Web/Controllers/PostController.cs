@@ -135,6 +135,7 @@
                 Description = model.Description,
                 DealTypeId = (int)model.DealType,
                 GenreIds = model.SelectedGenreIds,
+                NewPhoto = model.NewPhoto
             };
 
             var result = await this.editPostService.EditPostAsync(dto, currentUserId);
