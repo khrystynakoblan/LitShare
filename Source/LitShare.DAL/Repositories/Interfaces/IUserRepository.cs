@@ -11,5 +11,7 @@
         Task<Users?> GetByIdAsync(int id);
 
         Task<Users?> GetByEmailAsync(string email);
+
+        Task UpdateAsync(Users user);
     }
 }

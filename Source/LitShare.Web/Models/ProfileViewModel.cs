@@ -8,6 +8,8 @@ namespace LitShare.Web.Models
 
         public string Email { get; set; } = string.Empty;
 
+        public string Phone { get; set; } = string.Empty;
+
         public string Region { get; set; } = string.Empty;
 
         public string District { get; set; } = string.Empty;

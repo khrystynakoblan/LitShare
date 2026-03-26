@@ -25,13 +25,16 @@
                         <span class="navbar-toggler-icon"></span>
                     </button>
 
-                    <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between align-items-center">
+                    <div class="navbar-collapse collapse d-flex align-items-center">
 
-                        <form class="d-flex mx-auto w-50 my-2 my-sm-0" asp-controller="Home" asp-action="Index" method="get">
-                            <input class="form-control rounded-1" type="search" name="searchTerm" placeholder="Пошук..." aria-label="Search">
-                        </form>
+                        @if (ViewData["ShowSearch"] as bool? == true)
+                        {
+                            <form class="d-flex mx-auto w-50 my-2 my-sm-0" asp-controller="Home" asp-action="Index" method="get">
+                                <input class="form-control rounded-1" type="search" name="searchTerm" placeholder="Пошук..." aria-label="Search">
+                            </form>
+                        }
 
-                        <ul class="navbar-nav align-items-center flex-row">
+                        <ul class="navbar-nav align-items-center flex-row ms-auto">
                             @if (User.Identity?.IsAuthenticated == true)
                             {
                                 <li class="nav-item me-3">
