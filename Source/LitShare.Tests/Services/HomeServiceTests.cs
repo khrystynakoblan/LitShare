@@ -24,8 +24,6 @@
                 this.loggerMock.Object);
         }
 
-        // Відображення книг на головній сторінці 
-
         [Fact]
         public async Task GetFilteredPostsAsync_WithPosts_ReturnsSuccess()
         {
@@ -152,8 +150,6 @@
                 () => this.sut.GetFilteredPostsAsync(new PostFilterDto()));
         }
 
-
-        // Пошук за назвою / автором
         [Fact]
         public async Task GetFilteredPostsAsync_WithSearchTerm_PassesSearchTermToRepository()
         {
@@ -208,9 +204,6 @@
             Assert.Empty(result.Value!);
         }
 
-
-        // Фільтр за містом
-
         [Fact]
         public async Task GetFilteredPostsAsync_WithLocation_PassesLocationToRepository()
         {
@@ -248,7 +241,6 @@
         }
 
 
-        // Фільтр за типом угоди
         [Fact]
         public async Task GetFilteredPostsAsync_WithDealTypeExchange_PassesExchangeStringToRepository()
         {
@@ -314,7 +306,6 @@
         }
 
 
-        // Фільтр за жанрами
         [Fact]
         public async Task GetFilteredPostsAsync_WithGenres_PassesGenreIdsToRepository()
         {
@@ -355,7 +346,6 @@
         }
 
 
-        // Комбінація пошуку + фільтрів
         [Fact]
         public async Task GetFilteredPostsAsync_SearchTermAndLocation_PassesBothToRepository()
         {

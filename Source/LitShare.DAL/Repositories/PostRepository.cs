@@ -14,16 +14,6 @@
             this.context = context;
         }
 
-        public async Task<IEnumerable<Posts>> GetAllAsync()
-        {
-            return await this.context.Posts
-                .AsNoTracking()
-                .Include(p => p.User)
-                .Include(p => p.BookGenres)
-                    .ThenInclude(bg => bg.Genre)
-                .ToListAsync();
-        }
-
         public async Task<IEnumerable<Posts>> GetFilteredAsync(
             string? searchQuery,
             string? city,
@@ -37,7 +27,6 @@
                     .ThenInclude(bg => bg.Genre)
                 .AsQueryable();
 
-            // Фільтр за пошуковим запитом (назва або автор)
             if (!string.IsNullOrWhiteSpace(searchQuery))
             {
                 var lower = searchQuery.ToLower();
@@ -46,7 +35,6 @@
                     (p.Author != null && p.Author.ToLower().Contains(lower)));
             }
 
-            // Фільтр за містом
             if (!string.IsNullOrWhiteSpace(city))
             {
                 var lowerCity = city.ToLower();
@@ -56,14 +44,12 @@
                     p.User.City.ToLower().Contains(lowerCity));
             }
 
-            // Фільтр за жанрами
             if (genreIds != null && genreIds.Any())
             {
                 query = query.Where(p =>
                     p.BookGenres.Any(bg => genreIds.Contains(bg.GenreId)));
             }
 
-            // Фільтр за типом угоди (використовуємо рядкові значення для PostgreSQL enum)
             if (dealTypeStrings != null && dealTypeStrings.Any())
             {
                 query = query.Where(p => dealTypeStrings.Contains(p.DealType.ToString().ToLower()));

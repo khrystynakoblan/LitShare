@@ -4,8 +4,6 @@
 
     public interface IPostRepository
     {
-        Task<IEnumerable<Posts>> GetAllAsync();
-
         Task<IEnumerable<Posts>> GetFilteredAsync(
             string? searchQuery,
             string? city,
