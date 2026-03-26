@@ -1,15 +1,73 @@
 ﻿@model LitShare.Web.Models.HomeViewModel
+@using LitShare.DAL.Models
 @{
     ViewData["Title"] = "Головна";
 }
+
 <div class="container-fluid mt-3">
     <div class="row">
         <div class="col-md-2">
             <div class="border p-3">
-                <h6 class="fw-semibold">Фільтр:</h6>
-                @* фільтри будуть тут *@
+                <h6 class="fw-semibold mb-3">Фільтр:</h6>
+                
+                <form method="get" asp-action="Index" id="filterForm">
+                    @if (!string.IsNullOrEmpty(Model.SearchTerm))
+                    {
+                        <input type="hidden" name="searchTerm" value="@Model.SearchTerm" />
+                    }
+                    <!-- Локація -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Локація:</label>
+                        <input type="text" name="location" class="form-control form-control-sm" 
+                               placeholder="Місто..." value="@Model.Location" />
+                    </div>
+                    
+                    <!-- Тип угоди -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Тип угоди:</label>
+                        <div class="form-check">
+                            <input type="radio" name="dealType" class="form-check-input" value="Exchange" 
+                                   id="dealExchange" @(Model.DealType == DealType.Exchange ? "checked" : "") />
+                            <label class="form-check-label" for="dealExchange">Обмін</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="radio" name="dealType" class="form-check-input" value="Donation" 
+                                   id="dealDonation" @(Model.DealType == DealType.Donation ? "checked" : "") />
+                            <label class="form-check-label" for="dealDonation">Безкоштовно</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="radio" name="dealType" class="form-check-input" value="" 
+                                   id="dealAll" @(Model.DealType == null ? "checked" : "") />
+                            <label class="form-check-label" for="dealAll">Всі</label>
+                        </div>
+                    </div>
+                    
+                    <!-- Жанри -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Жанр:</label>
+                        <div class="overflow-auto" style="max-height: 300px;">
+                            @foreach (var genre in Model.AllGenres)
+                            {
+                                <div class="form-check">
+                                    <input type="checkbox" name="genres" class="form-check-input" 
+                                           value="@genre.Id" id="genre_@genre.Id"
+                                           @(Model.SelectedGenres != null && Model.SelectedGenres.Contains(genre.Id) ? "checked" : "") />
+                                    <label class="form-check-label" for="genre_@genre.Id">
+                                        @genre.Name
+                                    </label>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    
+                    @if (Model.SearchTerm != null || Model.Location != null || Model.DealType != null || (Model.SelectedGenres != null && Model.SelectedGenres.Any()))
+                    {
+                        <a asp-action="Index" class="btn btn-outline-secondary w-100 mt-2">Скинути</a>
+                    }
+                </form>
             </div>
         </div>
+        
         <div class="col-md-10">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <span class="text-muted">Знайдено: @Model.TotalCount книг</span>
@@ -17,10 +75,11 @@
                     + Додати книгу
                 </a>
             </div>
+            
             @if (!Model.Posts.Any())
             {
                 <div class="text-center text-muted mt-5">
-                    <p>Оголошень ще немає.</p>
+                    <p>Оголошень не знайдено за вибраними фільтрами.</p>
                 </div>
             }
             else
@@ -59,3 +118,25 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        document.querySelectorAll('input[type="radio"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                if (this.checked) {
+                    document.getElementById('filterForm').submit();
+                }
+            });
+        });
+        
+        let timeoutId;
+        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => {
+                    document.getElementById('filterForm').submit();
+                }, 500);
+            });
+        });
+    </script>
+}

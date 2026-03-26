@@ -6,5 +6,7 @@
     public interface IHomeService
     {
         Task<Result<List<PostCardDto>>> GetAllPostsAsync();
+
+        Task<Result<List<PostCardDto>>> GetFilteredPostsAsync(PostFilterDto filter);
     }
 }

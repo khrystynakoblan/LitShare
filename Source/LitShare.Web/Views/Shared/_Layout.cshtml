@@ -27,12 +27,31 @@
 
                     <div class="navbar-collapse collapse d-flex align-items-center">
 
-                        @if (ViewData["ShowSearch"] as bool? == true)
-                        {
-                            <form class="d-flex mx-auto w-50 my-2 my-sm-0" asp-controller="Home" asp-action="Index" method="get">
-                                <input class="form-control rounded-1" type="search" name="searchTerm" placeholder="Пошук..." aria-label="Search">
-                            </form>
-                        }
+                    @if (ViewData["ShowSearch"] as bool? == true)
+                    {
+                        <form class="d-flex mx-auto w-50 my-2 my-sm-0" asp-controller="Home" asp-action="Index" method="get" id="headerSearchForm">
+                            <input class="form-control rounded-1" type="search" name="searchTerm" 
+                                   placeholder="Пошук..." aria-label="Search"
+                                   value="@Context.Request.Query["searchTerm"]" />
+        
+                            @if (!string.IsNullOrEmpty(Context.Request.Query["location"]))
+                            {
+                                <input type="hidden" name="location" value="@Context.Request.Query["location"]" />
+                            }
+                            @if (!string.IsNullOrEmpty(Context.Request.Query["dealType"]))
+                            {
+                                <input type="hidden" name="dealType" value="@Context.Request.Query["dealType"]" />
+                            }
+                            @foreach (var genreId in Context.Request.Query["genres"])
+                            {
+                                <input type="hidden" name="genres" value="@genreId" />
+                            }
+        
+                            <button class="btn btn-dark ms-2" type="submit">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </form>
+                    }
 
                         <ul class="navbar-nav align-items-center flex-row ms-auto">
                             @if (User.Identity?.IsAuthenticated == true)

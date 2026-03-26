@@ -1,10 +1,10 @@
-﻿using LitShare.DAL.Context;
-using LitShare.DAL.Models;
-using LitShare.DAL.Repositories.Interfaces;
-using Microsoft.EntityFrameworkCore;
-
-namespace LitShare.DAL.Repositories
+﻿namespace LitShare.DAL.Repositories
 {
+    using LitShare.DAL.Context;
+    using LitShare.DAL.Models;
+    using LitShare.DAL.Repositories.Interfaces;
+    using Microsoft.EntityFrameworkCore;
+
     public class PostRepository : IPostRepository
     {
         private readonly LitShareDbContext context;
@@ -19,7 +19,57 @@ namespace LitShare.DAL.Repositories
             return await this.context.Posts
                 .AsNoTracking()
                 .Include(p => p.User)
+                .Include(p => p.BookGenres)
+                    .ThenInclude(bg => bg.Genre)
                 .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Posts>> GetFilteredAsync(
+            string? searchQuery,
+            string? city,
+            List<int>? genreIds,
+            List<string>? dealTypeStrings)
+        {
+            var query = this.context.Posts
+                .AsNoTracking()
+                .Include(p => p.User)
+                .Include(p => p.BookGenres)
+                    .ThenInclude(bg => bg.Genre)
+                .AsQueryable();
+
+            // Фільтр за пошуковим запитом (назва або автор)
+            if (!string.IsNullOrWhiteSpace(searchQuery))
+            {
+                var lower = searchQuery.ToLower();
+                query = query.Where(p =>
+                    (p.Title != null && p.Title.ToLower().Contains(lower)) ||
+                    (p.Author != null && p.Author.ToLower().Contains(lower)));
+            }
+
+            // Фільтр за містом
+            if (!string.IsNullOrWhiteSpace(city))
+            {
+                var lowerCity = city.ToLower();
+                query = query.Where(p =>
+                    p.User != null &&
+                    p.User.City != null &&
+                    p.User.City.ToLower().Contains(lowerCity));
+            }
+
+            // Фільтр за жанрами
+            if (genreIds != null && genreIds.Any())
+            {
+                query = query.Where(p =>
+                    p.BookGenres.Any(bg => genreIds.Contains(bg.GenreId)));
+            }
+
+            // Фільтр за типом угоди (використовуємо рядкові значення для PostgreSQL enum)
+            if (dealTypeStrings != null && dealTypeStrings.Any())
+            {
+                query = query.Where(p => dealTypeStrings.Contains(p.DealType.ToString().ToLower()));
+            }
+
+            return await query.ToListAsync();
         }
 
         public async Task AddAsync(Posts post)

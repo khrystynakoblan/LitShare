@@ -1,11 +1,16 @@
-﻿using System.Threading.Tasks;
-using LitShare.DAL.Models;
-
-namespace LitShare.DAL.Repositories.Interfaces
+﻿namespace LitShare.DAL.Repositories.Interfaces
 {
+    using LitShare.DAL.Models;
+
     public interface IPostRepository
     {
         Task<IEnumerable<Posts>> GetAllAsync();
+
+        Task<IEnumerable<Posts>> GetFilteredAsync(
+            string? searchQuery,
+            string? city,
+            List<int>? genreIds,
+            List<string>? dealTypeStrings);
 
         Task AddAsync(Posts post);
 
