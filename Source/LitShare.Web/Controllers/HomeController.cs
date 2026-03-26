@@ -23,6 +23,8 @@ namespace LitShare.Web.Controllers
         {
             this.logger.LogInformation("User navigated to home page.");
 
+            ViewData["ShowSearch"] = true;
+
             var result = await this.homeService.GetAllPostsAsync();
 
             if (result.IsFailure)

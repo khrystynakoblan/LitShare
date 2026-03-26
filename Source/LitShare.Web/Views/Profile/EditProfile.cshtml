@@ -1,19 +1,85 @@
+@model LitShare.Web.Models.ProfileViewModel
+
 @{
     ViewData["Title"] = "Редагування профілю";
 }
 
-<div class="row justify-content-center mt-5">
-    <div class="col-md-6 col-lg-5 text-center">
+<div class="container-fluid mt-4">
+    <div class="border rounded p-4 mx-auto" style="max-width: 1200px;">
 
-        <h2 class="mb-3">@ViewData["Title"]</h2>
+        <h2 class="text-center fw-bold mb-4">Редагування профілю</h2>
 
-        <div class="alert alert-info">
-            Ця сторінка ще в розробці 
+        <div class="row g-4">
+
+            <div class="col-md-4">
+                <div class="border rounded p-4 text-center">
+                    <img src="@(string.IsNullOrEmpty(Model.PhotoUrl)
+                            ? "https://cdn-icons-png.flaticon.com/512/149/149071.png"
+                            : Model.PhotoUrl)"
+                         alt="Фото профілю"
+                         class="rounded-circle mb-3"
+                         style="width:160px; height:160px; object-fit:cover;" />
+
+                    <div class="d-grid">
+                        <form asp-controller="Profile" asp-action="GenerateAvatar" method="post">
+                            <button type="submit" class="btn btn-dark">Змінити фото</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <div class="border rounded p-4">
+                    <form asp-controller="Profile" asp-action="EditProfile" method="post">
+                        
+                        <h4 class="fw-bold mb-4">Основна інформація</h4>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Ім'я</label>
+                            <input class="form-control" value="@Model.Name" disabled />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold" for="City">Населений пункт</label>
+                            <input class="form-control" id="City" name="City" value="@Model.City" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold" for="District">Район</label>
+                            <input class="form-control" id="District" name="District" value="@Model.District" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold" for="Region">Область</label>
+                            <input class="form-control" id="Region" name="Region" value="@Model.Region" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold" for="Phone">Контактні дані</label>
+                            <input class="form-control" asp-for="Phone" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold" for="Email">Email</label>
+                            <input class="form-control" id="Email" name="Email" value="@Model.Email" />
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold" for="About">Про себе</label>
+                            <textarea class="form-control" id="About" name="About" rows="6">@Model.About</textarea>
+                        </div>
+
+                        <div class="d-flex gap-3">
+                            <button type="submit" class="btn btn-dark px-4">Зберегти</button>
+                            <a asp-controller="Profile" asp-action="MyProfile" class="btn btn-outline-secondary px-4">
+                                Скасувати
+                            </a>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
         </div>
-
-        <a asp-controller="Profile" asp-action="MyProfile" class="btn btn-outline-secondary mt-3">
-            Назад до профілю
-        </a>
-
     </div>
 </div>
