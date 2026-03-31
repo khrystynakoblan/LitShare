@@ -14,7 +14,7 @@
     using Microsoft.AspNetCore.Mvc.Rendering;
     using Microsoft.Extensions.Logging;
 
-    [Authorize]
+    [Authorize(Roles = "User")]
     public class PostController : Controller
     {
         private readonly ICreatePostService createPostService;
