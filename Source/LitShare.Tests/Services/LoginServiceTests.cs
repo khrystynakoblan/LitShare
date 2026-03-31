@@ -43,7 +43,8 @@
             var result = await this.sut.LoginAsync(dto);
 
             Assert.True(result.IsSuccess);
-            Assert.Equal(expectedUserId, result.Value);
+            Assert.NotNull(result.Value);
+            Assert.Equal(expectedUserId, result.Value.UserId);
         }
 
         [Fact]
