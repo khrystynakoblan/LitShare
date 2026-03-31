@@ -3,8 +3,8 @@
     using LitShare.BLL.Common;
     using LitShare.BLL.DTOs;
 
-    public interface ILoginService
+    public interface IAdminService
     {
-        Task<Result<LoginResultDto>> LoginAsync(LoginDto dto);
+        Task<Result<List<ComplaintDto>>> GetAllComplaintsAsync();
     }
 }

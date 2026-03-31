@@ -3,6 +3,7 @@
     using System.Security.Claims;
     using LitShare.BLL.DTOs;
     using LitShare.BLL.Services.Interfaces;
+    using LitShare.DAL.Models;
     using LitShare.Web.Models;
     using Microsoft.AspNetCore.Authentication;
     using Microsoft.AspNetCore.Authentication.Cookies;
@@ -68,6 +69,11 @@
         {
             if (this.User.Identity != null && this.User.Identity.IsAuthenticated)
             {
+                if (this.User.IsInRole(RoleType.Admin.ToString()))
+                {
+                    return this.RedirectToAction("Index", "Admin");
+                }
+
                 return this.RedirectToAction("Index", "Home");
             }
 
@@ -96,10 +102,13 @@
                 return this.View(model);
             }
 
+            var loginValue = loginResult.Value!;
+
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, loginResult.Value.ToString()),
-                new Claim(ClaimTypes.Email, model.Email)
+                new Claim(ClaimTypes.NameIdentifier, loginValue.UserId.ToString()),
+                new Claim(ClaimTypes.Email, model.Email),
+                new Claim(ClaimTypes.Role, loginValue.Role.ToString()),
             };
 
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -108,6 +117,11 @@
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 new ClaimsPrincipal(claimsIdentity));
 
+            if (loginValue.Role == RoleType.Admin)
+            {
+                return this.RedirectToAction("Index", "Admin");
+            }
+
             return this.RedirectToAction("Index", "Home");
         }
 
@@ -115,9 +129,7 @@
         public async Task<IActionResult> Logout()
         {
             this.logger.LogInformation("User logged out.");
-
             await this.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-
             return this.RedirectToAction(nameof(this.Login));
         }
     }
