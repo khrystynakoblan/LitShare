@@ -2,18 +2,26 @@
     ViewData["Title"] = "Видалення акаунту";
 }
 
-<div class="row justify-content-center mt-5">
-    <div class="col-md-6 col-lg-5 text-center">
+<div class="container mt-5">
+    <div class="border rounded p-4 mx-auto text-center" style="max-width: 500px;">
 
-        <h2 class="mb-3">@ViewData["Title"]</h2>
+        <h3 class="text-danger fw-bold mb-3">
+            Ви впевнені, що хочете видалити акаунт?
+        </h3>
 
-        <div class="alert alert-info">
-            Ця сторінка ще в розробці 
-        </div>
+        <p class="text-muted mb-4">
+            Цю дію неможливо скасувати.
+        </p>
 
-        <a asp-controller="Profile" asp-action="MyProfile" class="btn btn-outline-secondary mt-3">
-            Назад до профілю
-        </a>
+        <form asp-action="DeleteAccountConfirmed" method="post">
+            <button type="submit" class="btn btn-danger px-4">
+                Видалити акаунт
+            </button>
+
+            <a asp-action="MyProfile" class="btn btn-outline-secondary px-4 ms-2">
+                Скасувати
+            </a>
+        </form>
 
     </div>
 </div>

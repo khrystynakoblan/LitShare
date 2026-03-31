@@ -61,5 +61,24 @@
 
             return Result<bool>.Success(true);
         }
+
+        public async Task<Result<bool>> DeleteAccountAsync(int userId)
+        {
+            this.logger.LogInformation("Deleting account. UserId: {UserId}", userId);
+
+            var user = await this.userRepository.GetByIdAsync(userId);
+
+            if (user == null)
+            {
+                this.logger.LogWarning("User not found. UserId: {UserId}", userId);
+                return Result<bool>.Failure("Користувача не знайдено.");
+            }
+
+            await this.userRepository.DeleteAsync(user);
+
+            this.logger.LogInformation("User deleted successfully. UserId: {UserId}", userId);
+
+            return Result<bool>.Success(true);
+        }
     }
 }
