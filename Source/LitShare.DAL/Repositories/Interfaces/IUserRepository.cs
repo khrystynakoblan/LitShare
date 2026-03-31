@@ -13,5 +13,7 @@
         Task<Users?> GetByEmailAsync(string email);
 
         Task UpdateAsync(Users user);
+
+        Task DeleteAsync(Users user);
     }
 }

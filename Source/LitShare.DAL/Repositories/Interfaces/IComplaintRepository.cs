@@ -8,5 +8,7 @@
         Task AddAsync(Complaints complaint);
 
         Task SaveChangesAsync();
+
+        Task<IEnumerable<Complaints>> GetAllAsync();
     }
 }

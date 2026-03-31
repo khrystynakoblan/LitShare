@@ -187,5 +187,90 @@ namespace LitShare.Tests.Services
             Assert.Equal(dto.About, user.About);
             Assert.Equal(dto.PhotoUrl, user.PhotoUrl);
         }
+        
+        [Fact]
+        public async Task DeleteAccountAsync_WhenUserExists_ReturnsSuccess_AndDeletesUser()
+        {
+            var user = new Users { Id = 1 };
+
+            userRepositoryMock
+                .Setup(r => r.GetByIdAsync(1))
+                .ReturnsAsync(user);
+
+            var result = await sut.DeleteAccountAsync(1);
+
+            Assert.True(result.IsSuccess);
+            userRepositoryMock.Verify(r => r.DeleteAsync(user), Times.Once);
+        }
+
+        [Fact]
+        public async Task DeleteAccountAsync_WhenUserNotFound_ReturnsFailure()
+        {
+            userRepositoryMock
+                .Setup(r => r.GetByIdAsync(It.IsAny<int>()))
+                .ReturnsAsync((Users?)null);
+
+            var result = await sut.DeleteAccountAsync(1);
+
+            Assert.False(result.IsSuccess);
+            Assert.Equal("Користувача не знайдено.", result.Error);
+        }
+
+        [Fact]
+        public async Task DeleteAccountAsync_WhenUserNotFound_DoesNotCallDelete()
+        {
+            userRepositoryMock
+                .Setup(r => r.GetByIdAsync(It.IsAny<int>()))
+                .ReturnsAsync((Users?)null);
+
+            await sut.DeleteAccountAsync(1);
+
+            userRepositoryMock.Verify(r => r.DeleteAsync(It.IsAny<Users>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task DeleteAccountAsync_WhenRepositoryThrows_PropagatesException()
+        {
+            var user = new Users { Id = 1 };
+
+            userRepositoryMock
+                .Setup(r => r.GetByIdAsync(1))
+                .ReturnsAsync(user);
+
+            userRepositoryMock
+                .Setup(r => r.DeleteAsync(user))
+                .ThrowsAsync(new Exception());
+
+            await Assert.ThrowsAsync<Exception>(() => sut.DeleteAccountAsync(1));
+        }
+
+        [Fact]
+        public async Task DeleteAccountAsync_CallsRepositoryGetByIdOnce()
+        {
+            var user = new Users { Id = 1 };
+
+            userRepositoryMock
+                .Setup(r => r.GetByIdAsync(1))
+                .ReturnsAsync(user);
+
+            await sut.DeleteAccountAsync(1);
+
+            userRepositoryMock.Verify(r => r.GetByIdAsync(1), Times.Once);
+        }
+
+        [Fact]
+        public async Task DeleteAccountAsync_WhenMultipleCalls_DeletesEachTime()
+        {
+            var user = new Users { Id = 1 };
+
+            userRepositoryMock
+                .Setup(r => r.GetByIdAsync(1))
+                .ReturnsAsync(user);
+
+            await sut.DeleteAccountAsync(1);
+            await sut.DeleteAccountAsync(1);
+
+            userRepositoryMock.Verify(r => r.DeleteAsync(user), Times.Exactly(2));
+        }
     }
 }

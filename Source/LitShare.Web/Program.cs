@@ -62,6 +62,7 @@ try
     builder.Services.AddScoped<IPostService, PostService>();
     builder.Services.AddScoped<IComplaintRepository, ComplaintRepository>();
     builder.Services.AddScoped<IComplaintService, ComplaintService>();
+    builder.Services.AddScoped<IAdminService, AdminService>();
     builder.Services.AddControllersWithViews();
 
     builder.Services.AddScoped<IProfileService, ProfileService>();

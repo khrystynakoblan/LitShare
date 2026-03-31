@@ -4,11 +4,12 @@ namespace LitShare.Web.Controllers
     using LitShare.BLL.DTOs;
     using LitShare.BLL.Services.Interfaces;
     using LitShare.Web.Models;
+    using Microsoft.AspNetCore.Authentication;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
 
-    [Authorize]
+    [Authorize(Roles = "User")]
     public class ProfileController : Controller
     {
         private readonly IProfileService profileService;
@@ -201,11 +202,32 @@ namespace LitShare.Web.Controllers
             return this.View("EditProfile", model);
         }
 
+        [HttpGet]
         public IActionResult DeleteAccount()
         {
-            this.logger.LogWarning("User opened DeleteAccount page");
-            return this.Content("Функція видалення акаунту ще не реалізована");
+            this.logger.LogInformation("User opened DeleteAccount page");
+            return this.View();
         }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteAccountConfirmed()
+        {
+            var userId = this.GetCurrentUserId();
+
+            this.logger.LogInformation("User confirmed account deletion. UserId: {UserId}", userId);
+
+            var result = await this.profileService.DeleteAccountAsync(userId);
+
+            if (result.IsFailure)
+            {
+                this.logger.LogWarning("Delete failed. UserId: {UserId}, Error: {Error}", userId, result.Error);
+                return this.Content(result.Error);
+            }
+
+            await this.HttpContext.SignOutAsync();
+
+            return this.RedirectToAction("Index", "Home");
+}
 
         private int GetCurrentUserId()
         {
