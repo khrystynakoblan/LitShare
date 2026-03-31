@@ -93,12 +93,6 @@ namespace LitShare.Web.Controllers
             return this.View(model);
         }
 
-        public IActionResult MyBooks()
-        {
-            this.logger.LogInformation("User opened MyBooks page");
-            return this.Content("Сторінка 'Мої книги' ще не готова");
-        }
-
         [HttpGet]
         public async Task<IActionResult> EditProfile()
         {
@@ -227,7 +221,24 @@ namespace LitShare.Web.Controllers
             await this.HttpContext.SignOutAsync();
 
             return this.RedirectToAction("Index", "Home");
-}
+           }
+
+        [HttpGet]
+        public async Task<IActionResult> MyBooks()
+        {
+            var userId = this.GetCurrentUserId();
+            this.logger.LogInformation("User opened MyBooks page. UserId: {UserId}", userId);
+            var booksResult = await this.postService.GetPostsByUserIdAsync(userId);
+
+            var books = booksResult.IsSuccess ? booksResult.Value! : new List<PostCardDto>();
+
+            var model = new ProfileViewModel
+            {
+                UserBooks = books
+            };
+
+            return this.View(model);
+        }
 
         private int GetCurrentUserId()
         {
