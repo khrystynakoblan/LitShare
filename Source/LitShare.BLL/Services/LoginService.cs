@@ -24,16 +24,16 @@
             this.logger = logger;
         }
 
-        public async Task<Result<int>> LoginAsync(LoginDto dto)
+        public async Task<Result<LoginResultDto>> LoginAsync(LoginDto dto)
         {
             if (dto == null)
             {
-                return Result<int>.Failure("Дані порожні.");
+                return Result<LoginResultDto>.Failure("Дані порожні.");
             }
 
             if (string.IsNullOrWhiteSpace(dto.Email) || string.IsNullOrWhiteSpace(dto.Password))
             {
-                return Result<int>.Failure("Email та пароль не можуть бути порожніми.");
+                return Result<LoginResultDto>.Failure("Email та пароль не можуть бути порожніми.");
             }
 
             this.logger.LogInformation("Login attempt. Email: {Email}", dto.Email);
@@ -43,7 +43,7 @@
             if (user is null || string.IsNullOrEmpty(user.PasswordHash))
             {
                 this.logger.LogWarning("Login failed. Email: {Email}", dto.Email);
-                return Result<int>.Failure("Невірний email або пароль.");
+                return Result<LoginResultDto>.Failure("Невірний email або пароль.");
             }
 
             var result = this.passwordHasher.VerifyHashedPassword(user, user.PasswordHash, dto.Password);
@@ -51,11 +51,16 @@
             if (result == PasswordVerificationResult.Failed)
             {
                 this.logger.LogWarning("Login failed: wrong password. Email: {Email}", dto.Email);
-                return Result<int>.Failure("Невірний email або пароль.");
+                return Result<LoginResultDto>.Failure("Невірний email або пароль.");
             }
 
-            this.logger.LogInformation("Login successful. Email: {Email}", dto.Email);
-            return Result<int>.Success(user.Id);
+            this.logger.LogInformation("Login successful. Email: {Email}, Role: {Role}", dto.Email, user.Role);
+
+            return Result<LoginResultDto>.Success(new LoginResultDto
+            {
+                UserId = user.Id,
+                Role = user.Role,
+            });
         }
     }
 }

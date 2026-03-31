@@ -1,0 +1,40 @@
+@model LitShare.Web.Models.AdminViewModel
+@{
+    ViewData["Title"] = "Список скарг";
+}
+
+<div class="container mt-4">
+    <h4 class="mb-3">Список скарг</h4>
+    <p class="text-muted mb-3">Всього скарг: @Model.TotalCount</p>
+
+    @if (!Model.Complaints.Any())
+    {
+        <div class="text-center text-muted mt-5">
+            <p>Скарг немає.</p>
+        </div>
+    }
+    else
+    {
+        <table class="table table-bordered table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>Скарга</th>
+                    <th>Назва книги</th>
+                    <th>Ім'я</th>
+                    <th>Дата</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var complaint in Model.Complaints)
+                {
+                    <tr>
+                        <td>@complaint.Text</td>
+                        <td>@complaint.BookTitle</td>
+                        <td>@complaint.ComplainantName</td>
+                        <td>@complaint.Date.ToString("dd/MM/yyyy")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

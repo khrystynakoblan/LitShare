@@ -8,7 +8,7 @@ namespace LitShare.Web.Controllers
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
 
-    [Authorize]
+    [Authorize(Roles = "User")]
     public class ProfileController : Controller
     {
         private readonly IProfileService profileService;
