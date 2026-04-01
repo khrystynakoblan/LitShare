@@ -1,6 +1,5 @@
 ﻿namespace LitShare.Web.Controllers
 {
-    using System.Security.Claims;
     using System.Threading.Tasks;
     using LitShare.BLL.DTOs;
     using LitShare.BLL.Services.Interfaces;
@@ -10,7 +9,7 @@
     using Microsoft.Extensions.Logging;
 
     [Authorize]
-    public class ComplaintController : Controller
+    public class ComplaintController : BaseController
     {
         private readonly IComplaintService complaintService;
         private readonly ILogger<ComplaintController> logger;
@@ -40,7 +39,7 @@
                 return this.View(model);
             }
 
-            int currentUserId = int.Parse(this.User.FindFirstValue(ClaimTypes.NameIdentifier) !);
+            int currentUserId = this.GetCurrentUserId();
             this.logger.LogInformation("User {UserId} submitting complaint for post ID: {PostId}", currentUserId, model.PostId);
 
             var dto = new CreateComplaintDto

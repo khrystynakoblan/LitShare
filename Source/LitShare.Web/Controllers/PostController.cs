@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Security.Claims;
     using System.Threading.Tasks;
     using LitShare.BLL.DTOs;
     using LitShare.BLL.Services.Interfaces;
@@ -15,7 +14,7 @@
     using Microsoft.Extensions.Logging;
 
     [Authorize(Roles = "User")]
-    public class PostController : Controller
+    public class PostController : BaseController
     {
         private readonly ICreatePostService createPostService;
         private readonly IEditPostService editPostService;
@@ -56,7 +55,7 @@
                 return this.View(model);
             }
 
-            int currentUserId = int.Parse(this.User.FindFirstValue(ClaimTypes.NameIdentifier) !);
+            int currentUserId = this.GetCurrentUserId();
 
             var dto = new CreatePostDto
             {
@@ -83,7 +82,7 @@
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            int currentUserId = int.Parse(this.User.FindFirstValue(ClaimTypes.NameIdentifier) !);
+            int currentUserId = this.GetCurrentUserId();
             var result = await this.editPostService.GetPostByIdAsync(id, currentUserId);
 
             if (result.IsFailure)
@@ -125,7 +124,7 @@
                 return this.View("~/Views/Post/Edit.cshtml", model);
             }
 
-            int currentUserId = int.Parse(this.User.FindFirstValue(ClaimTypes.NameIdentifier) !);
+            int currentUserId = this.GetCurrentUserId();
 
             var dto = new EditPostDto
             {

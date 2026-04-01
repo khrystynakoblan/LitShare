@@ -1,6 +1,5 @@
 namespace LitShare.Web.Controllers
 {
-    using System.Security.Claims;
     using LitShare.BLL.DTOs;
     using LitShare.BLL.Services.Interfaces;
     using LitShare.Web.Models;
@@ -10,7 +9,7 @@ namespace LitShare.Web.Controllers
     using Microsoft.Extensions.Logging;
 
     [Authorize(Roles = "User")]
-    public class ProfileController : Controller
+    public class ProfileController : BaseController
     {
         private readonly IProfileService profileService;
         private readonly IPostService postService;
@@ -238,12 +237,6 @@ namespace LitShare.Web.Controllers
             };
 
             return this.View(model);
-        }
-
-        private int GetCurrentUserId()
-        {
-            var userIdString = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            return int.Parse(userIdString!);
         }
     }
 }
