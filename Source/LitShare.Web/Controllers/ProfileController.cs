@@ -37,7 +37,7 @@ namespace LitShare.Web.Controllers
             if (result.IsFailure)
             {
                 this.logger.LogWarning("User not found. UserId: {UserId}", userId);
-                return this.Content(result.Error);
+                return this.HandleFailure(result.Error);
             }
 
             var user = result.Value!;
@@ -103,7 +103,7 @@ namespace LitShare.Web.Controllers
 
             if (result.IsFailure)
             {
-                return this.Content(result.Error);
+                return this.HandleFailure(result.Error);
             }
 
             var user = result.Value!;
@@ -171,7 +171,7 @@ namespace LitShare.Web.Controllers
 
             if (result.IsFailure)
             {
-                return this.Content(result.Error);
+                return this.HandleFailure(result.Error);
             }
 
             var user = result.Value!;
@@ -214,7 +214,7 @@ namespace LitShare.Web.Controllers
             if (result.IsFailure)
             {
                 this.logger.LogWarning("Delete failed. UserId: {UserId}, Error: {Error}", userId, result.Error);
-                return this.Content(result.Error);
+                return this.HandleFailure(result.Error);
             }
 
             await this.HttpContext.SignOutAsync();
