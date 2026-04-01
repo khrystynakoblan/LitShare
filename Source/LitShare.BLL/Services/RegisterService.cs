@@ -73,7 +73,7 @@
 
             this.logger.LogInformation("User registered successfully. Email: {Email}", dto.Email);
 
-            return Result<bool>.Success(true);
+            return true;
         }
     }
 }

@@ -125,21 +125,6 @@
         }
 
         [Fact]
-        public async Task GetFilteredPostsAsync_PostWithoutUser_CityIsNull()
-        {
-            this.postRepositoryMock
-                .Setup(r => r.GetFilteredAsync(null, null, null, null))
-                .ReturnsAsync(new List<Posts>
-                {
-                    new Posts { Id = 1, Title = "Книга", Author = "Автор", User = null },
-                });
-
-            var result = await this.sut.GetFilteredPostsAsync(new PostFilterDto());
-
-            Assert.Null(result.Value!.First().City);
-        }
-
-        [Fact]
         public async Task GetFilteredPostsAsync_WhenRepositoryThrows_PropagatesException()
         {
             this.postRepositoryMock

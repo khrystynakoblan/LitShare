@@ -20,7 +20,7 @@
             this.logger = logger;
         }
 
-        public async Task<Result<Users>> GetUserByIdAsync(int id)
+        public async Task<Result<UserProfileDto>> GetUserByIdAsync(int id)
         {
             this.logger.LogInformation("Fetching user profile. UserId: {UserId}", id);
             var user = await this.userRepository.GetByIdAsync(id);
@@ -28,11 +28,23 @@
             if (user == null)
             {
                 this.logger.LogWarning("User not found. UserId: {UserId}", id);
-                return Result<Users>.Failure("Користувача не знайдено.");
+                return Result<UserProfileDto>.Failure("Користувача не знайдено.");
             }
 
             this.logger.LogInformation("User profile loaded successfully. UserId: {UserId}", id);
-            return Result<Users>.Success(user);
+
+            return new UserProfileDto
+            {
+                Id = user.Id,
+                Name = user.Name ?? string.Empty,
+                Email = user.Email ?? string.Empty,
+                Phone = user.Phone,
+                Region = user.Region,
+                District = user.District,
+                City = user.City,
+                About = user.About,
+                PhotoUrl = user.PhotoUrl
+            };
         }
 
         public async Task<Result<bool>> UpdateProfileAsync(int userId, UpdateProfileDto dto)
@@ -59,7 +71,7 @@
 
             this.logger.LogInformation("Profile updated successfully. UserId: {UserId}", userId);
 
-            return Result<bool>.Success(true);
+            return true;
         }
 
         public async Task<Result<bool>> DeleteAccountAsync(int userId)
@@ -78,7 +90,7 @@
 
             this.logger.LogInformation("User deleted successfully. UserId: {UserId}", userId);
 
-            return Result<bool>.Success(true);
+            return true;
         }
     }
 }

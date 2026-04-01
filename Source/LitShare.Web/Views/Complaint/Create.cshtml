@@ -9,29 +9,70 @@
         "Інше",
     };
 }
+
 <div class="container mt-5 d-flex justify-content-center">
     <div class="border rounded p-5" style="width: 520px;">
         <h4 class="fw-bold text-center mb-4">Звіт про проблему</h4>
+
         <form asp-action="Create" method="post">
             <input type="hidden" asp-for="PostId" />
             <p class="fw-bold mb-3">Оберіть проблему:</p>
+
             <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+            <span asp-validation-for="ComplaintType" class="text-danger d-block mb-2"></span>
+
             @foreach (var option in complaintOptions)
             {
                 <div class="form-check mb-3">
-                    <input class="form-check-input" type="radio" asp-for="ComplaintType" value="@option" id="type_@option.GetHashCode()" />
+                    <input class="form-check-input complaint-radio" type="radio" asp-for="ComplaintType" value="@option" id="type_@option.GetHashCode()" />
                     <label class="form-check-label" for="type_@option.GetHashCode()">
                         @option
                     </label>
                 </div>
             }
+
             <div class="mb-4">
-                <textarea asp-for="AdditionalText" class="form-control" rows="7" placeholder="Додаткові коментарі (необов'язково)"></textarea>
+                <textarea asp-for="AdditionalText" id="AdditionalText" class="form-control" rows="7"
+                          placeholder="Будь ласка, опишіть проблему тут..."></textarea>
                 <span asp-validation-for="AdditionalText" class="text-danger"></span>
             </div>
-            <button type="submit" class="btn btn-dark px-4 py-2 w-100">
-                Надіслати
-            </button>
+
+            <div class="d-flex justify-content-between mt-4">
+                <a asp-controller="Post" asp-action="Details" asp-route-id="@Model.PostId" class="btn btn-outline-secondary px-4 py-2 w-100 me-2">
+                    Скасувати
+                </a>
+                <button type="submit" class="btn btn-dark px-4 py-2 w-100 ms-2">
+                    Надіслати
+                </button>
+            </div>
         </form>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const textParams = document.getElementById("AdditionalText");
+            const radios = document.querySelectorAll(".complaint-radio");
+
+            function toggleTextArea() {
+                const selectedRadio = document.querySelector(".complaint-radio:checked");
+
+                if (selectedRadio && selectedRadio.value === "Інше") {
+                    textParams.disabled = false; 
+                    textParams.placeholder = "Будь ласка, опишіть проблему детально ...";
+                } else {
+                    textParams.disabled = true; 
+                    textParams.value = ""; 
+                    textParams.placeholder = "Опишіть проблему (доступно при виборі 'Інше')";
+                }
+            }
+
+            radios.forEach(radio => {
+                radio.addEventListener("change", toggleTextArea);
+            });
+
+            toggleTextArea();
+        });
+    </script>
+}

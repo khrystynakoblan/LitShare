@@ -45,8 +45,8 @@ namespace LitShare.Web.Controllers
 
             var model = new ProfileViewModel
             {
-                Name = user.Name ?? string.Empty,
-                Email = user.Email ?? string.Empty,
+                Name = user.Name,
+                Email = user.Email,
                 Phone = user.Phone ?? string.Empty,
                 Region = user.Region ?? string.Empty,
                 District = user.District ?? string.Empty,
@@ -158,7 +158,7 @@ namespace LitShare.Web.Controllers
 
             this.logger.LogInformation("Profile updated successfully. UserId: {UserId}", userId);
 
-            return this.RedirectToAction("MyProfile");
+            return this.RedirectToAction("MyProfile", "Profile");
         }
 
         [HttpPost]
@@ -220,8 +220,8 @@ namespace LitShare.Web.Controllers
 
             await this.HttpContext.SignOutAsync();
 
-            return this.RedirectToAction("Index", "Home");
-           }
+            return this.RedirectToAction("Login", "Account");
+        }
 
         [HttpGet]
         public async Task<IActionResult> MyBooks()

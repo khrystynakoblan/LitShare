@@ -50,7 +50,7 @@
 
             this.logger.LogInformation("Successfully created post with ID: {PostId} for user ID: {UserId}", newPost.Id, userId);
 
-            return Result<int>.Success(newPost.Id);
+            return newPost.Id;
         }
 
         private async Task<string?> SaveImageAsync(CreatePostDto dto)

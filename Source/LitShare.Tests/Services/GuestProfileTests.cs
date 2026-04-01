@@ -1,19 +1,18 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Moq;
-using Xunit;
-using LitShare.Web.Controllers;
-using LitShare.Web.Models;
-using LitShare.BLL.Services.Interfaces;
-using LitShare.BLL.DTOs;
-using LitShare.BLL.Common;
-using LitShare.DAL.Models;
-
-namespace LitShare.Tests.Controllers
+﻿namespace LitShare.Tests.Controllers
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.Extensions.Logging;
+    using Moq;
+    using Xunit;
+    using LitShare.Web.Controllers;
+    using LitShare.Web.Models;
+    using LitShare.BLL.Services.Interfaces;
+    using LitShare.BLL.DTOs;
+    using LitShare.BLL.Common;
+
     public class GuestProfileTests
     {
         private readonly Mock<IProfileService> _profileServiceMock;
@@ -37,10 +36,10 @@ namespace LitShare.Tests.Controllers
         public async Task GuestProfile_FullSuccess_MapsAllFieldsCorrectly()
         {
             int userId = 1;
-            var user = new Users { Id = userId, Name = "User1", City = "City1", Phone = "+380970000000" };
+            var user = new UserProfileDto { Id = userId, Name = "User1", City = "City1", Phone = "+380970000000" };
             var books = new List<PostCardDto> { new PostCardDto { Title = "Book1" } };
 
-            _profileServiceMock.Setup(s => s.GetUserByIdAsync(userId)).ReturnsAsync(Result<Users>.Success(user));
+            _profileServiceMock.Setup(s => s.GetUserByIdAsync(userId)).ReturnsAsync(Result<UserProfileDto>.Success(user));
             _postServiceMock.Setup(s => s.GetPostsByUserIdAsync(userId)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Success(books));
 
             var result = await _controller.GuestProfile(userId);
@@ -55,7 +54,7 @@ namespace LitShare.Tests.Controllers
         [Fact]
         public async Task GuestProfile_UserNotFound_ReturnsNotFound()
         {
-            _profileServiceMock.Setup(s => s.GetUserByIdAsync(It.IsAny<int>())).ReturnsAsync(Result<Users>.Failure("Error"));
+            _profileServiceMock.Setup(s => s.GetUserByIdAsync(It.IsAny<int>())).ReturnsAsync(Result<UserProfileDto>.Failure("Error"));
 
             var result = await _controller.GuestProfile(1);
 
@@ -65,7 +64,7 @@ namespace LitShare.Tests.Controllers
         [Fact]
         public async Task GuestProfile_PostServiceFails_ReturnsViewWithEmptyBooks()
         {
-            _profileServiceMock.Setup(s => s.GetUserByIdAsync(1)).ReturnsAsync(Result<Users>.Success(new Users { Name = "User1" }));
+            _profileServiceMock.Setup(s => s.GetUserByIdAsync(1)).ReturnsAsync(Result<UserProfileDto>.Success(new UserProfileDto { Name = "User1" }));
             _postServiceMock.Setup(s => s.GetPostsByUserIdAsync(1)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Failure("DB Error"));
 
             var result = await _controller.GuestProfile(1);
@@ -78,7 +77,7 @@ namespace LitShare.Tests.Controllers
         [Fact]
         public async Task GuestProfile_NameIsNull_SetsDefaultName()
         {
-            _profileServiceMock.Setup(s => s.GetUserByIdAsync(1)).ReturnsAsync(Result<Users>.Success(new Users { Name = null }));
+            _profileServiceMock.Setup(s => s.GetUserByIdAsync(1)).ReturnsAsync(Result<UserProfileDto>.Success(new UserProfileDto { Name = null! }));
             _postServiceMock.Setup(s => s.GetPostsByUserIdAsync(1)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Success(new List<PostCardDto>()));
 
             var result = await _controller.GuestProfile(1);
@@ -91,8 +90,8 @@ namespace LitShare.Tests.Controllers
         [Fact]
         public async Task GuestProfile_LocationsAreNull_SetsDefaultText()
         {
-            var user = new Users { Name = "User1", Region = null, City = null };
-            _profileServiceMock.Setup(s => s.GetUserByIdAsync(1)).ReturnsAsync(Result<Users>.Success(user));
+            var user = new UserProfileDto { Name = "User1", Region = null, City = null };
+            _profileServiceMock.Setup(s => s.GetUserByIdAsync(1)).ReturnsAsync(Result<UserProfileDto>.Success(user));
             _postServiceMock.Setup(s => s.GetPostsByUserIdAsync(1)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Success(new List<PostCardDto>()));
 
             var result = await _controller.GuestProfile(1);
@@ -106,7 +105,7 @@ namespace LitShare.Tests.Controllers
         [Fact]
         public async Task GuestProfile_AboutIsNull_SetsDefaultText()
         {
-            _profileServiceMock.Setup(s => s.GetUserByIdAsync(1)).ReturnsAsync(Result<Users>.Success(new Users { About = null }));
+            _profileServiceMock.Setup(s => s.GetUserByIdAsync(1)).ReturnsAsync(Result<UserProfileDto>.Success(new UserProfileDto { About = null }));
             _postServiceMock.Setup(s => s.GetPostsByUserIdAsync(1)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Success(new List<PostCardDto>()));
 
             var result = await _controller.GuestProfile(1);
@@ -119,7 +118,7 @@ namespace LitShare.Tests.Controllers
         [Fact]
         public async Task GuestProfile_PhotoUrl_PassesCorrectUrl()
         {
-            _profileServiceMock.Setup(s => s.GetUserByIdAsync(1)).ReturnsAsync(Result<Users>.Success(new Users { PhotoUrl = "test.jpg" }));
+            _profileServiceMock.Setup(s => s.GetUserByIdAsync(1)).ReturnsAsync(Result<UserProfileDto>.Success(new UserProfileDto { PhotoUrl = "test.jpg" }));
             _postServiceMock.Setup(s => s.GetPostsByUserIdAsync(1)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Success(new List<PostCardDto>()));
 
             var result = await _controller.GuestProfile(1);
@@ -132,7 +131,7 @@ namespace LitShare.Tests.Controllers
         [Fact]
         public async Task GuestProfile_NoBooks_ReturnsEmptyCollection()
         {
-            _profileServiceMock.Setup(s => s.GetUserByIdAsync(1)).ReturnsAsync(Result<Users>.Success(new Users()));
+            _profileServiceMock.Setup(s => s.GetUserByIdAsync(1)).ReturnsAsync(Result<UserProfileDto>.Success(new UserProfileDto()));
             _postServiceMock.Setup(s => s.GetPostsByUserIdAsync(1)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Success(new List<PostCardDto>()));
 
             var result = await _controller.GuestProfile(1);
@@ -146,7 +145,7 @@ namespace LitShare.Tests.Controllers
         public async Task GuestProfile_ManyBooks_PassesAllBooksToModel()
         {
             var books = new List<PostCardDto> { new PostCardDto(), new PostCardDto() };
-            _profileServiceMock.Setup(s => s.GetUserByIdAsync(1)).ReturnsAsync(Result<Users>.Success(new Users()));
+            _profileServiceMock.Setup(s => s.GetUserByIdAsync(1)).ReturnsAsync(Result<UserProfileDto>.Success(new UserProfileDto()));
             _postServiceMock.Setup(s => s.GetPostsByUserIdAsync(1)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Success(books));
 
             var result = await _controller.GuestProfile(1);
@@ -159,7 +158,7 @@ namespace LitShare.Tests.Controllers
         [Fact]
         public async Task GuestProfile_EmailIsNull_SetsEmptyString()
         {
-            _profileServiceMock.Setup(s => s.GetUserByIdAsync(1)).ReturnsAsync(Result<Users>.Success(new Users { Email = null }));
+            _profileServiceMock.Setup(s => s.GetUserByIdAsync(1)).ReturnsAsync(Result<UserProfileDto>.Success(new UserProfileDto { Email = null! }));
             _postServiceMock.Setup(s => s.GetPostsByUserIdAsync(1)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Success(new List<PostCardDto>()));
 
             var result = await _controller.GuestProfile(1);

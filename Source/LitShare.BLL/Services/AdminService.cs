@@ -34,7 +34,7 @@
 
             this.logger.LogInformation("Fetched {Count} complaints.", dtos.Count);
 
-            return Result<List<ComplaintDto>>.Success(dtos);
+            return dtos;
         }
     }
 }
