@@ -41,7 +41,7 @@
             await this.complaintRepository.SaveChangesAsync();
 
             this.logger.LogInformation("Complaint successfully created for post {PostId} by user {UserId}", dto.PostId, userId);
-            return Result<bool>.Success(true);
+            return true;
         }
     }
 }

@@ -37,7 +37,7 @@
                 Name = g.Name ?? string.Empty
             }).ToList();
 
-            return Result<List<GenreDto>>.Success(genreDtos);
+            return genreDtos;
         }
     }
 }

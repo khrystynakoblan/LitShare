@@ -53,7 +53,7 @@
             }).ToList();
 
             this.logger.LogInformation("Filtered posts returned {Count} results.", postCards.Count);
-            return Result<List<PostCardDto>>.Success(postCards);
+            return postCards;
         }
     }
 }

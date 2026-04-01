@@ -154,7 +154,7 @@
                 return this.View("~/Views/Post/Edit.cshtml", model);
             }
 
-            return this.RedirectToAction("Index", "Home");
+            return this.RedirectToAction("Mybooks", "Profile");
         }
 
         [HttpGet]

@@ -56,11 +56,11 @@
 
             this.logger.LogInformation("Login successful. Email: {Email}, Role: {Role}", dto.Email, user.Role);
 
-            return Result<LoginResultDto>.Success(new LoginResultDto
+            return new LoginResultDto
             {
                 UserId = user.Id,
                 Role = user.Role,
-            });
+            };
         }
     }
 }

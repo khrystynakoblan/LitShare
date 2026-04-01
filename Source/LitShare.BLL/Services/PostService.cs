@@ -30,9 +30,9 @@ namespace LitShare.BLL.Services
                 Author = p.Author ?? string.Empty,
                 City = p.User?.City ?? "Не вказано",
                 PhotoUrl = p.PhotoUrl
-            });
+            }).ToList();
 
-            return Result<IEnumerable<PostCardDto>>.Success(dtos);
+            return dtos;
         }
 
         public async Task<Result<PostDetailsDto>> GetPostDetailsAsync(int id)
@@ -49,7 +49,7 @@ namespace LitShare.BLL.Services
 
             this.logger.LogInformation("BLL: Successfully fetched post details for ID: {Id}", id);
 
-            return Result<PostDetailsDto>.Success(new PostDetailsDto
+            return new PostDetailsDto
             {
                 Id = post.Id,
                 Title = post.Title ?? string.Empty,
@@ -61,7 +61,7 @@ namespace LitShare.BLL.Services
                     .Select(bg => bg.Genre?.Name ?? string.Empty)
                     .ToList(),
                 UserId = post.UserId,
-            });
+            };
         }
     }
 }

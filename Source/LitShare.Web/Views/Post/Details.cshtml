@@ -1,4 +1,5 @@
 ﻿@model LitShare.Web.Models.PostDetailsViewModel
+@using System.Security.Claims
 
 @{
     ViewData["Title"] = "Оголошення";
@@ -6,6 +7,13 @@
 
 <div class="container mt-4">
 
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
     <div class="row">
         <div class="col-md-4">
             <div class="bg-secondary-subtle d-flex align-items-center justify-content-center"
@@ -42,13 +50,34 @@
     </div>
 
     <div class="d-flex justify-content-between align-items-center mt-3">
+
         <a asp-controller="Profile" asp-action="GuestProfile" asp-route-id="@Model.UserId"
-           class="btn btn-dark px-4 py-2">
+           class="btn btn-dark d-flex align-items-center justify-content-center"
+           style="width: 240px; height: 50px;">
             Профіль користувача
         </a>
-        <a asp-controller="Complaint" asp-action="Create" asp-route-postId="@Model.Id"
-           class="btn btn-dark px-4 py-2 text-center">
-            Поскаржитися<br />на оголошення
-        </a>
+
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            var currentUserIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            int.TryParse(currentUserIdString, out int currentUserId);
+
+            if (currentUserId == Model.UserId)
+            {
+                <a asp-controller="Post" asp-action="Edit" asp-route-id="@Model.Id"
+                   class="btn btn-outline-dark d-flex align-items-center justify-content-center"
+                   style="width: 240px; height: 50px;">
+                    Редагувати оголошення
+                </a>
+            }
+            else
+            {
+                <a asp-controller="Complaint" asp-action="Create" asp-route-postId="@Model.Id"
+                   class="btn btn-outline-dark d-flex align-items-center justify-content-center"
+                   style="width: 240px; height: 50px;">
+                    Поскаржитися на оголошення
+                </a>
+            }
+        }
     </div>
 </div>

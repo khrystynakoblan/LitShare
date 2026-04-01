@@ -53,7 +53,7 @@
                 GenreIds = post.BookGenres.Select(bg => bg.GenreId).ToList(),
             };
 
-            return Result<PostViewDto>.Success(dto);
+            return dto;
         }
 
         public async Task<Result<bool>> EditPostAsync(EditPostDto dto, int currentUserId)
@@ -96,7 +96,7 @@
             await this.postRepository.SaveChangesAsync();
 
             this.logger.LogInformation("Successfully edited post with ID: {PostId}", dto.PostId);
-            return Result<bool>.Success(true);
+            return true;
         }
 
         private async Task<string?> SaveImageAsync(EditPostDto dto)
