@@ -8,7 +8,6 @@ namespace LitShare.Web.Controllers
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
 
-    // [Authorize(Roles = "User")]
     public class HomeController : Controller
     {
         private readonly IHomeService homeService;

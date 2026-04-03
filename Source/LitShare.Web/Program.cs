@@ -45,14 +45,6 @@ try
     builder.Services.AddScoped<IRegisterService, RegisterService>();
     builder.Services.AddScoped<ILoginService, LoginService>();
 
-    builder.Services.AddDistributedMemoryCache();
-    builder.Services.AddSession(options =>
-    {
-        options.IdleTimeout = TimeSpan.FromMinutes(30);
-        options.Cookie.HttpOnly = true;
-        options.Cookie.IsEssential = true;
-    });
-
     builder.Services.AddScoped<IPostRepository, PostRepository>();
     builder.Services.AddScoped<ICreatePostService, CreatePostService>();
     builder.Services.AddScoped<IGenreRepository, GenreRepository>();
@@ -92,7 +84,6 @@ try
     app.UseHttpsRedirection();
     app.UseStaticFiles();
     app.UseRouting();
-    app.UseSession();
     app.UseAuthentication();
     app.UseAuthorization();
 
