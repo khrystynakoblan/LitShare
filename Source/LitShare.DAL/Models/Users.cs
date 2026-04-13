@@ -52,5 +52,9 @@
         public ICollection<Posts>? Posts { get; set; }
 
         public ICollection<Complaints>? Complaints { get; set; }
+
+        public ICollection<Reviews>? ReviewsGiven { get; set; }
+
+        public ICollection<Reviews>? ReviewsReceived { get; set; }
     }
 }

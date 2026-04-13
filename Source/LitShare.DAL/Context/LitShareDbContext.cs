@@ -30,6 +30,8 @@
 
         public DbSet<BookGenres> BookGenres { get; set; }
 
+        public DbSet<Reviews> Reviews { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasPostgresEnum<DealType>("deal_type_t");
@@ -81,6 +83,24 @@
                 .HasColumnType("deal_type_t");
 
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Reviews>().Property(r => r.Date).HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+            modelBuilder.Entity<Reviews>()
+                .HasOne(r => r.Reviewer)
+                .WithMany(u => u.ReviewsGiven)
+                .HasForeignKey(r => r.ReviewerId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Reviews>()
+                .HasOne(r => r.ReviewedUser)
+                .WithMany(u => u.ReviewsReceived)
+                .HasForeignKey(r => r.ReviewedUserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Reviews>()
+                .HasIndex(r => new { r.ReviewerId, r.ReviewedUserId })
+                .IsUnique();
         }
 
         /// <summary>

@@ -1,0 +1,56 @@
+﻿@model LitShare.Web.Models.ReviewListViewModel
+@{
+    ViewData["Title"] = "Відгуки";
+}
+<div class="container mt-4" style="max-width: 700px;">
+    @if (Context.Request.Query.ContainsKey("success"))
+    {
+        <div class="alert alert-success">Відгук успішно надіслано!</div>
+    }
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-bold mb-0">Відгуки</h4>
+    </div>
+    <div class="border rounded p-4 mb-4 bg-white shadow-sm text-center">
+        <h2 class="fw-bold mb-1">@Model.AverageRating.ToString("0.0")</h2>
+        <div class="mb-1">
+            @for (int i = 1; i <= 5; i++)
+            {
+                <i class="bi @(i <= Math.Round(Model.AverageRating) ? "bi-star-fill" : "bi-star") text-warning fs-5"></i>
+            }
+        </div>
+        <p class="text-muted small">@Model.TotalReviews відгуків</p>
+        @if (Model.CanLeaveReview)
+        {
+            <a asp-action="Create" asp-route-userId="@Model.ReviewedUserId" class="btn btn-dark px-4">Залишити відгук</a>
+        }
+    </div>
+    @if (!Model.Reviews.Any())
+    {
+        <p class="text-muted text-center">Поки що відгуків немає.</p>
+    }
+    else
+    {
+        @foreach (var review in Model.Reviews)
+        {
+            <div class="border rounded p-3 mb-3 bg-white shadow-sm">
+                <div class="d-flex align-items-center mb-2">
+                    <a asp-controller="Profile" asp-action="GuestProfile" asp-route-id="@review.ReviewerId" class="text-decoration-none text-dark d-flex align-items-center gap-2">
+                        <img src="@(string.IsNullOrEmpty(review.ReviewerPhotoUrl) ? "https://cdn-icons-png.flaticon.com/512/149/149071.png" : review.ReviewerPhotoUrl)" class="rounded-circle" style="width:40px; height:40px; object-fit:cover;" />
+                        <span class="fw-bold">@review.ReviewerName</span>
+                    </a>
+                    <span class="ms-auto text-muted small">@review.Date.ToString("dd.MM.yyyy")</span>
+                </div>
+                <div class="mb-2">
+                    @for (int i = 1; i <= 5; i++)
+                    {
+                        <i class="bi @(i <= review.Rating ? "bi-star-fill" : "bi-star") text-warning"></i>
+                    }
+                </div>
+                @if (!string.IsNullOrEmpty(review.Text))
+                {
+                    <p class="mb-0 text-muted">@review.Text</p>
+                }
+            </div>
+        }
+    }
+</div>
