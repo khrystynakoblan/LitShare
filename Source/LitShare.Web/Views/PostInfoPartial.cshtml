@@ -1,0 +1,36 @@
+@model LitShare.Web.Models.PostDetailsViewModel
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="bg-secondary-subtle d-flex align-items-center justify-content-center"
+             style="height: 400px;">
+            @if (!string.IsNullOrEmpty(Model.PhotoUrl))
+            {
+                <img src="@Model.PhotoUrl" class="img-fluid h-100 w-100"
+                     style="object-fit: cover;" alt="Book cover" />
+            }
+            else
+            {
+                <i class="bi bi-image text-muted" style="font-size: 5rem;"></i>
+            }
+        </div>
+    </div>
+
+    <div class="col-md-8 ps-5">
+        <h3 class="fw-bold mb-1">@Model.Title</h3>
+        <p class="text-muted mb-3">@Model.Author</p>
+
+        <p>
+            <strong>Жанр:</strong>
+            @string.Join(", ", Model.Genres)
+        </p>
+
+        <p class="fw-bold mb-1">Опис</p>
+        <p>@Model.Description</p>
+
+        <p>
+            <strong>Тип угоди:</strong>
+            @(Model.DealType == LitShare.DAL.Models.DealType.Exchange ? "Обмін" : "Дарування")
+        </p>
+    </div>
+</div>

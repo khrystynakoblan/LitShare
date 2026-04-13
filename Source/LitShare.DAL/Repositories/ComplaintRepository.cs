@@ -1,7 +1,5 @@
 ﻿namespace LitShare.DAL.Repositories
 {
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
     using LitShare.DAL.Context;
     using LitShare.DAL.Models;
     using LitShare.DAL.Repositories.Interfaces;
@@ -34,6 +32,20 @@
                 .Include(c => c.Complainant)
                 .OrderByDescending(c => c.Date)
                 .ToListAsync();
+        }
+
+        public async Task<Complaints?> GetByIdAsync(int id)
+        {
+            return await this.context.Complaints
+                .Include(c => c.Post)
+                .Include(c => c.Complainant)
+                .FirstOrDefaultAsync(c => c.Id == id);
+        }
+
+        public Task DeleteAsync(Complaints complaint)
+        {
+            this.context.Complaints.Remove(complaint);
+            return Task.CompletedTask;
         }
     }
 }

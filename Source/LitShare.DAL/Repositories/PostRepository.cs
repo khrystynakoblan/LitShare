@@ -97,5 +97,27 @@
                 .Include(p => p.User)
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
+
+        public Task DeleteAsync(Posts post)
+        {
+            this.context.Posts.Remove(post);
+            return Task.CompletedTask;
+        }
+
+        public async Task<IEnumerable<Posts>> GetAllPostsAsync()
+        {
+            return await this.context.Posts
+                .AsNoTracking()
+                .Include(p => p.User)
+                .Include(p => p.BookGenres)
+                    .ThenInclude(bg => bg.Genre)
+                .ToListAsync();
+        }
+
+        public Task DeletePostAsync(Posts post)
+        {
+            this.context.Posts.Remove(post);
+            return Task.CompletedTask;
+        }
     }
 }
