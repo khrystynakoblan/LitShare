@@ -23,5 +23,9 @@
         Task<Posts?> GetByIdWithGenresAsync(int id);
 
         Task DeleteAsync(Posts post);
+
+        Task DeletePostAsync(Posts post);
+
+        Task<IEnumerable<Posts>> GetAllPostsAsync();
     }
 }

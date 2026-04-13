@@ -3,6 +3,15 @@
     ViewData["Title"] = "Список скарг";
 }
 
+    @if (User.IsInRole("Admin"))
+{
+    <li class="nav-item">
+        <a class="nav-link" asp-controller="Admin" asp-action="Statistics">
+            <i class="bi bi-graph-up"></i> Статистика
+        </a>
+    </li>
+}
+
 <div class="container mt-4">
     <h4 class="mb-3">Список скарг</h4>
     <p class="text-muted mb-3">Всього скарг: @Model.TotalCount</p>

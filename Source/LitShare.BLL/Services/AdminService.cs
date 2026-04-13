@@ -10,15 +10,18 @@
     {
         private readonly IComplaintRepository complaintRepository;
         private readonly IPostRepository postRepository;
+        private readonly IUserRepository userRepository;
         private readonly ILogger<AdminService> logger;
 
         public AdminService(
             IComplaintRepository complaintRepository,
             IPostRepository postRepository,
+            IUserRepository userRepository,
             ILogger<AdminService> logger)
         {
             this.complaintRepository = complaintRepository;
             this.postRepository = postRepository;
+            this.userRepository = userRepository;
             this.logger = logger;
         }
 
@@ -27,6 +30,7 @@
             this.logger.LogInformation("Approving complaint. Id: {Id}", id);
 
             var complaint = await this.complaintRepository.GetByIdAsync(id);
+
             if (complaint == null)
             {
                 return Result<bool>.Failure("Скаргу не знайдено.");
@@ -34,15 +38,11 @@
 
             if (complaint.Post != null)
             {
-                int postId = complaint.Post.Id;
-
-                await this.postRepository.DeleteAsync(complaint.Post);
-
-                this.logger.LogInformation("Post {PostId} marked for deletion due to complaint {ComplaintId}", postId, id);
+                await this.postRepository.DeletePostAsync(complaint.Post);
+                await this.postRepository.SaveChangesAsync();
             }
 
             await this.complaintRepository.DeleteAsync(complaint);
-
             await this.complaintRepository.SaveChangesAsync();
 
             return Result<bool>.Success(true);
@@ -63,8 +63,6 @@
                 Date = c.Date,
             }).ToList();
 
-            this.logger.LogInformation("Fetched {Count} complaints.", dtos.Count);
-
             return Result<List<ComplaintDto>>.Success(dtos);
         }
 
@@ -73,6 +71,7 @@
             this.logger.LogInformation("Fetching complaint details. Id: {Id}", id);
 
             var complaint = await this.complaintRepository.GetByIdAsync(id);
+
             if (complaint == null)
             {
                 return Result<ComplaintDetailsDto>.Failure("Скаргу не знайдено.");
@@ -98,6 +97,7 @@
             this.logger.LogInformation("Rejecting complaint. Id: {Id}", id);
 
             var complaint = await this.complaintRepository.GetByIdAsync(id);
+
             if (complaint == null)
             {
                 return Result<bool>.Failure("Скаргу не знайдено.");
@@ -107,6 +107,67 @@
             await this.complaintRepository.SaveChangesAsync();
 
             return Result<bool>.Success(true);
+        }
+
+        public async Task<Result<AdminStatsDto>> GetStatisticsAsync()
+        {
+            this.logger.LogInformation("Fetching admin statistics");
+
+            try
+            {
+                var users = await this.userRepository.GetAllAsync();
+                var posts = await this.postRepository.GetAllPostsAsync();
+                var complaints = await this.complaintRepository.GetAllAsync();
+
+                var cityStats = posts
+                    .Where(p => p.User?.City != null)
+                    .GroupBy(p => p.User!.City!)
+                    .Select(g => new CityStatDto
+                    {
+                        City = g.Key,
+                        Count = g.Count()
+                    })
+                    .OrderByDescending(x => x.Count)
+                    .Take(5)
+                    .ToList();
+
+                var genreStats = posts
+                    .Where(p => p.BookGenres != null)
+                    .SelectMany(p => p.BookGenres!)
+                    .Where(bg => bg.Genre?.Name != null)
+                    .GroupBy(bg => bg.Genre!.Name!)
+                    .Select(g => new GenreStatDto
+                    {
+                        GenreName = g.Key,
+                        Count = g.Count()
+                    })
+                    .OrderByDescending(x => x.Count)
+                    .Take(5)
+                    .ToList();
+
+                var stats = new AdminStatsDto
+                {
+                    TotalUsers = users.Count(),
+                    TotalPosts = posts.Count(),
+                    ActivePosts = posts.Count(),
+                    TotalComplaints = complaints.Count(),
+                    PendingComplaints = complaints.Count(),
+                    TopCities = cityStats,
+                    TopGenres = genreStats
+                };
+
+                return Result<AdminStatsDto>.Success(stats);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "Error fetching admin statistics");
+                return Result<AdminStatsDto>.Failure("Не вдалося завантажити статистику");
+            }
+        }
+
+        public Task GetStatisticsAsync(object key)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -52,5 +52,12 @@
             this.context.Users.Remove(user);
             await this.context.SaveChangesAsync();
         }
+
+        public async Task<IEnumerable<Users>> GetAllAsync()
+        {
+            return await this.context.Users
+                .AsNoTracking()
+                .ToListAsync();
+        }
     }
 }

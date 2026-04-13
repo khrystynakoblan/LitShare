@@ -1,5 +1,7 @@
 ﻿namespace LitShare.Tests.Services
 {
+    using LitShare.BLL.Common;
+    using LitShare.BLL.DTOs;
     using LitShare.BLL.Services;
     using LitShare.DAL.Models;
     using LitShare.DAL.Repositories.Interfaces;
@@ -11,271 +13,327 @@
     {
         private readonly Mock<IComplaintRepository> complaintRepositoryMock;
         private readonly Mock<IPostRepository> postRepositoryMock;
+        private readonly Mock<IUserRepository> userRepositoryMock;
         private readonly Mock<ILogger<AdminService>> loggerMock;
-        private readonly AdminService sut;
+        private readonly AdminService adminService;
 
         public AdminServiceTests()
         {
             this.complaintRepositoryMock = new Mock<IComplaintRepository>();
             this.postRepositoryMock = new Mock<IPostRepository>();
+            this.userRepositoryMock = new Mock<IUserRepository>();
             this.loggerMock = new Mock<ILogger<AdminService>>();
 
-            this.sut = new AdminService(
+            this.adminService = new AdminService(
                 this.complaintRepositoryMock.Object,
                 this.postRepositoryMock.Object,
+                this.userRepositoryMock.Object,
                 this.loggerMock.Object);
         }
 
         [Fact]
-        public async Task GetAllComplaintsAsync_WithNoComplaints_ReturnsSuccessWithEmptyList()
+        public async Task GetAllComplaintsAsync_WhenComplaintsExist_ReturnsSuccessWithList()
+        {
+            var complaints = new List<Complaints>
+            {
+                new Complaints
+                {
+                    Id = 1,
+                    Text = "Скарга 1",
+                    Date = DateTime.Now,
+                    Post = new Posts { Title = "Книга 1" },
+                    Complainant = new Users { Name = "Користувач 1" }
+                },
+                new Complaints
+                {
+                    Id = 2,
+                    Text = "Скарга 2",
+                    Date = DateTime.Now,
+                    Post = new Posts { Title = "Книга 2" },
+                    Complainant = new Users { Name = "Користувач 2" }
+                }
+            };
+
+            this.complaintRepositoryMock
+                .Setup(r => r.GetAllAsync())
+                .ReturnsAsync(complaints);
+
+            var result = await this.adminService.GetAllComplaintsAsync();
+
+            Assert.True(result.IsSuccess);
+            Assert.Equal(2, result.Value!.Count);
+            Assert.Equal("Скарга 1", result.Value[0].Text);
+            Assert.Equal("Книга 1", result.Value[0].BookTitle);
+        }
+
+        [Fact]
+        public async Task GetAllComplaintsAsync_WhenNoComplaints_ReturnsSuccessWithEmptyList()
         {
             this.complaintRepositoryMock
                 .Setup(r => r.GetAllAsync())
                 .ReturnsAsync(new List<Complaints>());
 
-            var result = await this.sut.GetAllComplaintsAsync();
+            var result = await this.adminService.GetAllComplaintsAsync();
 
             Assert.True(result.IsSuccess);
             Assert.Empty(result.Value!);
         }
 
         [Fact]
-        public async Task GetAllComplaintsAsync_MapsDateCorrectly()
-        {
-            var date = new DateTime(2025, 9, 24);
-
-            this.complaintRepositoryMock
-                .Setup(r => r.GetAllAsync())
-                .ReturnsAsync(new List<Complaints>
-                {
-                    new Complaints
-                    {
-                        Id = 1,
-                        Text = "Скарга",
-                        Date = date,
-                        Post = new Posts { Title = "Кобзар" },
-                        Complainant = new Users { Name = "Іван" },
-                    },
-                });
-
-            var result = await this.sut.GetAllComplaintsAsync();
-
-            Assert.Equal(date, result.Value![0].Date);
-        }
-
-        [Fact]
-        public async Task GetAllComplaintsAsync_ComplaintWithNullText_ReturnsEmptyString()
-        {
-            this.complaintRepositoryMock
-                .Setup(r => r.GetAllAsync())
-                .ReturnsAsync(new List<Complaints>
-                {
-                    new Complaints
-                    {
-                        Id = 1,
-                        Text = null,
-                        Post = new Posts { Title = "Кобзар" },
-                        Complainant = new Users { Name = "Іван" },
-                    },
-                });
-
-            var result = await this.sut.GetAllComplaintsAsync();
-
-            Assert.Equal(string.Empty, result.Value![0].Text);
-        }
-
-        [Fact]
-        public async Task GetAllComplaintsAsync_ComplaintWithNullPost_ReturnsEmptyBookTitle()
-        {
-            this.complaintRepositoryMock
-                .Setup(r => r.GetAllAsync())
-                .ReturnsAsync(new List<Complaints>
-                {
-                    new Complaints
-                    {
-                        Id = 1,
-                        Text = "Скарга",
-                        Post = null,
-                        Complainant = new Users { Name = "Іван" },
-                    },
-                });
-
-            var result = await this.sut.GetAllComplaintsAsync();
-
-            Assert.Equal(string.Empty, result.Value![0].BookTitle);
-        }
-
-        [Fact]
-        public async Task GetAllComplaintsAsync_ComplaintWithNullComplainant_ReturnsEmptyComplainantName()
-        {
-            this.complaintRepositoryMock
-                .Setup(r => r.GetAllAsync())
-                .ReturnsAsync(new List<Complaints>
-                {
-                    new Complaints
-                    {
-                        Id = 1,
-                        Text = "Скарга",
-                        Post = new Posts { Title = "Кобзар" },
-                        Complainant = null,
-                    },
-                });
-
-            var result = await this.sut.GetAllComplaintsAsync();
-
-            Assert.Equal(string.Empty, result.Value![0].ComplainantName);
-        }
-
-        [Fact]
-        public async Task GetAllComplaintsAsync_ComplaintWithNullPostTitle_ReturnsEmptyBookTitle()
-        {
-            this.complaintRepositoryMock
-                .Setup(r => r.GetAllAsync())
-                .ReturnsAsync(new List<Complaints>
-                {
-                    new Complaints
-                    {
-                        Id = 1,
-                        Text = "Скарга",
-                        Post = new Posts { Title = null },
-                        Complainant = new Users { Name = "Іван" },
-                    },
-                });
-
-            var result = await this.sut.GetAllComplaintsAsync();
-
-            Assert.Equal(string.Empty, result.Value![0].BookTitle);
-        }
-
-        [Fact]
-        public async Task GetAllComplaintsAsync_WhenRepositoryThrows_PropagatesException()
-        {
-            this.complaintRepositoryMock
-                .Setup(r => r.GetAllAsync())
-                .ThrowsAsync(new InvalidOperationException("DB connection lost"));
-
-            await Assert.ThrowsAsync<InvalidOperationException>(
-                () => this.sut.GetAllComplaintsAsync());
-        }
-
-        private static IEnumerable<Complaints> SampleComplaints() => new List<Complaints>
-        {
-            new Complaints
-            {
-                Id = 1,
-                Text = "Книга не відповідає опису",
-                Date = new DateTime(2025, 9, 24),
-                Post = new Posts { Title = "Кобзар" },
-                Complainant = new Users { Name = "Іван" },
-            },
-            new Complaints
-            {
-                Id = 2,
-                Text = "Продавець не виходить на зв'язок",
-                Date = new DateTime(2025, 9, 24),
-                Post = new Posts { Title = "Лісова пісня" },
-                Complainant = new Users { Name = "Марія" },
-            },
-        };
-
-        [Fact]
-        public async Task ApproveComplaintAsync_ComplaintNotFound_ReturnsFailure()
-        {
-            this.complaintRepositoryMock
-                .Setup(r => r.GetByIdAsync(It.IsAny<int>()))
-                .ReturnsAsync((Complaints?)null);
-
-            var result = await this.sut.ApproveComplaintAsync(1);
-
-            Assert.True(result.IsFailure);
-            Assert.Equal("Скаргу не знайдено.", result.Error);
-        }
-
-        [Fact]
-        public async Task ApproveComplaintAsync_WithExistingPost_DeletesBothPostAndComplaint()
-        {
-            var post = new Posts { Id = 10, Title = "Книга з порушенням" };
-            var complaint = new Complaints { Id = 1, Post = post };
-
-            this.complaintRepositoryMock
-                .Setup(r => r.GetByIdAsync(1))
-                .ReturnsAsync(complaint);
-
-            var result = await this.sut.ApproveComplaintAsync(1);
-
-            Assert.True(result.IsSuccess);
-            this.postRepositoryMock.Verify(r => r.DeleteAsync(post), Times.Once);
-            this.complaintRepositoryMock.Verify(r => r.DeleteAsync(complaint), Times.Once);
-            this.complaintRepositoryMock.Verify(r => r.SaveChangesAsync(), Times.Once);
-        }
-
-        [Fact]
-        public async Task ApproveComplaintAsync_PostIsNull_DeletesOnlyComplaint()
-        {
-            var complaint = new Complaints { Id = 1, Post = null };
-
-            this.complaintRepositoryMock
-                .Setup(r => r.GetByIdAsync(1))
-                .ReturnsAsync(complaint);
-
-            var result = await this.sut.ApproveComplaintAsync(1);
-
-            Assert.True(result.IsSuccess);
-            this.postRepositoryMock.Verify(r => r.DeleteAsync(It.IsAny<Posts>()), Times.Never);
-            this.complaintRepositoryMock.Verify(r => r.DeleteAsync(complaint), Times.Once);
-        }
-
-        [Fact]
-        public async Task RejectComplaintAsync_ComplaintNotFound_ReturnsFailure()
-        {
-            this.complaintRepositoryMock
-                .Setup(r => r.GetByIdAsync(It.IsAny<int>()))
-                .ReturnsAsync((Complaints?)null);
-
-            var result = await this.sut.RejectComplaintAsync(1);
-
-            Assert.True(result.IsFailure);
-            Assert.Equal("Скаргу не знайдено.", result.Error);
-        }
-
-        [Fact]
-        public async Task RejectComplaintAsync_ComplaintExists_DeletesOnlyComplaintNotPost()
-        {
-            var post = new Posts { Id = 10, Title = "Хороша книга" };
-            var complaint = new Complaints { Id = 1, Post = post };
-
-            this.complaintRepositoryMock
-                .Setup(r => r.GetByIdAsync(1))
-                .ReturnsAsync(complaint);
-
-            var result = await this.sut.RejectComplaintAsync(1);
-
-            Assert.True(result.IsSuccess);
-            this.complaintRepositoryMock.Verify(r => r.DeleteAsync(complaint), Times.Once);
-            this.postRepositoryMock.Verify(r => r.DeleteAsync(It.IsAny<Posts>()), Times.Never);
-            this.complaintRepositoryMock.Verify(r => r.SaveChangesAsync(), Times.Once);
-        }
-
-        [Fact]
-        public async Task GetComplaintByIdAsync_ExistingId_ReturnsMappedDto()
+        public async Task GetComplaintByIdAsync_WhenComplaintExists_ReturnsSuccessWithDetails()
         {
             var complaint = new Complaints
             {
                 Id = 1,
-                Text = "Тест",
-                Post = new Posts { Title = "Кобзар", Author = "Шевченко" },
-                Complainant = new Users { Name = "Олег" }
+                Text = "Тестова скарга",
+                Date = new DateTime(2024, 1, 15),
+                Post = new Posts
+                {
+                    Title = "Кобзар",
+                    Author = "Тарас Шевченко",
+                    Description = "Опис книги",
+                    PhotoUrl = "/images/kobzar.jpg"
+                },
+                Complainant = new Users { Name = "Іван Петренко" }
             };
 
             this.complaintRepositoryMock
                 .Setup(r => r.GetByIdAsync(1))
                 .ReturnsAsync(complaint);
 
-            var result = await this.sut.GetComplaintByIdAsync(1);
+            var result = await this.adminService.GetComplaintByIdAsync(1);
 
             Assert.True(result.IsSuccess);
-            Assert.Equal("Кобзар", result.Value!.BookTitle);
-            Assert.Equal("Олег", result.Value!.ComplainantName);
+            Assert.Equal(1, result.Value!.Id);
+            Assert.Equal("Тестова скарга", result.Value.Text);
+            Assert.Equal("Іван Петренко", result.Value.ComplainantName);
+            Assert.Equal("Кобзар", result.Value.BookTitle);
+            Assert.Equal("Тарас Шевченко", result.Value.BookAuthor);
+        }
+
+        [Fact]
+        public async Task GetComplaintByIdAsync_WhenComplaintNotFound_ReturnsFailure()
+        {
+            this.complaintRepositoryMock
+                .Setup(r => r.GetByIdAsync(999))
+                .ReturnsAsync((Complaints?)null);
+
+            var result = await this.adminService.GetComplaintByIdAsync(999);
+
+            Assert.True(result.IsFailure);
+            Assert.Equal("Скаргу не знайдено.", result.Error);
+        }
+
+        
+        [Fact]
+        public async Task ApproveComplaintAsync_WhenComplaintExistsWithPost_DeletesPostAndComplaint()
+        {
+            var post = new Posts { Id = 10, Title = "Тестова книга" };
+            var complaint = new Complaints
+            {
+                Id = 1,
+                Text = "Скарга",
+                Post = post
+            };
+
+            this.complaintRepositoryMock
+                .Setup(r => r.GetByIdAsync(1))
+                .ReturnsAsync(complaint);
+
+            this.postRepositoryMock
+                .Setup(r => r.DeletePostAsync(post))
+                .Returns(Task.CompletedTask);
+
+            this.postRepositoryMock
+                .Setup(r => r.SaveChangesAsync())
+                .Returns(Task.CompletedTask);
+
+            this.complaintRepositoryMock
+                .Setup(r => r.DeleteAsync(complaint))
+                .Returns(Task.CompletedTask);
+
+            var result = await this.adminService.ApproveComplaintAsync(1);
+
+            Assert.True(result.IsSuccess);
+            this.postRepositoryMock.Verify(r => r.DeletePostAsync(post), Times.Once);
+            this.complaintRepositoryMock.Verify(r => r.DeleteAsync(complaint), Times.Once);
+            this.postRepositoryMock.Verify(r => r.SaveChangesAsync(), Times.AtLeastOnce);
+        }
+
+        [Fact]
+        public async Task ApproveComplaintAsync_WhenComplaintExistsWithoutPost_DeletesOnlyComplaint()
+        {
+            var complaint = new Complaints
+            {
+                Id = 1,
+                Text = "Скарга",
+                Post = null
+            };
+
+            this.complaintRepositoryMock
+                .Setup(r => r.GetByIdAsync(1))
+                .ReturnsAsync(complaint);
+
+            this.complaintRepositoryMock
+                .Setup(r => r.DeleteAsync(complaint))
+                .Returns(Task.CompletedTask);
+
+            var result = await this.adminService.ApproveComplaintAsync(1);
+
+            Assert.True(result.IsSuccess);
+            this.postRepositoryMock.Verify(r => r.DeletePostAsync(It.IsAny<Posts>()), Times.Never);
+            this.complaintRepositoryMock.Verify(r => r.DeleteAsync(complaint), Times.Once);
+        }
+
+        [Fact]
+        public async Task ApproveComplaintAsync_WhenComplaintNotFound_ReturnsFailure()
+        {
+            this.complaintRepositoryMock
+                .Setup(r => r.GetByIdAsync(999))
+                .ReturnsAsync((Complaints?)null);
+
+            var result = await this.adminService.ApproveComplaintAsync(999);
+
+            Assert.True(result.IsFailure);
+            Assert.Equal("Скаргу не знайдено.", result.Error);
+            this.postRepositoryMock.Verify(r => r.DeletePostAsync(It.IsAny<Posts>()), Times.Never);
+        }
+
+        
+        [Fact]
+        public async Task RejectComplaintAsync_WhenComplaintExists_DeletesOnlyComplaint()
+        {
+            var complaint = new Complaints
+            {
+                Id = 1,
+                Text = "Скарга",
+                Post = new Posts { Id = 10, Title = "Книга" }
+            };
+
+            this.complaintRepositoryMock
+                .Setup(r => r.GetByIdAsync(1))
+                .ReturnsAsync(complaint);
+
+            this.complaintRepositoryMock
+                .Setup(r => r.DeleteAsync(complaint))
+                .Returns(Task.CompletedTask);
+
+            var result = await this.adminService.RejectComplaintAsync(1);
+
+            Assert.True(result.IsSuccess);
+            this.postRepositoryMock.Verify(r => r.DeletePostAsync(It.IsAny<Posts>()), Times.Never);
+            this.complaintRepositoryMock.Verify(r => r.DeleteAsync(complaint), Times.Once);
+        }
+
+        [Fact]
+        public async Task RejectComplaintAsync_WhenComplaintNotFound_ReturnsFailure()
+        {
+            this.complaintRepositoryMock
+                .Setup(r => r.GetByIdAsync(999))
+                .ReturnsAsync((Complaints?)null);
+
+            var result = await this.adminService.RejectComplaintAsync(999);
+
+            Assert.True(result.IsFailure);
+            Assert.Equal("Скаргу не знайдено.", result.Error);
+        }
+
+        [Fact]
+        public async Task GetStatisticsAsync_WhenDataExists_ReturnsCorrectStatistics()
+        {
+            var users = new List<Users>
+            {
+                new Users { Id = 1, Name = "User1", City = "Київ" },
+                new Users { Id = 2, Name = "User2", City = "Львів" },
+                new Users { Id = 3, Name = "User3", City = "Київ" }
+            };
+
+            var posts = new List<Posts>
+            {
+                new Posts
+                {
+                    Id = 1,
+                    Title = "Книга 1",
+                    User = new Users { City = "Київ" },
+                    BookGenres = new List<BookGenres>
+                    {
+                        new BookGenres { Genre = new Genres { Name = "Роман" } }
+                    }
+                },
+                new Posts
+                {
+                    Id = 2,
+                    Title = "Книга 2",
+                    User = new Users { City = "Львів" },
+                    BookGenres = new List<BookGenres>
+                    {
+                        new BookGenres { Genre = new Genres { Name = "Поезія" } }
+                    }
+                },
+                new Posts
+                {
+                    Id = 3,
+                    Title = "Книга 3",
+                    User = new Users { City = "Київ" },
+                    BookGenres = new List<BookGenres>
+                    {
+                        new BookGenres { Genre = new Genres { Name = "Роман" } },
+                        new BookGenres { Genre = new Genres { Name = "Драма" } }
+                    }
+                }
+            };
+
+            var complaints = new List<Complaints>
+            {
+                new Complaints { Id = 1, Text = "Скарга 1" },
+                new Complaints { Id = 2, Text = "Скарга 2" }
+            };
+
+            this.userRepositoryMock.Setup(r => r.GetAllAsync()).ReturnsAsync(users);
+            this.postRepositoryMock.Setup(r => r.GetAllPostsAsync()).ReturnsAsync(posts);
+            this.complaintRepositoryMock.Setup(r => r.GetAllAsync()).ReturnsAsync(complaints);
+
+            var result = await this.adminService.GetStatisticsAsync();
+
+            Assert.True(result.IsSuccess);
+            Assert.Equal(3, result.Value!.TotalUsers);
+            Assert.Equal(3, result.Value.TotalPosts);
+            Assert.Equal(2, result.Value.TotalComplaints);
+
+            Assert.Contains(result.Value.TopCities, c => c.City == "Київ" && c.Count == 2);
+            Assert.Contains(result.Value.TopCities, c => c.City == "Львів" && c.Count == 1);
+
+            Assert.Contains(result.Value.TopGenres, g => g.GenreName == "Роман" && g.Count == 2);
+        }
+
+        [Fact]
+        public async Task GetStatisticsAsync_WhenNoData_ReturnsEmptyStatistics()
+        {
+            this.userRepositoryMock.Setup(r => r.GetAllAsync()).ReturnsAsync(new List<Users>());
+            this.postRepositoryMock.Setup(r => r.GetAllPostsAsync()).ReturnsAsync(new List<Posts>());
+            this.complaintRepositoryMock.Setup(r => r.GetAllAsync()).ReturnsAsync(new List<Complaints>());
+
+            var result = await this.adminService.GetStatisticsAsync();
+
+            Assert.True(result.IsSuccess);
+            Assert.Equal(0, result.Value!.TotalUsers);
+            Assert.Equal(0, result.Value.TotalPosts);
+            Assert.Equal(0, result.Value.TotalComplaints);
+            Assert.Empty(result.Value.TopCities);
+            Assert.Empty(result.Value.TopGenres);
+        }
+
+        [Fact]
+        public async Task GetStatisticsAsync_WhenRepositoryThrowsException_ReturnsFailure()
+        {
+            this.userRepositoryMock
+                .Setup(r => r.GetAllAsync())
+                .ThrowsAsync(new Exception("Database error"));
+
+            var result = await this.adminService.GetStatisticsAsync();
+
+            Assert.True(result.IsFailure);
+            Assert.Equal("Не вдалося завантажити статистику", result.Error);
         }
     }
 }

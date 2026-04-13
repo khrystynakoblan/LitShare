@@ -1,5 +1,6 @@
 namespace LitShare.Web.Controllers
 {
+    using LitShare.BLL.DTOs;
     using LitShare.BLL.Services.Interfaces;
     using LitShare.Web.Models;
     using Microsoft.AspNetCore.Authorization;
@@ -94,6 +95,27 @@ namespace LitShare.Web.Controllers
 
             TempData["SuccessMessage"] = "Скаргу відхилено.";
             return this.RedirectToAction(nameof(this.Index));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Statistics()
+        {
+            this.logger.LogInformation("Admin viewing statistics page");
+
+            var result = await this.adminService.GetStatisticsAsync();
+
+            if (result.IsFailure)
+            {
+                TempData["ErrorMessage"] = result.Error;
+                return this.View(new AdminStatsViewModel());
+            }
+
+            var model = new AdminStatsViewModel
+            {
+                Stats = result.Value!
+            };
+
+            return this.View(model);
         }
     }
 }
