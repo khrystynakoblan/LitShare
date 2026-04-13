@@ -21,5 +21,7 @@
         Task UpdateAsync(Posts post);
 
         Task<Posts?> GetByIdWithGenresAsync(int id);
+
+        Task DeleteAsync(Posts post);
     }
 }

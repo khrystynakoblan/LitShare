@@ -6,5 +6,11 @@
     public interface IAdminService
     {
         Task<Result<List<ComplaintDto>>> GetAllComplaintsAsync();
+
+        Task<Result<ComplaintDetailsDto>> GetComplaintByIdAsync(int id);
+
+        Task<Result<bool>> ApproveComplaintAsync(int id);
+
+        Task<Result<bool>> RejectComplaintAsync(int id);
     }
 }

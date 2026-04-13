@@ -27,7 +27,8 @@
             <tbody>
                 @foreach (var complaint in Model.Complaints)
                 {
-                    <tr>
+                    <tr style="cursor: pointer;"
+                        onclick="window.location='@Url.Action("Details", "Admin", new { id = complaint.Id })'">
                         <td>@complaint.Text</td>
                         <td>@complaint.BookTitle</td>
                         <td>@complaint.ComplainantName</td>

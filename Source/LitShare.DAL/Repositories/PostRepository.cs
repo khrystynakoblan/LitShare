@@ -97,5 +97,11 @@
                 .Include(p => p.User)
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
+
+        public Task DeleteAsync(Posts post)
+        {
+            this.context.Posts.Remove(post);
+            return Task.CompletedTask;
+        }
     }
 }

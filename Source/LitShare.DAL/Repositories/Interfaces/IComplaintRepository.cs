@@ -1,6 +1,5 @@
 ﻿namespace LitShare.DAL.Repositories.Interfaces
 {
-    using System.Threading.Tasks;
     using LitShare.DAL.Models;
 
     public interface IComplaintRepository
@@ -10,5 +9,9 @@
         Task SaveChangesAsync();
 
         Task<IEnumerable<Complaints>> GetAllAsync();
+
+        Task<Complaints?> GetByIdAsync(int id);
+
+        Task DeleteAsync(Complaints complaint);
     }
 }

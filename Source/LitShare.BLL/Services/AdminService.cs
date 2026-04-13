@@ -17,6 +17,11 @@
             this.logger = logger;
         }
 
+        public Task<Result<bool>> ApproveComplaintAsync(int id)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<Result<List<ComplaintDto>>> GetAllComplaintsAsync()
         {
             this.logger.LogInformation("Fetching all complaints for admin.");
@@ -35,6 +40,16 @@
             this.logger.LogInformation("Fetched {Count} complaints.", dtos.Count);
 
             return dtos;
+        }
+
+        public Task<Result<ComplaintDetailsDto>> GetComplaintByIdAsync(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Result<bool>> RejectComplaintAsync(int id)
+        {
+            throw new NotImplementedException();
         }
     }
 }
