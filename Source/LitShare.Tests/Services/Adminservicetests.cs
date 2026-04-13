@@ -10,41 +10,20 @@
     public class AdminServiceTests
     {
         private readonly Mock<IComplaintRepository> complaintRepositoryMock;
+        private readonly Mock<IPostRepository> postRepositoryMock;
         private readonly Mock<ILogger<AdminService>> loggerMock;
         private readonly AdminService sut;
 
         public AdminServiceTests()
         {
             this.complaintRepositoryMock = new Mock<IComplaintRepository>();
+            this.postRepositoryMock = new Mock<IPostRepository>();
             this.loggerMock = new Mock<ILogger<AdminService>>();
 
             this.sut = new AdminService(
                 this.complaintRepositoryMock.Object,
+                this.postRepositoryMock.Object,
                 this.loggerMock.Object);
-        }
-
-        [Fact]
-        public async Task GetAllComplaintsAsync_WithComplaints_ReturnsSuccess()
-        {
-            this.complaintRepositoryMock
-                .Setup(r => r.GetAllAsync())
-                .ReturnsAsync(SampleComplaints());
-
-            var result = await this.sut.GetAllComplaintsAsync();
-
-            Assert.True(result.IsSuccess);
-        }
-
-        [Fact]
-        public async Task GetAllComplaintsAsync_WithComplaints_ReturnsCorrectCount()
-        {
-            this.complaintRepositoryMock
-                .Setup(r => r.GetAllAsync())
-                .ReturnsAsync(SampleComplaints());
-
-            var result = await this.sut.GetAllComplaintsAsync();
-
-            Assert.Equal(2, result.Value!.Count);
         }
 
         [Fact]
@@ -58,42 +37,6 @@
 
             Assert.True(result.IsSuccess);
             Assert.Empty(result.Value!);
-        }
-
-        [Fact]
-        public async Task GetAllComplaintsAsync_MapsTextCorrectly()
-        {
-            this.complaintRepositoryMock
-                .Setup(r => r.GetAllAsync())
-                .ReturnsAsync(SampleComplaints());
-
-            var result = await this.sut.GetAllComplaintsAsync();
-
-            Assert.Contains(result.Value!, c => c.Text == "Книга не відповідає опису");
-        }
-
-        [Fact]
-        public async Task GetAllComplaintsAsync_MapsBookTitleFromPost()
-        {
-            this.complaintRepositoryMock
-                .Setup(r => r.GetAllAsync())
-                .ReturnsAsync(SampleComplaints());
-
-            var result = await this.sut.GetAllComplaintsAsync();
-
-            Assert.Contains(result.Value!, c => c.BookTitle == "Кобзар");
-        }
-
-        [Fact]
-        public async Task GetAllComplaintsAsync_MapsComplainantNameFromUser()
-        {
-            this.complaintRepositoryMock
-                .Setup(r => r.GetAllAsync())
-                .ReturnsAsync(SampleComplaints());
-
-            var result = await this.sut.GetAllComplaintsAsync();
-
-            Assert.Contains(result.Value!, c => c.ComplainantName == "Іван");
         }
 
         [Fact]
@@ -234,5 +177,105 @@
                 Complainant = new Users { Name = "Марія" },
             },
         };
+
+        [Fact]
+        public async Task ApproveComplaintAsync_ComplaintNotFound_ReturnsFailure()
+        {
+            this.complaintRepositoryMock
+                .Setup(r => r.GetByIdAsync(It.IsAny<int>()))
+                .ReturnsAsync((Complaints?)null);
+
+            var result = await this.sut.ApproveComplaintAsync(1);
+
+            Assert.True(result.IsFailure);
+            Assert.Equal("Скаргу не знайдено.", result.Error);
+        }
+
+        [Fact]
+        public async Task ApproveComplaintAsync_WithExistingPost_DeletesBothPostAndComplaint()
+        {
+            var post = new Posts { Id = 10, Title = "Книга з порушенням" };
+            var complaint = new Complaints { Id = 1, Post = post };
+
+            this.complaintRepositoryMock
+                .Setup(r => r.GetByIdAsync(1))
+                .ReturnsAsync(complaint);
+
+            var result = await this.sut.ApproveComplaintAsync(1);
+
+            Assert.True(result.IsSuccess);
+            this.postRepositoryMock.Verify(r => r.DeleteAsync(post), Times.Once);
+            this.complaintRepositoryMock.Verify(r => r.DeleteAsync(complaint), Times.Once);
+            this.complaintRepositoryMock.Verify(r => r.SaveChangesAsync(), Times.Once);
+        }
+
+        [Fact]
+        public async Task ApproveComplaintAsync_PostIsNull_DeletesOnlyComplaint()
+        {
+            var complaint = new Complaints { Id = 1, Post = null };
+
+            this.complaintRepositoryMock
+                .Setup(r => r.GetByIdAsync(1))
+                .ReturnsAsync(complaint);
+
+            var result = await this.sut.ApproveComplaintAsync(1);
+
+            Assert.True(result.IsSuccess);
+            this.postRepositoryMock.Verify(r => r.DeleteAsync(It.IsAny<Posts>()), Times.Never);
+            this.complaintRepositoryMock.Verify(r => r.DeleteAsync(complaint), Times.Once);
+        }
+
+        [Fact]
+        public async Task RejectComplaintAsync_ComplaintNotFound_ReturnsFailure()
+        {
+            this.complaintRepositoryMock
+                .Setup(r => r.GetByIdAsync(It.IsAny<int>()))
+                .ReturnsAsync((Complaints?)null);
+
+            var result = await this.sut.RejectComplaintAsync(1);
+
+            Assert.True(result.IsFailure);
+            Assert.Equal("Скаргу не знайдено.", result.Error);
+        }
+
+        [Fact]
+        public async Task RejectComplaintAsync_ComplaintExists_DeletesOnlyComplaintNotPost()
+        {
+            var post = new Posts { Id = 10, Title = "Хороша книга" };
+            var complaint = new Complaints { Id = 1, Post = post };
+
+            this.complaintRepositoryMock
+                .Setup(r => r.GetByIdAsync(1))
+                .ReturnsAsync(complaint);
+
+            var result = await this.sut.RejectComplaintAsync(1);
+
+            Assert.True(result.IsSuccess);
+            this.complaintRepositoryMock.Verify(r => r.DeleteAsync(complaint), Times.Once);
+            this.postRepositoryMock.Verify(r => r.DeleteAsync(It.IsAny<Posts>()), Times.Never);
+            this.complaintRepositoryMock.Verify(r => r.SaveChangesAsync(), Times.Once);
+        }
+
+        [Fact]
+        public async Task GetComplaintByIdAsync_ExistingId_ReturnsMappedDto()
+        {
+            var complaint = new Complaints
+            {
+                Id = 1,
+                Text = "Тест",
+                Post = new Posts { Title = "Кобзар", Author = "Шевченко" },
+                Complainant = new Users { Name = "Олег" }
+            };
+
+            this.complaintRepositoryMock
+                .Setup(r => r.GetByIdAsync(1))
+                .ReturnsAsync(complaint);
+
+            var result = await this.sut.GetComplaintByIdAsync(1);
+
+            Assert.True(result.IsSuccess);
+            Assert.Equal("Кобзар", result.Value!.BookTitle);
+            Assert.Equal("Олег", result.Value!.ComplainantName);
+        }
     }
 }

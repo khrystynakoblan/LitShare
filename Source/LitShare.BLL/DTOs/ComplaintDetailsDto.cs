@@ -10,13 +10,11 @@
 
         public DateTime Date { get; set; }
 
-        public int PostId { get; set; }
-
         public string BookTitle { get; set; } = string.Empty;
 
         public string BookAuthor { get; set; } = string.Empty;
 
-        public string? BookDescription { get; set; }
+        public string BookDescription { get; set; } = string.Empty;
 
         public string? BookPhotoUrl { get; set; }
     }

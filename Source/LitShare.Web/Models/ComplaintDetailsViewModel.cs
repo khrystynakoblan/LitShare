@@ -4,6 +4,6 @@
 
     public class ComplaintDetailsViewModel
     {
-        public ComplaintDetailsDto Complaint { get; set; } = new ComplaintDetailsDto();
+        public ComplaintDetailsDto? Complaint { get; set; }
     }
 }
