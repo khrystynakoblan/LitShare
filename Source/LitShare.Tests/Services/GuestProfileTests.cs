@@ -3,33 +3,40 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using LitShare.BLL.Common;
+    using LitShare.BLL.DTOs;
+    using LitShare.BLL.Services.Interfaces;
+    using LitShare.Web.Controllers;
+    using LitShare.Web.Models;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
     using Moq;
     using Xunit;
-    using LitShare.Web.Controllers;
-    using LitShare.Web.Models;
-    using LitShare.BLL.Services.Interfaces;
-    using LitShare.BLL.DTOs;
-    using LitShare.BLL.Common;
 
     public class GuestProfileTests
     {
-        private readonly Mock<IProfileService> _profileServiceMock;
-        private readonly Mock<IPostService> _postServiceMock;
-        private readonly Mock<ILogger<ProfileController>> _loggerMock;
-        private readonly ProfileController _controller;
+        private readonly Mock<IProfileService> profileServiceMock;
+        private readonly Mock<IPostService> postServiceMock;
+        private readonly Mock<IReviewService> reviewServiceMock;
+        private readonly Mock<ILogger<ProfileController>> loggerMock;
+        private readonly ProfileController controller;
 
         public GuestProfileTests()
         {
-            _profileServiceMock = new Mock<IProfileService>();
-            _postServiceMock = new Mock<IPostService>();
-            _loggerMock = new Mock<ILogger<ProfileController>>();
+            this.profileServiceMock = new Mock<IProfileService>();
+            this.postServiceMock = new Mock<IPostService>();
+            this.reviewServiceMock = new Mock<IReviewService>();
+            this.loggerMock = new Mock<ILogger<ProfileController>>();
 
-            _controller = new ProfileController(
-                _profileServiceMock.Object,
-                _postServiceMock.Object,
-                _loggerMock.Object);
+            this.reviewServiceMock
+                .Setup(r => r.GetReviewsByUserIdAsync(It.IsAny<int>()))
+                .ReturnsAsync(Result<IEnumerable<ReviewDto>>.Success(new List<ReviewDto>()));
+
+            this.controller = new ProfileController(
+                this.profileServiceMock.Object,
+                this.postServiceMock.Object,
+                this.reviewServiceMock.Object,
+                this.loggerMock.Object);
         }
 
         [Fact]
@@ -39,10 +46,10 @@
             var user = new UserProfileDto { Id = userId, Name = "User1", City = "City1", Phone = "+380970000000" };
             var books = new List<PostCardDto> { new PostCardDto { Title = "Book1" } };
 
-            _profileServiceMock.Setup(s => s.GetUserByIdAsync(userId)).ReturnsAsync(Result<UserProfileDto>.Success(user));
-            _postServiceMock.Setup(s => s.GetPostsByUserIdAsync(userId)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Success(books));
+            this.profileServiceMock.Setup(s => s.GetUserByIdAsync(userId)).ReturnsAsync(Result<UserProfileDto>.Success(user));
+            this.postServiceMock.Setup(s => s.GetPostsByUserIdAsync(userId)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Success(books));
 
-            var result = await _controller.GuestProfile(userId);
+            var result = await this.controller.GuestProfile(userId);
 
             var viewResult = Assert.IsType<ViewResult>(result);
             var model = Assert.IsType<ProfileViewModel>(viewResult.Model);
@@ -54,9 +61,9 @@
         [Fact]
         public async Task GuestProfile_UserNotFound_ReturnsNotFound()
         {
-            _profileServiceMock.Setup(s => s.GetUserByIdAsync(It.IsAny<int>())).ReturnsAsync(Result<UserProfileDto>.Failure("Error"));
+            this.profileServiceMock.Setup(s => s.GetUserByIdAsync(It.IsAny<int>())).ReturnsAsync(Result<UserProfileDto>.Failure("Error"));
 
-            var result = await _controller.GuestProfile(1);
+            var result = await this.controller.GuestProfile(1);
 
             Assert.IsType<NotFoundObjectResult>(result);
         }
@@ -64,10 +71,10 @@
         [Fact]
         public async Task GuestProfile_PostServiceFails_ReturnsViewWithEmptyBooks()
         {
-            _profileServiceMock.Setup(s => s.GetUserByIdAsync(1)).ReturnsAsync(Result<UserProfileDto>.Success(new UserProfileDto { Name = "User1" }));
-            _postServiceMock.Setup(s => s.GetPostsByUserIdAsync(1)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Failure("DB Error"));
+            this.profileServiceMock.Setup(s => s.GetUserByIdAsync(1)).ReturnsAsync(Result<UserProfileDto>.Success(new UserProfileDto { Name = "User1" }));
+            this.postServiceMock.Setup(s => s.GetPostsByUserIdAsync(1)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Failure("DB Error"));
 
-            var result = await _controller.GuestProfile(1);
+            var result = await this.controller.GuestProfile(1);
 
             var viewResult = Assert.IsType<ViewResult>(result);
             var model = Assert.IsType<ProfileViewModel>(viewResult.Model);
@@ -77,10 +84,10 @@
         [Fact]
         public async Task GuestProfile_NameIsNull_SetsDefaultName()
         {
-            _profileServiceMock.Setup(s => s.GetUserByIdAsync(1)).ReturnsAsync(Result<UserProfileDto>.Success(new UserProfileDto { Name = null! }));
-            _postServiceMock.Setup(s => s.GetPostsByUserIdAsync(1)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Success(new List<PostCardDto>()));
+            this.profileServiceMock.Setup(s => s.GetUserByIdAsync(1)).ReturnsAsync(Result<UserProfileDto>.Success(new UserProfileDto { Name = null! }));
+            this.postServiceMock.Setup(s => s.GetPostsByUserIdAsync(1)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Success(new List<PostCardDto>()));
 
-            var result = await _controller.GuestProfile(1);
+            var result = await this.controller.GuestProfile(1);
 
             var viewResult = Assert.IsType<ViewResult>(result);
             var model = Assert.IsType<ProfileViewModel>(viewResult.Model);
@@ -91,10 +98,10 @@
         public async Task GuestProfile_LocationsAreNull_SetsDefaultText()
         {
             var user = new UserProfileDto { Name = "User1", Region = null, City = null };
-            _profileServiceMock.Setup(s => s.GetUserByIdAsync(1)).ReturnsAsync(Result<UserProfileDto>.Success(user));
-            _postServiceMock.Setup(s => s.GetPostsByUserIdAsync(1)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Success(new List<PostCardDto>()));
+            this.profileServiceMock.Setup(s => s.GetUserByIdAsync(1)).ReturnsAsync(Result<UserProfileDto>.Success(user));
+            this.postServiceMock.Setup(s => s.GetPostsByUserIdAsync(1)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Success(new List<PostCardDto>()));
 
-            var result = await _controller.GuestProfile(1);
+            var result = await this.controller.GuestProfile(1);
 
             var viewResult = Assert.IsType<ViewResult>(result);
             var model = Assert.IsType<ProfileViewModel>(viewResult.Model);
@@ -105,10 +112,10 @@
         [Fact]
         public async Task GuestProfile_AboutIsNull_SetsDefaultText()
         {
-            _profileServiceMock.Setup(s => s.GetUserByIdAsync(1)).ReturnsAsync(Result<UserProfileDto>.Success(new UserProfileDto { About = null }));
-            _postServiceMock.Setup(s => s.GetPostsByUserIdAsync(1)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Success(new List<PostCardDto>()));
+            this.profileServiceMock.Setup(s => s.GetUserByIdAsync(1)).ReturnsAsync(Result<UserProfileDto>.Success(new UserProfileDto { About = null }));
+            this.postServiceMock.Setup(s => s.GetPostsByUserIdAsync(1)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Success(new List<PostCardDto>()));
 
-            var result = await _controller.GuestProfile(1);
+            var result = await this.controller.GuestProfile(1);
 
             var viewResult = Assert.IsType<ViewResult>(result);
             var model = Assert.IsType<ProfileViewModel>(viewResult.Model);
@@ -118,10 +125,10 @@
         [Fact]
         public async Task GuestProfile_PhotoUrl_PassesCorrectUrl()
         {
-            _profileServiceMock.Setup(s => s.GetUserByIdAsync(1)).ReturnsAsync(Result<UserProfileDto>.Success(new UserProfileDto { PhotoUrl = "test.jpg" }));
-            _postServiceMock.Setup(s => s.GetPostsByUserIdAsync(1)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Success(new List<PostCardDto>()));
+            this.profileServiceMock.Setup(s => s.GetUserByIdAsync(1)).ReturnsAsync(Result<UserProfileDto>.Success(new UserProfileDto { PhotoUrl = "test.jpg" }));
+            this.postServiceMock.Setup(s => s.GetPostsByUserIdAsync(1)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Success(new List<PostCardDto>()));
 
-            var result = await _controller.GuestProfile(1);
+            var result = await this.controller.GuestProfile(1);
 
             var viewResult = Assert.IsType<ViewResult>(result);
             var model = Assert.IsType<ProfileViewModel>(viewResult.Model);
@@ -131,10 +138,10 @@
         [Fact]
         public async Task GuestProfile_NoBooks_ReturnsEmptyCollection()
         {
-            _profileServiceMock.Setup(s => s.GetUserByIdAsync(1)).ReturnsAsync(Result<UserProfileDto>.Success(new UserProfileDto()));
-            _postServiceMock.Setup(s => s.GetPostsByUserIdAsync(1)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Success(new List<PostCardDto>()));
+            this.profileServiceMock.Setup(s => s.GetUserByIdAsync(1)).ReturnsAsync(Result<UserProfileDto>.Success(new UserProfileDto()));
+            this.postServiceMock.Setup(s => s.GetPostsByUserIdAsync(1)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Success(new List<PostCardDto>()));
 
-            var result = await _controller.GuestProfile(1);
+            var result = await this.controller.GuestProfile(1);
 
             var viewResult = Assert.IsType<ViewResult>(result);
             var model = Assert.IsType<ProfileViewModel>(viewResult.Model);
@@ -145,10 +152,10 @@
         public async Task GuestProfile_ManyBooks_PassesAllBooksToModel()
         {
             var books = new List<PostCardDto> { new PostCardDto(), new PostCardDto() };
-            _profileServiceMock.Setup(s => s.GetUserByIdAsync(1)).ReturnsAsync(Result<UserProfileDto>.Success(new UserProfileDto()));
-            _postServiceMock.Setup(s => s.GetPostsByUserIdAsync(1)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Success(books));
+            this.profileServiceMock.Setup(s => s.GetUserByIdAsync(1)).ReturnsAsync(Result<UserProfileDto>.Success(new UserProfileDto()));
+            this.postServiceMock.Setup(s => s.GetPostsByUserIdAsync(1)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Success(books));
 
-            var result = await _controller.GuestProfile(1);
+            var result = await this.controller.GuestProfile(1);
 
             var viewResult = Assert.IsType<ViewResult>(result);
             var model = Assert.IsType<ProfileViewModel>(viewResult.Model);
@@ -158,14 +165,43 @@
         [Fact]
         public async Task GuestProfile_EmailIsNull_SetsEmptyString()
         {
-            _profileServiceMock.Setup(s => s.GetUserByIdAsync(1)).ReturnsAsync(Result<UserProfileDto>.Success(new UserProfileDto { Email = null! }));
-            _postServiceMock.Setup(s => s.GetPostsByUserIdAsync(1)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Success(new List<PostCardDto>()));
+            this.profileServiceMock.Setup(s => s.GetUserByIdAsync(1)).ReturnsAsync(Result<UserProfileDto>.Success(new UserProfileDto { Email = null! }));
+            this.postServiceMock.Setup(s => s.GetPostsByUserIdAsync(1)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Success(new List<PostCardDto>()));
 
-            var result = await _controller.GuestProfile(1);
+            var result = await this.controller.GuestProfile(1);
 
             var viewResult = Assert.IsType<ViewResult>(result);
             var model = Assert.IsType<ProfileViewModel>(viewResult.Model);
             Assert.Equal(string.Empty, model.Email);
+        }
+
+        [Fact]
+        public async Task GuestProfile_ReviewServiceFails_SetsReviewCountToZero()
+        {
+            this.profileServiceMock.Setup(s => s.GetUserByIdAsync(1)).ReturnsAsync(Result<UserProfileDto>.Success(new UserProfileDto { Name = "User1" }));
+            this.postServiceMock.Setup(s => s.GetPostsByUserIdAsync(1)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Success(new List<PostCardDto>()));
+            this.reviewServiceMock.Setup(r => r.GetReviewsByUserIdAsync(1)).ReturnsAsync(Result<IEnumerable<ReviewDto>>.Failure("Error"));
+
+            var result = await this.controller.GuestProfile(1);
+
+            var viewResult = Assert.IsType<ViewResult>(result);
+            var model = Assert.IsType<ProfileViewModel>(viewResult.Model);
+            Assert.Equal(0, model.ReviewCount);
+        }
+
+        [Fact]
+        public async Task GuestProfile_WithReviews_SetsCorrectReviewCount()
+        {
+            var reviews = new List<ReviewDto> { new ReviewDto(), new ReviewDto(), new ReviewDto() };
+            this.profileServiceMock.Setup(s => s.GetUserByIdAsync(1)).ReturnsAsync(Result<UserProfileDto>.Success(new UserProfileDto { Name = "User1" }));
+            this.postServiceMock.Setup(s => s.GetPostsByUserIdAsync(1)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Success(new List<PostCardDto>()));
+            this.reviewServiceMock.Setup(r => r.GetReviewsByUserIdAsync(1)).ReturnsAsync(Result<IEnumerable<ReviewDto>>.Success(reviews));
+
+            var result = await this.controller.GuestProfile(1);
+
+            var viewResult = Assert.IsType<ViewResult>(result);
+            var model = Assert.IsType<ProfileViewModel>(viewResult.Model);
+            Assert.Equal(3, model.ReviewCount);
         }
     }
 }
