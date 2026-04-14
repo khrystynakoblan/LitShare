@@ -21,5 +21,9 @@ namespace LitShare.Web.Models
         public string? PhotoUrl { get; set; }
 
         public IEnumerable<PostCardDto> UserBooks { get; set; } = new List<PostCardDto>();
+
+        public int UserId { get; set; }
+
+        public int ReviewCount { get; set; }
     }
 }

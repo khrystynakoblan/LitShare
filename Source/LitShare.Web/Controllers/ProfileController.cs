@@ -13,15 +13,18 @@ namespace LitShare.Web.Controllers
     {
         private readonly IProfileService profileService;
         private readonly IPostService postService;
+        private readonly IReviewService reviewService;
         private readonly ILogger<ProfileController> logger;
 
         public ProfileController(
             IProfileService profileService,
             IPostService postService,
+            IReviewService reviewService,
             ILogger<ProfileController> logger)
         {
             this.profileService = profileService;
             this.postService = postService;
+            this.reviewService = reviewService;
             this.logger = logger;
         }
 
@@ -51,7 +54,7 @@ namespace LitShare.Web.Controllers
                 District = user.District ?? string.Empty,
                 City = user.City ?? string.Empty,
                 PhotoUrl = user.PhotoUrl,
-                About = user.About ?? string.Empty
+                About = user.About ?? string.Empty,
             };
 
             return this.View(model);
@@ -73,11 +76,14 @@ namespace LitShare.Web.Controllers
             var user = result.Value!;
 
             var booksResult = await this.postService.GetPostsByUserIdAsync(id);
-
             var books = booksResult.IsSuccess ? booksResult.Value! : new List<PostCardDto>();
+
+            var reviewsResult = await this.reviewService.GetReviewsByUserIdAsync(id);
+            var reviewCount = reviewsResult.IsSuccess ? reviewsResult.Value!.Count() : 0;
 
             var model = new ProfileViewModel
             {
+                UserId = id,
                 Name = user.Name ?? "Користувач",
                 Email = user.Email ?? string.Empty,
                 Region = user.Region ?? "Не вказано",
@@ -86,7 +92,8 @@ namespace LitShare.Web.Controllers
                 PhotoUrl = user.PhotoUrl,
                 Phone = user.Phone ?? "Номер не вказано",
                 About = user.About ?? "Інформація відсутня",
-                UserBooks = books
+                UserBooks = books,
+                ReviewCount = reviewCount,
             };
 
             return this.View(model);
@@ -117,7 +124,7 @@ namespace LitShare.Web.Controllers
                 District = user.District ?? string.Empty,
                 City = user.City ?? string.Empty,
                 About = user.About ?? string.Empty,
-                PhotoUrl = user.PhotoUrl
+                PhotoUrl = user.PhotoUrl,
             };
 
             return this.View(model);
@@ -143,7 +150,7 @@ namespace LitShare.Web.Controllers
                 District = model.District,
                 City = model.City,
                 About = model.About,
-                PhotoUrl = model.PhotoUrl
+                PhotoUrl = model.PhotoUrl,
             };
 
             var result = await this.profileService.UpdateProfileAsync(userId, dto);
@@ -189,7 +196,7 @@ namespace LitShare.Web.Controllers
                 City = user.City ?? string.Empty,
                 About = user.About ?? string.Empty,
                 PhotoUrl = tempAvatar,
-                UserBooks = new List<PostCardDto>()
+                UserBooks = new List<PostCardDto>(),
             };
 
             return this.View("EditProfile", model);
@@ -227,13 +234,13 @@ namespace LitShare.Web.Controllers
         {
             var userId = this.GetCurrentUserId();
             this.logger.LogInformation("User opened MyBooks page. UserId: {UserId}", userId);
-            var booksResult = await this.postService.GetPostsByUserIdAsync(userId);
 
+            var booksResult = await this.postService.GetPostsByUserIdAsync(userId);
             var books = booksResult.IsSuccess ? booksResult.Value! : new List<PostCardDto>();
 
             var model = new ProfileViewModel
             {
-                UserBooks = books
+                UserBooks = books,
             };
 
             return this.View(model);

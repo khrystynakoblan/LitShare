@@ -59,6 +59,9 @@ try
     builder.Services.AddScoped<IComplaintRepository, ComplaintRepository>();
     builder.Services.AddScoped<IProfileService, ProfileService>();
 
+    builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
+    builder.Services.AddScoped<IReviewService, ReviewService>();
+
     builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
         .AddCookie(options =>
         {
