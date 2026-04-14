@@ -27,5 +27,7 @@
         Task DeletePostAsync(Posts post);
 
         Task<IEnumerable<Posts>> GetAllPostsAsync();
+
+        Task<IEnumerable<Posts>> GetAllAsync();
     }
 }

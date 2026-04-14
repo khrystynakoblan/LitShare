@@ -119,5 +119,10 @@
             this.context.Posts.Remove(post);
             return Task.CompletedTask;
         }
+
+        public async Task<IEnumerable<Posts>> GetAllAsync()
+        {
+            return await this.GetAllPostsAsync();
+        }
     }
 }
