@@ -120,9 +120,9 @@
             return Task.CompletedTask;
         }
 
-        public Task<IEnumerable<Posts>> GetAllAsync()
+        public async Task<IEnumerable<Posts>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            return await this.GetAllPostsAsync();
         }
     }
 }

@@ -90,7 +90,6 @@ namespace LitShare.Web.Controllers
                 return this.RedirectToAction(nameof(this.Details), new { id });
             }
 
-            TempData["SuccessMessage"] = "Скаргу відхилено.";
             return this.RedirectToAction(nameof(this.Index));
         }
 
