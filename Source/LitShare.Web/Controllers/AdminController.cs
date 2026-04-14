@@ -70,12 +70,10 @@ namespace LitShare.Web.Controllers
 
             if (result.IsFailure)
             {
-                this.logger.LogWarning("Failed to approve complaint. Id: {Id}, Error: {Error}", id, result.Error);
                 TempData["ErrorMessage"] = result.Error;
                 return this.RedirectToAction(nameof(this.Details), new { id });
             }
 
-            TempData["SuccessMessage"] = "Скаргу підтверджено. Оголошення видалено.";
             return this.RedirectToAction(nameof(this.Index));
         }
 
@@ -88,7 +86,6 @@ namespace LitShare.Web.Controllers
 
             if (result.IsFailure)
             {
-                this.logger.LogWarning("Failed to reject complaint. Id: {Id}, Error: {Error}", id, result.Error);
                 TempData["ErrorMessage"] = result.Error;
                 return this.RedirectToAction(nameof(this.Details), new { id });
             }

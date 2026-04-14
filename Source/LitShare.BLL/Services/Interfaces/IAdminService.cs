@@ -14,7 +14,5 @@
         Task<Result<bool>> RejectComplaintAsync(int id);
 
         Task<Result<AdminStatsDto>> GetStatisticsAsync();
-
-        Task GetStatisticsAsync(object key);
     }
 }

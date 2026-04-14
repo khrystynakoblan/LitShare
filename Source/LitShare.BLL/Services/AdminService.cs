@@ -4,6 +4,7 @@
     using LitShare.BLL.DTOs;
     using LitShare.BLL.Services.Interfaces;
     using LitShare.DAL.Repositories.Interfaces;
+    using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Logging;
 
     public class AdminService : IAdminService
@@ -36,16 +37,32 @@
                 return Result<bool>.Failure("Скаргу не знайдено.");
             }
 
-            if (complaint.Post != null)
+            try
             {
-                await this.postRepository.DeletePostAsync(complaint.Post);
-                await this.postRepository.SaveChangesAsync();
+                if (complaint.Post != null)
+                {
+                    await this.postRepository.DeletePostAsync(complaint.Post);
+                    await this.postRepository.SaveChangesAsync();
+                }
+
+                var checkComplaint = await this.complaintRepository.GetByIdAsync(id);
+                if (checkComplaint != null)
+                {
+                    await this.complaintRepository.DeleteAsync(checkComplaint);
+                    await this.complaintRepository.SaveChangesAsync();
+                }
+
+                return Result<bool>.Success(true);
             }
-
-            await this.complaintRepository.DeleteAsync(complaint);
-            await this.complaintRepository.SaveChangesAsync();
-
-            return Result<bool>.Success(true);
+            catch (DbUpdateConcurrencyException)
+            {
+                return Result<bool>.Success(true);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "Помилка при підтвердженні скарги");
+                return Result<bool>.Failure("Виникла помилка при видаленні даних.");
+            }
         }
 
         public async Task<Result<List<ComplaintDto>>> GetAllComplaintsAsync()
@@ -116,7 +133,7 @@
             try
             {
                 var users = await this.userRepository.GetAllAsync();
-                var posts = await this.postRepository.GetAllPostsAsync();
+                var posts = await this.postRepository.GetAllAsync();
                 var complaints = await this.complaintRepository.GetAllAsync();
 
                 var cityStats = posts
@@ -124,7 +141,7 @@
                     .GroupBy(p => p.User!.City!)
                     .Select(g => new CityStatDto
                     {
-                        City = g.Key,
+                        City = g.Key ?? string.Empty,
                         Count = g.Count()
                     })
                     .OrderByDescending(x => x.Count)
@@ -132,13 +149,13 @@
                     .ToList();
 
                 var genreStats = posts
-                    .Where(p => p.BookGenres != null)
+                    .Where(p => p.BookGenres != null && p.BookGenres.Any())
                     .SelectMany(p => p.BookGenres!)
                     .Where(bg => bg.Genre?.Name != null)
                     .GroupBy(bg => bg.Genre!.Name!)
                     .Select(g => new GenreStatDto
                     {
-                        GenreName = g.Key,
+                        GenreName = g.Key ?? "Без жанру",
                         Count = g.Count()
                     })
                     .OrderByDescending(x => x.Count)
@@ -163,11 +180,6 @@
                 this.logger.LogError(ex, "Error fetching admin statistics");
                 return Result<AdminStatsDto>.Failure("Не вдалося завантажити статистику");
             }
-        }
-
-        public Task GetStatisticsAsync(object key)
-        {
-            throw new NotImplementedException();
         }
     }
 }

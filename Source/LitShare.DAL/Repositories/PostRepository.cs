@@ -119,5 +119,10 @@
             this.context.Posts.Remove(post);
             return Task.CompletedTask;
         }
+
+        public Task<IEnumerable<Posts>> GetAllAsync()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
