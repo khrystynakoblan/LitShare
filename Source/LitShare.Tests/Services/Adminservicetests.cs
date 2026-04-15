@@ -290,7 +290,7 @@
             };
 
             this.userRepositoryMock.Setup(r => r.GetAllAsync()).ReturnsAsync(users);
-            this.postRepositoryMock.Setup(r => r.GetAllPostsAsync()).ReturnsAsync(posts);
+            this.postRepositoryMock.Setup(r => r.GetAllAsync()).ReturnsAsync(posts);
             this.complaintRepositoryMock.Setup(r => r.GetAllAsync()).ReturnsAsync(complaints);
 
             var result = await this.adminService.GetStatisticsAsync();

@@ -75,7 +75,7 @@ namespace LitShare.Web.Controllers
 
             var user = result.Value!;
 
-            var booksResult = await this.postService.GetPostsByUserIdAsync(id);
+            var booksResult = await this.postService.GetPostsByUserIdAsync(id, true);
             var books = booksResult.IsSuccess ? booksResult.Value! : new List<PostCardDto>();
 
             var reviewsResult = await this.reviewService.GetReviewsByUserIdAsync(id);
@@ -230,12 +230,12 @@ namespace LitShare.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> MyBooks()
+        public async Task<IActionResult> MyBooks(bool? isActive)
         {
             var userId = this.GetCurrentUserId();
-            this.logger.LogInformation("User opened MyBooks page. UserId: {UserId}", userId);
+            this.logger.LogInformation("User opened MyBooks page. UserId: {UserId}, Filter: {IsActive}", userId, isActive);
 
-            var booksResult = await this.postService.GetPostsByUserIdAsync(userId);
+            var booksResult = await this.postService.GetPostsByUserIdAsync(userId, isActive);
             var books = booksResult.IsSuccess ? booksResult.Value! : new List<PostCardDto>();
 
             var model = new ProfileViewModel
@@ -244,6 +244,60 @@ namespace LitShare.Web.Controllers
             };
 
             return this.View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> TogglePostStatus(int postId)
+        {
+            var userId = this.GetCurrentUserId();
+
+            var postsResult = await this.postService.GetPostsByUserIdAsync(userId, null);
+
+            if (postsResult.IsFailure)
+            {
+                return this.HandleFailure(postsResult.Error);
+            }
+
+            var post = postsResult.Value!.FirstOrDefault(p => p.Id == postId);
+
+            if (post == null)
+            {
+                return this.HandleFailure("Пост не знайдено");
+            }
+
+            var result = await this.postService.SetPostStatusAsync(postId, userId, !post.IsActive);
+
+            if (result.IsFailure)
+            {
+                return this.HandleFailure(result.Error);
+            }
+
+            return this.RedirectToAction("MyBooks");
+        }
+
+        [HttpGet]
+        public IActionResult DeletePost(int postId)
+        {
+            this.logger.LogInformation("User opened delete post confirmation. PostId: {PostId}", postId);
+            ViewBag.PostId = postId;
+            return this.View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeletePostConfirmed(int postId)
+        {
+            var userId = this.GetCurrentUserId();
+
+            this.logger.LogInformation("User confirmed post deletion. UserId: {UserId}, PostId: {PostId}", userId, postId);
+
+            var result = await this.postService.DeletePostAsync(postId, userId);
+
+            if (result.IsFailure)
+            {
+                return this.HandleFailure(result.Error);
+            }
+
+            return this.RedirectToAction("MyBooks");
         }
     }
 }

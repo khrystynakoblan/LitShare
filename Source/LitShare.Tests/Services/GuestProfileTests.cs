@@ -47,7 +47,7 @@
             var books = new List<PostCardDto> { new PostCardDto { Title = "Book1" } };
 
             this.profileServiceMock.Setup(s => s.GetUserByIdAsync(userId)).ReturnsAsync(Result<UserProfileDto>.Success(user));
-            this.postServiceMock.Setup(s => s.GetPostsByUserIdAsync(userId)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Success(books));
+            this.postServiceMock.Setup(s => s.GetPostsByUserIdAsync(userId, true)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Success(books));
 
             var result = await this.controller.GuestProfile(userId);
 
@@ -72,7 +72,7 @@
         public async Task GuestProfile_PostServiceFails_ReturnsViewWithEmptyBooks()
         {
             this.profileServiceMock.Setup(s => s.GetUserByIdAsync(1)).ReturnsAsync(Result<UserProfileDto>.Success(new UserProfileDto { Name = "User1" }));
-            this.postServiceMock.Setup(s => s.GetPostsByUserIdAsync(1)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Failure("DB Error"));
+            this.postServiceMock.Setup(s => s.GetPostsByUserIdAsync(1, true)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Failure("DB Error"));
 
             var result = await this.controller.GuestProfile(1);
 
@@ -85,7 +85,7 @@
         public async Task GuestProfile_NameIsNull_SetsDefaultName()
         {
             this.profileServiceMock.Setup(s => s.GetUserByIdAsync(1)).ReturnsAsync(Result<UserProfileDto>.Success(new UserProfileDto { Name = null! }));
-            this.postServiceMock.Setup(s => s.GetPostsByUserIdAsync(1)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Success(new List<PostCardDto>()));
+            this.postServiceMock.Setup(s => s.GetPostsByUserIdAsync(1, true)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Success(new List<PostCardDto>()));
 
             var result = await this.controller.GuestProfile(1);
 
@@ -99,7 +99,7 @@
         {
             var user = new UserProfileDto { Name = "User1", Region = null, City = null };
             this.profileServiceMock.Setup(s => s.GetUserByIdAsync(1)).ReturnsAsync(Result<UserProfileDto>.Success(user));
-            this.postServiceMock.Setup(s => s.GetPostsByUserIdAsync(1)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Success(new List<PostCardDto>()));
+            this.postServiceMock.Setup(s => s.GetPostsByUserIdAsync(1, true)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Success(new List<PostCardDto>()));
 
             var result = await this.controller.GuestProfile(1);
 
@@ -113,7 +113,7 @@
         public async Task GuestProfile_AboutIsNull_SetsDefaultText()
         {
             this.profileServiceMock.Setup(s => s.GetUserByIdAsync(1)).ReturnsAsync(Result<UserProfileDto>.Success(new UserProfileDto { About = null }));
-            this.postServiceMock.Setup(s => s.GetPostsByUserIdAsync(1)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Success(new List<PostCardDto>()));
+            this.postServiceMock.Setup(s => s.GetPostsByUserIdAsync(1, true)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Success(new List<PostCardDto>()));
 
             var result = await this.controller.GuestProfile(1);
 
@@ -126,7 +126,7 @@
         public async Task GuestProfile_PhotoUrl_PassesCorrectUrl()
         {
             this.profileServiceMock.Setup(s => s.GetUserByIdAsync(1)).ReturnsAsync(Result<UserProfileDto>.Success(new UserProfileDto { PhotoUrl = "test.jpg" }));
-            this.postServiceMock.Setup(s => s.GetPostsByUserIdAsync(1)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Success(new List<PostCardDto>()));
+            this.postServiceMock.Setup(s => s.GetPostsByUserIdAsync(1, true)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Success(new List<PostCardDto>()));
 
             var result = await this.controller.GuestProfile(1);
 
@@ -139,7 +139,7 @@
         public async Task GuestProfile_NoBooks_ReturnsEmptyCollection()
         {
             this.profileServiceMock.Setup(s => s.GetUserByIdAsync(1)).ReturnsAsync(Result<UserProfileDto>.Success(new UserProfileDto()));
-            this.postServiceMock.Setup(s => s.GetPostsByUserIdAsync(1)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Success(new List<PostCardDto>()));
+            this.postServiceMock.Setup(s => s.GetPostsByUserIdAsync(1, true)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Success(new List<PostCardDto>()));
 
             var result = await this.controller.GuestProfile(1);
 
@@ -153,7 +153,7 @@
         {
             var books = new List<PostCardDto> { new PostCardDto(), new PostCardDto() };
             this.profileServiceMock.Setup(s => s.GetUserByIdAsync(1)).ReturnsAsync(Result<UserProfileDto>.Success(new UserProfileDto()));
-            this.postServiceMock.Setup(s => s.GetPostsByUserIdAsync(1)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Success(books));
+            this.postServiceMock.Setup(s => s.GetPostsByUserIdAsync(1, true)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Success(books));
 
             var result = await this.controller.GuestProfile(1);
 
@@ -166,7 +166,7 @@
         public async Task GuestProfile_EmailIsNull_SetsEmptyString()
         {
             this.profileServiceMock.Setup(s => s.GetUserByIdAsync(1)).ReturnsAsync(Result<UserProfileDto>.Success(new UserProfileDto { Email = null! }));
-            this.postServiceMock.Setup(s => s.GetPostsByUserIdAsync(1)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Success(new List<PostCardDto>()));
+            this.postServiceMock.Setup(s => s.GetPostsByUserIdAsync(1, true)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Success(new List<PostCardDto>()));
 
             var result = await this.controller.GuestProfile(1);
 
@@ -179,7 +179,7 @@
         public async Task GuestProfile_ReviewServiceFails_SetsReviewCountToZero()
         {
             this.profileServiceMock.Setup(s => s.GetUserByIdAsync(1)).ReturnsAsync(Result<UserProfileDto>.Success(new UserProfileDto { Name = "User1" }));
-            this.postServiceMock.Setup(s => s.GetPostsByUserIdAsync(1)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Success(new List<PostCardDto>()));
+            this.postServiceMock.Setup(s => s.GetPostsByUserIdAsync(1,true)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Success(new List<PostCardDto>()));
             this.reviewServiceMock.Setup(r => r.GetReviewsByUserIdAsync(1)).ReturnsAsync(Result<IEnumerable<ReviewDto>>.Failure("Error"));
 
             var result = await this.controller.GuestProfile(1);
@@ -194,7 +194,7 @@
         {
             var reviews = new List<ReviewDto> { new ReviewDto(), new ReviewDto(), new ReviewDto() };
             this.profileServiceMock.Setup(s => s.GetUserByIdAsync(1)).ReturnsAsync(Result<UserProfileDto>.Success(new UserProfileDto { Name = "User1" }));
-            this.postServiceMock.Setup(s => s.GetPostsByUserIdAsync(1)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Success(new List<PostCardDto>()));
+            this.postServiceMock.Setup(s => s.GetPostsByUserIdAsync(1, true)).ReturnsAsync(Result<IEnumerable<PostCardDto>>.Success(new List<PostCardDto>()));
             this.reviewServiceMock.Setup(r => r.GetReviewsByUserIdAsync(1)).ReturnsAsync(Result<IEnumerable<ReviewDto>>.Success(reviews));
 
             var result = await this.controller.GuestProfile(1);
