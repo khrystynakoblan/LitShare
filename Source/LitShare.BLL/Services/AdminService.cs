@@ -52,11 +52,11 @@
                     await this.complaintRepository.SaveChangesAsync();
                 }
 
-                return Result<bool>.Success(true);
+                return true;
             }
             catch (DbUpdateConcurrencyException)
             {
-                return Result<bool>.Success(true);
+                return true;
             }
             catch (Exception ex)
             {
@@ -80,7 +80,7 @@
                 Date = c.Date,
             }).ToList();
 
-            return Result<List<ComplaintDto>>.Success(dtos);
+            return dtos;
         }
 
         public async Task<Result<ComplaintDetailsDto>> GetComplaintByIdAsync(int id)
@@ -106,7 +106,7 @@
                 BookPhotoUrl = complaint.Post?.PhotoUrl,
             };
 
-            return Result<ComplaintDetailsDto>.Success(dto);
+            return dto;
         }
 
         public async Task<Result<bool>> RejectComplaintAsync(int id)
@@ -123,7 +123,7 @@
             await this.complaintRepository.DeleteAsync(complaint);
             await this.complaintRepository.SaveChangesAsync();
 
-            return Result<bool>.Success(true);
+            return true;
         }
 
         public async Task<Result<AdminStatsDto>> GetStatisticsAsync()
@@ -173,7 +173,7 @@
                     TopGenres = genreStats
                 };
 
-                return Result<AdminStatsDto>.Success(stats);
+                return stats;
             }
             catch (Exception ex)
             {

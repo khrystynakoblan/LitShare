@@ -4,6 +4,7 @@ using LitShare.DAL.Context;
 using LitShare.DAL.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LitShare.DAL.Migrations
 {
     [DbContext(typeof(LitShareDbContext))]
-    partial class LitShareDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260414204537_AddFavorites")]
+    partial class AddFavorites
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -138,10 +141,6 @@ namespace LitShare.DAL.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("text")
                         .HasColumnName("description");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_active");
 
                     b.Property<string>("PhotoUrl")
                         .HasColumnType("text")

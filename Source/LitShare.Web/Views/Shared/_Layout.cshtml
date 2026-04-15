@@ -73,14 +73,11 @@
                                     </form>
                                 </li>
 
-                                @if (!User.IsInRole("Admin"))
-                                {
-                                    <li class="nav-item">
-                                        <a class="nav-link text-dark p-0" asp-controller="Profile" asp-action="MyProfile" title="Мій профіль">
-                                            <i class="bi bi-person-circle fs-3"></i>
-                                        </a>
-                                    </li>
-                                }
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark p-0" asp-controller="Profile" asp-action="MyProfile" title="Мій профіль">
+                                        <i class="bi bi-person-circle fs-3"></i>
+                                    </a>
+                                </li>
                             }
                         </ul>
                     </div>

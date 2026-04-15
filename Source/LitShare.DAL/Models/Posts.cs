@@ -41,5 +41,7 @@
         public virtual ICollection<BookGenres> BookGenres { get; set; } = new List<BookGenres>();
 
         public virtual ICollection<Complaints>? Complaints { get; set; }
+
+        public virtual ICollection<Favorites>? FavoritedBy { get; set; }
     }
 }

@@ -32,6 +32,8 @@
 
         public DbSet<Reviews> Reviews { get; set; }
 
+        public DbSet<Favorites> Favorites { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasPostgresEnum<DealType>("deal_type_t");
@@ -81,6 +83,21 @@
             modelBuilder.Entity<Posts>()
                 .Property(p => p.DealType)
                 .HasColumnType("deal_type_t");
+
+            modelBuilder.Entity<Favorites>(entity =>
+            {
+                entity.HasKey(f => new { f.UserId, f.PostId });
+
+                entity.HasOne(f => f.User)
+                      .WithMany(u => u.Favorites)
+                      .HasForeignKey(f => f.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(f => f.Post)
+                      .WithMany(p => p.FavoritedBy)
+                      .HasForeignKey(f => f.PostId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
 
             base.OnModelCreating(modelBuilder);
 

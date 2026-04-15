@@ -19,12 +19,30 @@
         {
             @foreach (var book in Model.UserBooks)
             {
+                bool isFavorited = Model.FavoritePostIds != null && Model.FavoritePostIds.Contains(book.Id);
+
                 <div class="col text-center">
-                    <div class="card h-100 border shadow-sm p-2 bg-white">
-                        <div class="bg-light rounded d-flex align-items-center justify-content-center overflow-hidden" style="aspect-ratio: 3/4;">
+                    <div class="card h-100 border shadow-sm p-2 bg-white position-relative">
+
+                        <form asp-controller="Favorite" asp-action="Toggle" method="post"
+                              class="position-absolute top-0 end-0 m-1" style="z-index: 1;">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="postId" value="@book.Id" />
+                            <input type="hidden" name="returnUrl" value="/Profile/MyBooks" />
+                            <button type="submit" class="btn btn-link p-1 border-0">
+                                <i class="bi @(isFavorited ? "bi-heart-fill text-danger" : "bi-heart text-muted")"
+                                   style="font-size: 1.2rem;"></i>
+                            </button>
+                        </form>
+
+                        <div class="bg-light rounded d-flex align-items-center justify-content-center overflow-hidden"
+                             style="aspect-ratio: 3/4;">
                             @if (!string.IsNullOrEmpty(book.PhotoUrl))
                             {
-                                <img src="@book.PhotoUrl" class="w-100 h-100" style="object-fit: cover;" alt="@book.Title" />
+                                <img src="@book.PhotoUrl"
+                                     class="w-100 h-100"
+                                     style="object-fit: cover;"
+                                     alt="@book.Title" />
                             }
                             else
                             {
@@ -33,9 +51,10 @@
                         </div>
 
                         <div class="card-body px-0 py-2">
-                            <p class="mb-0 fw-bold small text-truncate" title="@book.Title">@book.Title</p>
+                            <p class="mb-0 fw-bold small text-truncate">@book.Title</p>
                             <p class="mb-0 text-muted extra-small">@book.Author</p>
 
+                            <!-- статус -->
                             <p class="mb-1 extra-small">
                                 <span class="badge @(book.IsActive ? "bg-success" : "bg-secondary")">
                                     @(book.IsActive ? "Активна" : "Неактивна")
@@ -46,9 +65,11 @@
                                 <i class="bi bi-geo-alt"></i> @(book.City ?? "Київ")
                             </p>
 
-                            <a asp-controller="Post" asp-action="Edit" asp-route-id="@book.Id"
+                            <a asp-controller="Post"
+                               asp-action="Edit"
+                               asp-route-id="@book.Id"
                                class="btn btn-dark w-100 extra-small py-1"
-                               style="border-radius: 4px; background-color: #333;">
+                               style="border-radius: 4px;">
                                 Редагувати
                             </a>
 
@@ -62,6 +83,7 @@
                                 </button>
                             </form>
                         </div>
+
                     </div>
                 </div>
             }

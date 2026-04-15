@@ -56,5 +56,7 @@
         public ICollection<Reviews>? ReviewsGiven { get; set; }
 
         public ICollection<Reviews>? ReviewsReceived { get; set; }
+
+        public virtual ICollection<Favorites>? Favorites { get; set; }
     }
 }
