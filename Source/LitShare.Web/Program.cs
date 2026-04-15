@@ -32,6 +32,7 @@ try
     var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
     dataSourceBuilder.MapEnum<DealType>("deal_type_t");
     _ = dataSourceBuilder.MapEnum<RoleType>("role_t");
+    dataSourceBuilder.MapEnum<RequestStatus>("request_status_t");
     var dataSource = dataSourceBuilder.Build();
 
     builder.Services.AddDbContext<LitShareDbContext>(options =>
@@ -63,6 +64,9 @@ try
     builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
     builder.Services.AddScoped<IReviewService, ReviewService>();
     builder.Services.AddScoped<IFavoriteService, FavoriteService>();
+
+    builder.Services.AddScoped<IExchangeRepository, ExchangeRepository>();
+    builder.Services.AddScoped<IExchangeService, ExchangeService>();
 
     builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
         .AddCookie(options =>

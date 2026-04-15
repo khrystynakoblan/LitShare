@@ -20,5 +20,7 @@
         public List<string> Genres { get; set; } = new List<string>();
 
         public int UserId { get; set; }
+
+        public bool HasAlreadyRequested { get; set; }
     }
 }

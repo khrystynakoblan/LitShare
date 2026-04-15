@@ -4,6 +4,7 @@ using LitShare.DAL.Context;
 using LitShare.DAL.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LitShare.DAL.Migrations
 {
     [DbContext(typeof(LitShareDbContext))]
-    partial class LitShareDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260415172853_AddExchangeRequests")]
+    partial class AddExchangeRequests
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -84,26 +87,21 @@ namespace LitShare.DAL.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
+                        .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("PostId")
-                        .HasColumnType("integer")
-                        .HasColumnName("post_id");
+                        .HasColumnType("integer");
 
                     b.Property<int>("SenderId")
-                        .HasColumnType("integer")
-                        .HasColumnName("sender_id");
+                        .HasColumnType("integer");
 
                     b.Property<RequestStatus>("Status")
-                        .HasColumnType("request_status_t")
-                        .HasColumnName("status");
+                        .HasColumnType("request_status_t");
 
                     b.HasKey("Id");
 

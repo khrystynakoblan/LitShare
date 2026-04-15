@@ -34,6 +34,8 @@
 
         public DbSet<Favorites> Favorites { get; set; }
 
+        public DbSet<ExchangeRequest> ExchangeRequests { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasPostgresEnum<DealType>("deal_type_t");
@@ -117,6 +119,12 @@
 
             modelBuilder.Entity<Reviews>()
                 .HasIndex(r => new { r.ReviewerId, r.ReviewedUserId })
+                .IsUnique();
+
+            modelBuilder.HasPostgresEnum<RequestStatus>();
+
+            modelBuilder.Entity<ExchangeRequest>()
+                .HasIndex(e => new { e.SenderId, e.PostId })
                 .IsUnique();
         }
 

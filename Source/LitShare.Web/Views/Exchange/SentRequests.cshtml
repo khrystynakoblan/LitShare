@@ -1,0 +1,70 @@
+﻿@model IEnumerable<LitShare.BLL.DTOs.SentRequestDto>
+
+@{
+    ViewData["Title"] = "Мої запити";
+}
+
+<div class="container mt-4">
+    <h2 class="fw-bold mb-4">Надіслані запити на обмін</h2>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-light border text-center p-5">
+            <p class="text-muted mb-0">Ви ще не надсилали жодного запиту.</p>
+            <a href="/" class="btn btn-dark mt-3">Шукати книги</a>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Книга</th>
+                        <th>Автор</th>
+                        <th>Дата запиту</th>
+                        <th>Статус</th>
+                        <th class="text-end">Дії</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var request in Model)
+                    {
+                        <tr>
+                            <td><strong>@request.BookTitle</strong></td>
+                            <td>@request.BookAuthor</td>
+                            <td>@request.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                            <td>
+                                @{
+                                    var badgeClass = request.Status switch
+                                    {
+                                        "Pending" => "bg-warning text-dark",
+                                        "Accepted" => "bg-success",
+                                        "Rejected" => "bg-danger",
+                                        _ => "bg-secondary"
+                                    };
+                                    var statusUkf = request.Status switch
+                                    {
+                                        "Pending" => "Очікує",
+                                        "Accepted" => "Прийнято",
+                                        "Rejected" => "Відхилено",
+                                        _ => request.Status
+                                    };
+                                }
+                                <span class="badge @badgeClass">@statusUkf</span>
+                            </td>
+                            <td class="text-end">
+                                <a asp-controller="Post"
+                                       asp-action="Details"
+                                       asp-route-id="@request.PostId"
+                                       class="btn btn-sm btn-outline-dark">
+                                    Деталі оголошення
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
