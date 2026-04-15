@@ -3,6 +3,7 @@ using LitShare.BLL.DTOs;
 using LitShare.BLL.Services.Interfaces;
 using LitShare.DAL.Models;
 using LitShare.DAL.Repositories.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace LitShare.BLL.Services
 {
@@ -10,29 +11,36 @@ namespace LitShare.BLL.Services
     {
         private readonly IExchangeRepository exchangeRepository;
         private readonly IPostRepository postRepository;
+        private readonly ILogger<ExchangeService> logger;
 
-        public ExchangeService(IExchangeRepository exchangeRepository, IPostRepository postRepository)
+        public ExchangeService(IExchangeRepository exchangeRepository, IPostRepository postRepository, ILogger<ExchangeService> logger)
         {
             this.exchangeRepository = exchangeRepository;
             this.postRepository = postRepository;
+            this.logger = logger;
         }
 
         public async Task<Result<bool>> CreateRequestAsync(int postId, int senderId)
         {
+            this.logger.LogInformation("Attempting to create exchange request. PostId: {PostId}, SenderId: {SenderId}", postId, senderId);
+
             var post = await this.postRepository.GetByIdAsync(postId);
 
             if (post == null)
             {
+                this.logger.LogWarning("CreateRequest failed: Post not found. PostId: {PostId}", postId);
                 return Result<bool>.Failure("Оголошення не знайдено.");
             }
 
             if (post.UserId == senderId)
             {
+                this.logger.LogWarning("CreateRequest failed: User {SenderId} tried to request their own post {PostId}", senderId, postId);
                 return Result<bool>.Failure("Ви не можете надіслати запит на власне оголошення.");
             }
 
             if (await this.exchangeRepository.ExistsAsync(senderId, postId))
             {
+                this.logger.LogWarning("CreateRequest failed: Duplicate request. SenderId: {SenderId}, PostId: {PostId}", senderId, postId);
                 return Result<bool>.Failure("Ви вже надсилали запит на це оголошення.");
             }
 
@@ -47,6 +55,7 @@ namespace LitShare.BLL.Services
             await this.exchangeRepository.AddAsync(request);
             await this.exchangeRepository.SaveChangesAsync();
 
+            this.logger.LogInformation("Exchange request created successfully. RequestId: {RequestId}, PostId: {PostId}", request.Id, postId);
             return true;
         }
 

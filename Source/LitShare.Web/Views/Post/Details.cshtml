@@ -6,6 +6,24 @@
 }
 
 <div class="container mt-4">
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
     <div class="row">
         <div class="col-md-4">
             <div class="bg-secondary-subtle d-flex align-items-center justify-content-center"
@@ -42,7 +60,6 @@
     </div>
 
     <div class="d-flex justify-content-between align-items-center mt-3">
-
         <a asp-controller="Profile" asp-action="GuestProfile" asp-route-id="@Model.UserId"
                class="btn btn-dark d-flex align-items-center justify-content-center"
                style="width: 240px; height: 50px;">
@@ -77,16 +94,15 @@
                         <form asp-controller="Exchange" asp-action="CreateRequest" method="post">
                             <input type="hidden" name="postId" value="@Model.Id" />
                             <button type="submit" class="btn btn-dark d-flex align-items-center justify-content-center"
-                                    style="width: 240px; height: 50px;"
-                                    onclick="return confirm('Чи дійсно Ви хочете надіслати запит?')">
+                                    style="width: 240px; height: 50px;">
                                 Надіслати запит
                             </button>
                         </form>
                     }
 
                     <a asp-controller="Complaint" asp-action="Create" asp-route-postId="@Model.Id"
-                           class="btn btn-outline-dark d-flex align-items-center justify-content-center"
-                           style="width: 240px; height: 50px;">
+                       class="btn btn-outline-dark d-flex align-items-center justify-content-center"
+                       style="width: 240px; height: 50px;">
                         Поскаржитися
                     </a>
                 </div>
@@ -94,19 +110,3 @@
         }
     </div>
 </div>
-
-@section Scripts {
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <script>
-            alert('@Html.Raw(TempData["SuccessMessage"])');
-        </script>
-    }
-    
-    @if (TempData["ErrorMessage"] != null)
-    {
-        <script>
-            alert('@Html.Raw(TempData["ErrorMessage"])');
-        </script>
-    }
-}
