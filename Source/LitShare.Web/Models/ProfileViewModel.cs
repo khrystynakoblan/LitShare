@@ -25,5 +25,7 @@ namespace LitShare.Web.Models
         public int UserId { get; set; }
 
         public int ReviewCount { get; set; }
+
+        public HashSet<int> FavoritePostIds { get; set; } = new HashSet<int>();
     }
 }

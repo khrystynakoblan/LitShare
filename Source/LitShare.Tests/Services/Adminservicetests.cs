@@ -289,9 +289,9 @@
                 new Complaints { Id = 2, Text = "Скарга 2" }
             };
 
-            this.userRepositoryMock.Setup(r => r.GetAllAsync()).ReturnsAsync(users);
-            this.postRepositoryMock.Setup(r => r.GetAllPostsAsync()).ReturnsAsync(posts);
-            this.complaintRepositoryMock.Setup(r => r.GetAllAsync()).ReturnsAsync(complaints);
+            this.userRepositoryMock.Setup(r => r.GetAllAsync()).ReturnsAsync(users.AsEnumerable());
+            this.postRepositoryMock.Setup(r => r.GetAllAsync()).ReturnsAsync(posts.AsEnumerable());
+            this.complaintRepositoryMock.Setup(r => r.GetAllAsync()).ReturnsAsync(complaints.AsEnumerable());
 
             var result = await this.adminService.GetStatisticsAsync();
 

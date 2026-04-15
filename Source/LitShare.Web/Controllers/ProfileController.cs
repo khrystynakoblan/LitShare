@@ -8,23 +8,26 @@ namespace LitShare.Web.Controllers
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
 
-    [Authorize(Roles = "User")]
+    [Authorize(Roles = "User, Admin")]
     public class ProfileController : BaseController
     {
         private readonly IProfileService profileService;
         private readonly IPostService postService;
         private readonly IReviewService reviewService;
+        private readonly IFavoriteService favoriteService;
         private readonly ILogger<ProfileController> logger;
 
         public ProfileController(
             IProfileService profileService,
             IPostService postService,
             IReviewService reviewService,
+            IFavoriteService favoriteService,
             ILogger<ProfileController> logger)
         {
             this.profileService = profileService;
             this.postService = postService;
             this.reviewService = reviewService;
+            this.favoriteService = favoriteService;
             this.logger = logger;
         }
 
@@ -238,9 +241,13 @@ namespace LitShare.Web.Controllers
             var booksResult = await this.postService.GetPostsByUserIdAsync(userId);
             var books = booksResult.IsSuccess ? booksResult.Value! : new List<PostCardDto>();
 
+            var favResult = await this.favoriteService.GetFavoritePostIdsAsync(userId);
+            var favoriteIds = favResult.IsSuccess ? favResult.Value! : new HashSet<int>();
+
             var model = new ProfileViewModel
             {
                 UserBooks = books,
+                FavoritePostIds = favoriteIds,
             };
 
             return this.View(model);
