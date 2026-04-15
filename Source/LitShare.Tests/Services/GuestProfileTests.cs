@@ -18,6 +18,7 @@
         private readonly Mock<IProfileService> profileServiceMock;
         private readonly Mock<IPostService> postServiceMock;
         private readonly Mock<IReviewService> reviewServiceMock;
+        private readonly Mock<IFavoriteService> favoriteServiceMock;
         private readonly Mock<ILogger<ProfileController>> loggerMock;
         private readonly ProfileController controller;
 
@@ -26,6 +27,7 @@
             this.profileServiceMock = new Mock<IProfileService>();
             this.postServiceMock = new Mock<IPostService>();
             this.reviewServiceMock = new Mock<IReviewService>();
+            this.favoriteServiceMock = new Mock<IFavoriteService>();
             this.loggerMock = new Mock<ILogger<ProfileController>>();
 
             this.reviewServiceMock
@@ -36,6 +38,7 @@
                 this.profileServiceMock.Object,
                 this.postServiceMock.Object,
                 this.reviewServiceMock.Object,
+                this.favoriteServiceMock.Object,
                 this.loggerMock.Object);
         }
 

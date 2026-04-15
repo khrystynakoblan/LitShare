@@ -58,9 +58,11 @@ try
     builder.Services.AddControllersWithViews();
     builder.Services.AddScoped<IComplaintRepository, ComplaintRepository>();
     builder.Services.AddScoped<IProfileService, ProfileService>();
+    builder.Services.AddScoped<IFavoriteRepository, FavoriteRepository>();
 
     builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
     builder.Services.AddScoped<IReviewService, ReviewService>();
+    builder.Services.AddScoped<IFavoriteService, FavoriteService>();
 
     builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
         .AddCookie(options =>

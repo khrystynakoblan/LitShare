@@ -18,5 +18,7 @@
         public List<int>? SelectedGenres { get; set; }
 
         public List<GenreDto> AllGenres { get; set; } = new List<GenreDto>();
+
+        public HashSet<int> FavoritePostIds { get; set; } = new HashSet<int>();
     }
 }
