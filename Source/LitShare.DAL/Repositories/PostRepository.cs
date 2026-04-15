@@ -25,6 +25,7 @@
                 .Include(p => p.User)
                 .Include(p => p.BookGenres)
                     .ThenInclude(bg => bg.Genre)
+                .Where(p => p.IsActive)
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(searchQuery))
@@ -83,10 +84,10 @@
                 .ToListAsync();
         }
 
-        public Task UpdateAsync(Posts post)
+        public async Task UpdateAsync(Posts post)
         {
             this.context.Posts.Update(post);
-            return Task.CompletedTask;
+            await this.context.SaveChangesAsync();
         }
 
         public async Task<Posts?> GetByIdWithGenresAsync(int id)

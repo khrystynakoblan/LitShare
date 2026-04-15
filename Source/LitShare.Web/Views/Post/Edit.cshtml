@@ -90,7 +90,7 @@
             <span asp-validation-for="Description" class="text-danger"></span>
         </div>
 
-        <div class="row gx-2 mb-5">
+        <div class="row gx-2 mb-3">
             <div class="col-6">
                 <button type="submit" class="btn btn-dark w-100 py-2 fw-bold">Зберегти</button>
             </div>
@@ -98,6 +98,16 @@
                 <button type="submit" class="btn btn-outline-dark w-100 py-2">Відхилити зміни</button>
             </div>
         </div>
+    </form>
+
+    <form asp-controller="Profile" asp-action="DeletePostConfirmed" method="post"
+          onsubmit="return confirm('Точно хочеш видалити книгу? Це незворотно');">
+
+        <input type="hidden" name="postId" value="@Model.Id" />
+
+        <button type="submit" class="btn btn-outline-danger w-100 py-2">
+            Видалити книгу
+        </button>
     </form>
 </div>
 

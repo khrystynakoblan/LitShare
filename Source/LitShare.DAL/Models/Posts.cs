@@ -32,6 +32,9 @@
         [Column("photo_url")]
         public string? PhotoUrl { get; set; }
 
+        [Column("is_active")]
+        public bool IsActive { get; set; } = true;
+
         [ForeignKey("UserId")]
         public virtual Users? User { get; set; }
 

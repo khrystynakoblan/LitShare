@@ -135,7 +135,7 @@
         {
             this.SetupGetByIdWithGenres(SamplePost());
             await this.sut.GetPostDetailsAsync(1);
-            this.VerifyLog(LogLevel.Information, "BLL: Fetching post details for ID: 1");
+            this.VerifyLog(LogLevel.Information, "Fetching post details for ID: 1");
         }
 
         [Fact]
@@ -143,7 +143,7 @@
         {
             this.SetupGetByIdWithGenres(SamplePost());
             await this.sut.GetPostDetailsAsync(1);
-            this.VerifyLog(LogLevel.Information, "BLL: Successfully fetched post details for ID: 1");
+            this.VerifyLog(LogLevel.Information, "Successfully fetched post details for ID: 1");
         }
 
         [Fact]
@@ -173,7 +173,7 @@
                 .Setup(r => r.GetByIdWithGenresAsync(It.IsAny<int>()))
                 .ReturnsAsync((Posts?)null);
             await this.sut.GetPostDetailsAsync(99);
-            this.VerifyLog(LogLevel.Warning, "BLL: Post with ID: 99 was not found");
+            this.VerifyLog(LogLevel.Warning, "Post not found. ID: 99");
         }
 
         [Fact]
@@ -192,7 +192,7 @@
             this.postRepositoryMock
                 .Setup(r => r.GetByUserIdAsync(1))
                 .ReturnsAsync(SampleUserPosts());
-            var result = await this.sut.GetPostsByUserIdAsync(1);
+            var result = await this.sut.GetPostsByUserIdAsync(1, null);
             Assert.True(result.IsSuccess);
         }
 
@@ -202,7 +202,7 @@
             this.postRepositoryMock
                 .Setup(r => r.GetByUserIdAsync(1))
                 .ReturnsAsync(SampleUserPosts());
-            var result = await this.sut.GetPostsByUserIdAsync(1);
+            var result = await this.sut.GetPostsByUserIdAsync(1, null);
             Assert.Equal(2, result.Value!.Count());
         }
 
@@ -212,7 +212,7 @@
             this.postRepositoryMock
                 .Setup(r => r.GetByUserIdAsync(1))
                 .ReturnsAsync(SampleUserPosts());
-            var result = await this.sut.GetPostsByUserIdAsync(1);
+            var result = await this.sut.GetPostsByUserIdAsync(1, null);
             Assert.Contains(result.Value!, p => p.Title == "Кобзар");
         }
 
@@ -222,7 +222,7 @@
             this.postRepositoryMock
                 .Setup(r => r.GetByUserIdAsync(1))
                 .ReturnsAsync(new List<Posts>());
-            var result = await this.sut.GetPostsByUserIdAsync(1);
+            var result = await this.sut.GetPostsByUserIdAsync(1, null);
             Assert.True(result.IsSuccess);
             Assert.Empty(result.Value!);
         }
@@ -233,7 +233,7 @@
             this.postRepositoryMock
                 .Setup(r => r.GetByUserIdAsync(1))
                 .ReturnsAsync(SampleUserPosts());
-            var result = await this.sut.GetPostsByUserIdAsync(1);
+            var result = await this.sut.GetPostsByUserIdAsync(1, null);
             Assert.Contains(result.Value!, p => p.City == "Львів");
         }
 
@@ -246,7 +246,7 @@
                 {
                     new Posts { Id = 1, Title = "Книга", Author = "Автор", User = null },
                 });
-            var result = await this.sut.GetPostsByUserIdAsync(1);
+            var result = await this.sut.GetPostsByUserIdAsync(1, null);
             Assert.Contains(result.Value!, p => p.City == "Не вказано");
         }
 
@@ -304,5 +304,299 @@
                 User = new Users { City = "Київ" },
             },
         };
+        [Fact]
+        public async Task SetPostStatusAsync_ValidRequest_UpdatesStatusSuccessfully()
+        {
+            var post = new Posts
+            {
+                Id = 1,
+                UserId = 42,
+                IsActive = true
+            };
+
+            this.postRepositoryMock
+                .Setup(r => r.GetByIdAsync(1))
+                .ReturnsAsync(post);
+
+            var result = await this.sut.SetPostStatusAsync(1, 42, false);
+
+            Assert.True(result.IsSuccess);
+            Assert.False(post.IsActive);
+        }
+
+        [Fact]
+        public async Task SetPostStatusAsync_PostNotFound_ReturnsFailure()
+        {
+            this.postRepositoryMock
+                .Setup(r => r.GetByIdAsync(It.IsAny<int>()))
+                .ReturnsAsync((Posts?)null);
+
+            var result = await this.sut.SetPostStatusAsync(1, 42, false);
+
+            Assert.False(result.IsSuccess);
+            Assert.Equal("Пост не знайдено", result.Error);
+        }
+
+        [Fact]
+        public async Task SetPostStatusAsync_UnauthorizedUser_ReturnsFailure()
+        {
+            var post = new Posts
+            {
+                Id = 1,
+                UserId = 99,
+                IsActive = true
+            };
+
+            this.postRepositoryMock
+                .Setup(r => r.GetByIdAsync(1))
+                .ReturnsAsync(post);
+
+            var result = await this.sut.SetPostStatusAsync(1, 42, false);
+
+            Assert.False(result.IsSuccess);
+            Assert.Equal("Немає доступу до цього поста", result.Error);
+        }
+
+        [Fact]
+        public async Task SetPostStatusAsync_CallsUpdateAsync()
+        {
+            var post = new Posts
+            {
+                Id = 1,
+                UserId = 42,
+                IsActive = true
+            };
+
+            this.postRepositoryMock
+                .Setup(r => r.GetByIdAsync(1))
+                .ReturnsAsync(post);
+
+            await this.sut.SetPostStatusAsync(1, 42, false);
+
+            this.postRepositoryMock.Verify(r => r.UpdateAsync(post), Times.Once);
+        }
+
+        [Fact]
+        public async Task SetPostStatusAsync_LogsStartMessage()
+        {
+            var post = new Posts
+            {
+                Id = 1,
+                UserId = 42,
+                IsActive = true
+            };
+
+            this.postRepositoryMock
+                .Setup(r => r.GetByIdAsync(1))
+                .ReturnsAsync(post);
+
+            await this.sut.SetPostStatusAsync(1, 42, false);
+
+            this.VerifyLog(LogLevel.Information, "Changing post status");
+        }
+
+        [Fact]
+        public async Task SetPostStatusAsync_LogsWarning_WhenPostNotFound()
+        {
+            this.postRepositoryMock
+                .Setup(r => r.GetByIdAsync(It.IsAny<int>()))
+                .ReturnsAsync((Posts?)null);
+
+            await this.sut.SetPostStatusAsync(1, 42, false);
+
+            this.VerifyLog(LogLevel.Warning, "Post not found");
+        }
+
+        [Fact]
+        public async Task SetPostStatusAsync_LogsWarning_WhenUnauthorized()
+        {
+            var post = new Posts
+            {
+                Id = 1,
+                UserId = 99,
+                IsActive = true
+            };
+
+            this.postRepositoryMock
+                .Setup(r => r.GetByIdAsync(1))
+                .ReturnsAsync(post);
+
+            await this.sut.SetPostStatusAsync(1, 42, false);
+
+            this.VerifyLog(LogLevel.Warning, "Unauthorized");
+        }
+
+        [Fact]
+        public async Task SetPostStatusAsync_LogsSuccessMessage()
+        {
+            var post = new Posts
+            {
+                Id = 1,
+                UserId = 42,
+                IsActive = true
+            };
+
+            this.postRepositoryMock
+                .Setup(r => r.GetByIdAsync(1))
+                .ReturnsAsync(post);
+
+            await this.sut.SetPostStatusAsync(1, 42, false);
+
+            this.VerifyLog(LogLevel.Information, "Post status updated successfully");
+        }
+
+        [Fact]
+        public async Task SetPostStatusAsync_ToggleFromFalseToTrue()
+        {
+            var post = new Posts
+            {
+                Id = 1,
+                UserId = 42,
+                IsActive = false
+            };
+
+            this.postRepositoryMock
+                .Setup(r => r.GetByIdAsync(1))
+                .ReturnsAsync(post);
+
+            var result = await this.sut.SetPostStatusAsync(1, 42, true);
+
+            Assert.True(result.IsSuccess);
+            Assert.True(post.IsActive);
+        }
+        [Fact]
+        public async Task DeletePostAsync_ValidPost_DeletesSuccessfully()
+        {
+            var post = new Posts
+            {
+                Id = 1,
+                UserId = 42
+            };
+
+            this.postRepositoryMock
+                .Setup(r => r.GetByIdAsync(1))
+                .ReturnsAsync(post);
+
+            var result = await this.sut.DeletePostAsync(1, 42);
+
+            Assert.True(result.IsSuccess);
+        }
+
+        [Fact]
+        public async Task DeletePostAsync_CallsDeleteAndSaveChanges()
+        {
+            var post = new Posts
+            {
+                Id = 1,
+                UserId = 42
+            };
+
+            this.postRepositoryMock
+                .Setup(r => r.GetByIdAsync(1))
+                .ReturnsAsync(post);
+
+            await this.sut.DeletePostAsync(1, 42);
+
+            this.postRepositoryMock.Verify(r => r.DeleteAsync(post), Times.Once);
+            this.postRepositoryMock.Verify(r => r.SaveChangesAsync(), Times.Once);
+        }
+
+        [Fact]
+        public async Task DeletePostAsync_PostNotFound_ReturnsFailure()
+        {
+            this.postRepositoryMock
+                .Setup(r => r.GetByIdAsync(It.IsAny<int>()))
+                .ReturnsAsync((Posts?)null);
+
+            var result = await this.sut.DeletePostAsync(1, 42);
+
+            Assert.False(result.IsSuccess);
+            Assert.Equal("Пост не знайдено", result.Error);
+        }
+
+        [Fact]
+        public async Task DeletePostAsync_UnauthorizedUser_ReturnsFailure()
+        {
+            var post = new Posts
+            {
+                Id = 1,
+                UserId = 99
+            };
+
+            this.postRepositoryMock
+                .Setup(r => r.GetByIdAsync(1))
+                .ReturnsAsync(post);
+
+            var result = await this.sut.DeletePostAsync(1, 42);
+
+            Assert.False(result.IsSuccess);
+            Assert.Equal("Немає доступу до цього поста", result.Error);
+        }
+
+        [Fact]
+        public async Task DeletePostAsync_LogsStartMessage()
+        {
+            var post = new Posts
+            {
+                Id = 1,
+                UserId = 42
+            };
+
+            this.postRepositoryMock
+                .Setup(r => r.GetByIdAsync(1))
+                .ReturnsAsync(post);
+
+            await this.sut.DeletePostAsync(1, 42);
+
+            this.VerifyLog(LogLevel.Information, "Deleting post");
+        }
+
+        [Fact]
+        public async Task DeletePostAsync_LogsWarning_WhenPostNotFound()
+        {
+            this.postRepositoryMock
+                .Setup(r => r.GetByIdAsync(It.IsAny<int>()))
+                .ReturnsAsync((Posts?)null);
+
+            await this.sut.DeletePostAsync(1, 42);
+
+            this.VerifyLog(LogLevel.Warning, "Post not found");
+        }
+
+        [Fact]
+        public async Task DeletePostAsync_LogsWarning_WhenUnauthorized()
+        {
+            var post = new Posts
+            {
+                Id = 1,
+                UserId = 99
+            };
+
+            this.postRepositoryMock
+                .Setup(r => r.GetByIdAsync(1))
+                .ReturnsAsync(post);
+
+            await this.sut.DeletePostAsync(1, 42);
+
+            this.VerifyLog(LogLevel.Warning, "Unauthorized");
+        }
+
+        [Fact]
+        public async Task DeletePostAsync_LogsSuccessMessage()
+        {
+            var post = new Posts
+            {
+                Id = 1,
+                UserId = 42
+            };
+
+            this.postRepositoryMock
+                .Setup(r => r.GetByIdAsync(1))
+                .ReturnsAsync(post);
+
+            await this.sut.DeletePostAsync(1, 42);
+
+            this.VerifyLog(LogLevel.Information, "Post deleted successfully");
+        }
     }
 }
