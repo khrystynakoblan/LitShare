@@ -11,21 +11,25 @@
     using LitShare.DAL.Repositories.Interfaces;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Options;
 
     public class EditPostService : IEditPostService
     {
         private readonly IPostRepository postRepository;
         private readonly IWebHostEnvironment environment;
         private readonly ILogger<EditPostService> logger;
+        private readonly AppSettings settings;
 
         public EditPostService(
             IPostRepository postRepository,
             IWebHostEnvironment environment,
-            ILogger<EditPostService> logger)
+            ILogger<EditPostService> logger,
+            IOptions<AppSettings> options)
         {
             this.postRepository = postRepository;
             this.environment = environment;
             this.logger = logger;
+            this.settings = options.Value;
         }
 
         public async Task<Result<PostViewDto>> GetPostByIdAsync(int id, int currentUserId)
@@ -79,6 +83,17 @@
 
             if (dto.NewPhoto != null && dto.NewPhoto.Length > 0)
             {
+                if (dto.NewPhoto.Length > this.settings.MaxImageSizeBytes)
+                {
+                    this.logger.LogWarning(
+                        "Upload failed: Image too large ({Size} bytes). Max allowed: {Max} bytes.",
+                        dto.NewPhoto.Length,
+                        this.settings.MaxImageSizeBytes);
+
+                    double maxSizeMb = this.settings.MaxImageSizeBytes / 1048576.0;
+                    return Result<bool>.Failure($"Розмір зображення перевищує максимально допустимий ({maxSizeMb:F1} МБ).");
+                }
+
                 string? newPhotoUrl = await this.SaveImageAsync(dto);
                 if (newPhotoUrl != null)
                 {

@@ -1,3 +1,4 @@
+using LitShare.BLL.Common;
 using LitShare.BLL.Services;
 using LitShare.BLL.Services.Interfaces;
 using LitShare.DAL.Context;
@@ -40,6 +41,8 @@ try
 
     builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
     builder.Services.AddProblemDetails();
+
+    builder.Services.Configure<AppSettings>(builder.Configuration.GetSection(AppSettings.SectionName));
 
     builder.Services.AddScoped<IPasswordHasher<Users>, PasswordHasher<Users>>();
     builder.Services.AddScoped<IUserRepository, UserRepository>();

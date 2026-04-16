@@ -6,20 +6,30 @@
     using LitShare.DAL.Models;
     using LitShare.DAL.Repositories.Interfaces;
     using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Options;
 
     public class HomeService : IHomeService
     {
         private readonly IPostRepository postRepository;
         private readonly ILogger<HomeService> logger;
+        private readonly AppSettings settings;
 
-        public HomeService(IPostRepository postRepository, ILogger<HomeService> logger)
+        public HomeService(IPostRepository postRepository, ILogger<HomeService> logger, IOptions<AppSettings> options)
         {
             this.postRepository = postRepository;
             this.logger = logger;
+            this.settings = options.Value;
         }
 
         public async Task<Result<List<PostCardDto>>> GetFilteredPostsAsync(PostFilterDto filter)
         {
+            if (!string.IsNullOrWhiteSpace(filter.SearchTerm) && filter.SearchTerm.Length < this.settings.MinSearchLength)
+            {
+                this.logger.LogInformation("Пошуковий запит '{SearchTerm}' закороткий. Мінімум {Min} символів.", filter.SearchTerm, this.settings.MinSearchLength);
+                return Result<List<PostCardDto>>.Failure(
+                    $"Для пошуку необхідно ввести мінімум {this.settings.MinSearchLength} символи.");
+            }
+
             this.logger.LogInformation(
                 "Fetching filtered posts. SearchQuery: {SearchQuery}, City: {City}, Genres: {GenreCount}, DealType: {DealType}",
                 filter.SearchTerm,

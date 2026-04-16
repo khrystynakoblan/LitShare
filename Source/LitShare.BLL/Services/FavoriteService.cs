@@ -6,16 +6,19 @@
     using LitShare.DAL.Models;
     using LitShare.DAL.Repositories.Interfaces;
     using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Options;
 
     public class FavoriteService : IFavoriteService
     {
         private readonly IFavoriteRepository favoriteRepository;
         private readonly ILogger<FavoriteService> logger;
+        private readonly AppSettings settings;
 
-        public FavoriteService(IFavoriteRepository favoriteRepository, ILogger<FavoriteService> logger)
+        public FavoriteService(IFavoriteRepository favoriteRepository, ILogger<FavoriteService> logger, IOptions<AppSettings> options)
         {
             this.favoriteRepository = favoriteRepository;
             this.logger = logger;
+            this.settings = options.Value;
         }
 
         public async Task<Result<List<FavoriteDto>>> GetFavoritesAsync(int userId)
@@ -43,6 +46,13 @@
         public async Task<Result<bool>> AddToFavoritesAsync(int userId, int postId)
         {
             this.logger.LogInformation("User {UserId} adding post {PostId} to favorites.", userId, postId);
+
+            var currentFavorites = await this.favoriteRepository.GetFavoritePostIdsAsync(userId);
+            if (currentFavorites.Count >= this.settings.MaxFavoritesPerUser)
+            {
+                this.logger.LogWarning("User {UserId} reached max favorites limit ({Limit}).", userId, this.settings.MaxFavoritesPerUser);
+                return Result<bool>.Failure($"Ви досягли ліміту вподобаних книг ({this.settings.MaxFavoritesPerUser}).");
+            }
 
             bool alreadyExists = await this.favoriteRepository.ExistsAsync(userId, postId);
 

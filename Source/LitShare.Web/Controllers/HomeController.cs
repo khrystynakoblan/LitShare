@@ -59,9 +59,17 @@ namespace LitShare.Web.Controllers
             if (result.IsFailure)
             {
                 this.logger.LogWarning("Failed to load posts: {Error}", result.Error);
+
+                ModelState.AddModelError(string.Empty, result.Error);
+
                 return this.View(new HomeViewModel
                 {
                     AllGenres = genresResult.IsSuccess ? genresResult.Value! : new List<GenreDto>(),
+                    SearchTerm = searchTerm,
+                    Location = location,
+                    DealType = dealType,
+                    SelectedGenres = genres,
+                    Posts = new List<PostCardDto>()
                 });
             }
 

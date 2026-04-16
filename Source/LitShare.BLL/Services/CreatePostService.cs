@@ -11,26 +11,42 @@
     using LitShare.DAL.Repositories.Interfaces;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Options;
 
     public class CreatePostService : ICreatePostService
     {
         private readonly IPostRepository postRepository;
         private readonly IWebHostEnvironment environment;
         private readonly ILogger<CreatePostService> logger;
+        private readonly AppSettings settings;
 
         public CreatePostService(
             IPostRepository postRepository,
             IWebHostEnvironment environment,
-            ILogger<CreatePostService> logger)
+            ILogger<CreatePostService> logger,
+            IOptions<AppSettings> options)
         {
             this.postRepository = postRepository;
             this.environment = environment;
             this.logger = logger;
+            this.settings = options.Value;
         }
 
         public async Task<Result<int>> CreatePostAsync(CreatePostDto dto, int userId)
         {
             this.logger.LogInformation("Starting post creation for user ID: {UserId}. Title: {Title}", userId, dto.Title);
+
+            if (dto.ImageFile != null && dto.ImageFile.Length > this.settings.MaxImageSizeBytes)
+            {
+                this.logger.LogWarning(
+                    "Upload failed: Image too large ({Size} bytes). Max allowed: {Max} bytes.",
+                    dto.ImageFile.Length,
+                    this.settings.MaxImageSizeBytes);
+
+                double maxSizeMb = this.settings.MaxImageSizeBytes / 1048576.0;
+
+                return Result<int>.Failure($"Розмір зображення перевищує максимально допустимий ({maxSizeMb:F1} МБ).");
+            }
 
             string? photoUrl = await this.SaveImageAsync(dto);
 

@@ -6,6 +6,7 @@
     using LitShare.DAL.Repositories.Interfaces;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Options;
 
     public class AdminService : IAdminService
     {
@@ -13,17 +14,20 @@
         private readonly IPostRepository postRepository;
         private readonly IUserRepository userRepository;
         private readonly ILogger<AdminService> logger;
+        private readonly AppSettings settings;
 
         public AdminService(
             IComplaintRepository complaintRepository,
             IPostRepository postRepository,
             IUserRepository userRepository,
-            ILogger<AdminService> logger)
+            ILogger<AdminService> logger,
+            IOptions<AppSettings> options)
         {
             this.complaintRepository = complaintRepository;
             this.postRepository = postRepository;
             this.userRepository = userRepository;
             this.logger = logger;
+            this.settings = options.Value;
         }
 
         public async Task<Result<bool>> ApproveComplaintAsync(int id)
@@ -139,13 +143,9 @@
                 var cityStats = posts
                     .Where(p => p.User?.City != null)
                     .GroupBy(p => p.User!.City!)
-                    .Select(g => new CityStatDto
-                    {
-                        City = g.Key ?? string.Empty,
-                        Count = g.Count()
-                    })
+                    .Select(g => new CityStatDto { City = g.Key, Count = g.Count() })
                     .OrderByDescending(x => x.Count)
-                    .Take(5)
+                    .Take(this.settings.AdminStatsTopCitiesCount)
                     .ToList();
 
                 var genreStats = posts
@@ -159,7 +159,7 @@
                         Count = g.Count()
                     })
                     .OrderByDescending(x => x.Count)
-                    .Take(5)
+                    .Take(this.settings.AdminStatsTopGenresCount)
                     .ToList();
 
                 var stats = new AdminStatsDto

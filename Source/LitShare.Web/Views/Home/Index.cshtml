@@ -66,6 +66,19 @@
                 <a asp-controller="Post" asp-action="CreatePost" class="btn btn-dark">+ Додати книгу</a>
             </div>
 
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-warning fw-bold my-3 text-center" role="alert">
+                    @foreach (var value in ViewData.ModelState.Values)
+                    {
+                        foreach (var error in value.Errors)
+                        {
+                            <p class="mb-0">@error.ErrorMessage</p>
+                        }
+                    }
+                </div>
+            }
+            
             @if (!Model.Posts.Any())
             {
                 <div class="text-center text-muted mt-5">
