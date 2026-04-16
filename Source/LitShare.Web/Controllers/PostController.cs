@@ -20,6 +20,7 @@
         private readonly IEditPostService editPostService;
         private readonly IGenreService genreService;
         private readonly IPostService postService;
+        private readonly IExchangeService exchangeService;
         private readonly ILogger<PostController> logger;
 
         public PostController(
@@ -27,12 +28,14 @@
             IEditPostService editPostService,
             IGenreService genreService,
             IPostService postService,
+            IExchangeService exchangeService,
             ILogger<PostController> logger)
         {
             this.createPostService = createPostService;
             this.editPostService = editPostService;
             this.genreService = genreService;
             this.postService = postService;
+            this.exchangeService = exchangeService;
             this.logger = logger;
         }
 
@@ -180,7 +183,16 @@
                 DealType = post.DealType,
                 Genres = post.Genres,
                 UserId = post.UserId,
+                HasAlreadyRequested = false
             };
+
+            if (this.User.Identity?.IsAuthenticated == true)
+            {
+                int currentUserId = this.GetCurrentUserId();
+
+                var sentRequests = await this.exchangeService.GetSentRequestsAsync(currentUserId);
+                model.HasAlreadyRequested = sentRequests.Any(r => r.PostId == id);
+            }
 
             return this.View(model);
         }
