@@ -197,6 +197,41 @@
             return this.View(model);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var userId = GetCurrentUserId();
+
+            var post = await postService.GetPostDetailsAsync(id);
+
+            if (post.IsFailure)
+            {
+                return HandleFailure(post.Error);
+            }
+
+            if (post.Value!.UserId != userId)
+            {
+                return HandleFailure("Немає доступу");
+            }
+
+            return View(post.Value);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var userId = GetCurrentUserId();
+
+            var result = await postService.DeletePostAsync(id, userId);
+
+            if (result.IsFailure)
+            {
+                return HandleFailure(result.Error);
+            }
+
+            return RedirectToAction("MyBooks", "Profile");
+        }
+
         private SelectList BuildDealTypeSelectList(int? selectedValue = null)
         {
             var items = Enum.GetValues(typeof(DealType))
