@@ -5,6 +5,7 @@
     using System.IO;
     using System.Text;
     using System.Threading.Tasks;
+    using LitShare.BLL.Common;
     using LitShare.BLL.DTOs;
     using LitShare.BLL.Services;
     using LitShare.DAL.Models;
@@ -12,6 +13,7 @@
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Options;
     using Moq;
     using Xunit;
 
@@ -20,6 +22,7 @@
         private readonly Mock<IPostRepository> postRepositoryMock;
         private readonly Mock<IWebHostEnvironment> environmentMock;
         private readonly Mock<ILogger<EditPostService>> loggerMock;
+        private readonly IOptions<AppSettings> options;
         private readonly EditPostService sut;
 
         private const int CurrentUserId = 10;
@@ -32,10 +35,17 @@
 
             this.environmentMock.Setup(e => e.WebRootPath).Returns("C:/fake_wwwroot");
 
+            var appSettings = new AppSettings
+            {
+                MaxImageSizeBytes = 5242880
+            };
+            this.options = Options.Create(appSettings);
+
             this.sut = new EditPostService(
                 this.postRepositoryMock.Object,
                 this.environmentMock.Object,
-                this.loggerMock.Object);
+                this.loggerMock.Object,
+                this.options);
         }
 
         [Fact]
@@ -223,6 +233,36 @@
 
             await Assert.ThrowsAsync<InvalidOperationException>(
                 () => this.sut.EditPostAsync(ValidDto(), CurrentUserId));
+        }
+
+        [Fact]
+        public async Task EditPostAsync_NewPhotoExceedsSizeLimit_ReturnsFailure()
+        {
+            var strictSettings = new AppSettings { MaxImageSizeBytes = 10 };
+            var strictOptions = Options.Create(strictSettings);
+
+            var serviceWithStrictLimit = new EditPostService(
+                this.postRepositoryMock.Object,
+                this.environmentMock.Object,
+                this.loggerMock.Object,
+                strictOptions);
+
+            var post = ExistingPost(CurrentUserId);
+            this.SetupGetById(post);
+
+            var mockFile = new Mock<IFormFile>();
+            mockFile.Setup(f => f.Length).Returns(20);
+            mockFile.Setup(f => f.FileName).Returns("too_large_image.jpg");
+
+            var dto = ValidDto();
+            dto.NewPhoto = mockFile.Object;
+
+            var result = await serviceWithStrictLimit.EditPostAsync(dto, CurrentUserId);
+
+            Assert.False(result.IsSuccess);
+
+            this.postRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<Posts>()), Times.Never);
+            this.postRepositoryMock.Verify(r => r.SaveChangesAsync(), Times.Never);
         }
 
         private static EditPostDto ValidDto() => new EditPostDto

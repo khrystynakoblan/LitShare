@@ -10,6 +10,7 @@
     using LitShare.DAL.Repositories.Interfaces;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Options;
     using Moq;
     using Xunit;
 
@@ -18,6 +19,7 @@
         private readonly Mock<IPostRepository> postRepositoryMock;
         private readonly Mock<IWebHostEnvironment> environmentMock;
         private readonly Mock<ILogger<CreatePostService>> loggerMock;
+        private readonly IOptions<AppSettings> options;
         private readonly CreatePostService sut;
 
         public CreatePostServiceTests()
@@ -28,10 +30,17 @@
 
             this.environmentMock.Setup(e => e.WebRootPath).Returns("C:/fake_wwwroot");
 
+            var appSettings = new AppSettings
+            {
+                MaxImageSizeBytes = 5242880
+            };
+            this.options = Options.Create(appSettings);
+
             this.sut = new CreatePostService(
                 this.postRepositoryMock.Object,
                 this.environmentMock.Object,
-                this.loggerMock.Object);
+                this.loggerMock.Object,
+                this.options);
         }
 
         [Fact]
@@ -146,6 +155,29 @@
                 .ThrowsAsync(new InvalidOperationException("Fatal error"));
 
             await Assert.ThrowsAsync<InvalidOperationException>(() => this.sut.CreatePostAsync(ValidDto(), 1));
+        }
+
+        [Fact]
+        public async Task CreatePostAsync_ImageTooLarge_ReturnsFailure()
+        {
+            var strictSettings = new AppSettings { MaxImageSizeBytes = 10 };
+            var strictOptions = Options.Create(strictSettings);
+
+            var serviceWithStrictLimit = new CreatePostService(
+                this.postRepositoryMock.Object,
+                this.environmentMock.Object,
+                this.loggerMock.Object,
+                strictOptions);
+
+            var mockFile = new Mock<Microsoft.AspNetCore.Http.IFormFile>();
+            mockFile.Setup(f => f.Length).Returns(20);
+
+            var dto = ValidDto();
+            dto.ImageFile = mockFile.Object;
+
+            var result = await serviceWithStrictLimit.CreatePostAsync(dto, 1);
+
+            Assert.True(result.IsFailure);
         }
 
         private static CreatePostDto ValidDto() => new CreatePostDto

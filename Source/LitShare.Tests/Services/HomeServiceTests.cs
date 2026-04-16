@@ -1,10 +1,12 @@
 ﻿namespace LitShare.Tests.Services
 {
+    using LitShare.BLL.Common;
     using LitShare.BLL.DTOs;
     using LitShare.BLL.Services;
     using LitShare.DAL.Models;
     using LitShare.DAL.Repositories.Interfaces;
     using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Options;
     using Moq;
     using Xunit;
 
@@ -12,6 +14,7 @@
     {
         private readonly Mock<IPostRepository> postRepositoryMock;
         private readonly Mock<ILogger<HomeService>> loggerMock;
+        private readonly IOptions<AppSettings> options;
         private readonly HomeService sut;
 
         public HomeServiceTests()
@@ -19,9 +22,16 @@
             this.postRepositoryMock = new Mock<IPostRepository>();
             this.loggerMock = new Mock<ILogger<HomeService>>();
 
+            var appSettings = new AppSettings
+            {
+                MinSearchLength = 2
+            };
+            this.options = Options.Create(appSettings);
+
             this.sut = new HomeService(
                 this.postRepositoryMock.Object,
-                this.loggerMock.Object);
+                this.loggerMock.Object,
+                this.options);
         }
 
         [Fact]
@@ -398,5 +408,23 @@
                 User = new Users { City = "Київ" },
             },
         };
+
+        [Fact]
+        public async Task GetFilteredPostsAsync_SearchTermTooShort_ReturnsFailure()
+        {
+            var customSettings = new AppSettings { MinSearchLength = 3 };
+            var customOptions = Options.Create(customSettings);
+
+            var serviceWithLimits = new HomeService(
+                this.postRepositoryMock.Object,
+                this.loggerMock.Object,
+                customOptions);
+
+            var filterDto = new PostFilterDto { SearchTerm = "Аб" };
+
+            var result = await serviceWithLimits.GetFilteredPostsAsync(filterDto);
+
+            Assert.True(result.IsFailure);
+        }
     }
 }

@@ -13,7 +13,7 @@
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_ENVIRONMENT": "Production",
         "ConnectionStrings__DefaultConnection": "User Id=postgres.fvqkxehdeaqdpiuefkvl;Password=cfhjbvgh345!!2rfvA;Server=aws-1-eu-west-1.pooler.supabase.com;Port=5432;Database=postgres"
       },
       "dotnetRunMessages": true,

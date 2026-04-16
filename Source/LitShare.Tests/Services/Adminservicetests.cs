@@ -6,6 +6,7 @@
     using LitShare.DAL.Models;
     using LitShare.DAL.Repositories.Interfaces;
     using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Options;
     using Moq;
     using Xunit;
 
@@ -15,6 +16,7 @@
         private readonly Mock<IPostRepository> postRepositoryMock;
         private readonly Mock<IUserRepository> userRepositoryMock;
         private readonly Mock<ILogger<AdminService>> loggerMock;
+        private readonly IOptions<AppSettings> options;
         private readonly AdminService adminService;
 
         public AdminServiceTests()
@@ -24,11 +26,19 @@
             this.userRepositoryMock = new Mock<IUserRepository>();
             this.loggerMock = new Mock<ILogger<AdminService>>();
 
+            var appSettings = new AppSettings
+            {
+                AdminStatsTopCitiesCount = 5,
+                AdminStatsTopGenresCount = 5
+            };
+            this.options = Options.Create(appSettings);
+
             this.adminService = new AdminService(
                 this.complaintRepositoryMock.Object,
                 this.postRepositoryMock.Object,
                 this.userRepositoryMock.Object,
-                this.loggerMock.Object);
+                this.loggerMock.Object,
+                this.options);
         }
 
         [Fact]

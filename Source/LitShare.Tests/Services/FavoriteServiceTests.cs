@@ -4,6 +4,8 @@
     using LitShare.DAL.Models;
     using LitShare.DAL.Repositories.Interfaces;
     using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Options; 
+    using LitShare.BLL.Common;
     using Moq;
     using Xunit;
 
@@ -11,6 +13,7 @@
     {
         private readonly Mock<IFavoriteRepository> favoriteRepositoryMock;
         private readonly Mock<ILogger<FavoriteService>> loggerMock;
+        private readonly IOptions<AppSettings> options;
         private readonly FavoriteService sut;
 
         public FavoriteServiceTests()
@@ -18,9 +21,20 @@
             this.favoriteRepositoryMock = new Mock<IFavoriteRepository>();
             this.loggerMock = new Mock<ILogger<FavoriteService>>();
 
+            this.favoriteRepositoryMock
+                .Setup(r => r.GetFavoritePostIdsAsync(It.IsAny<int>()))
+                .ReturnsAsync(new HashSet<int>());
+
+            var appSettings = new AppSettings
+            {
+                MaxFavoritesPerUser = 100
+            };
+            this.options = Options.Create(appSettings);
+
             this.sut = new FavoriteService(
                 this.favoriteRepositoryMock.Object,
-                this.loggerMock.Object);
+                this.loggerMock.Object,
+                this.options);
         }
 
         [Fact]
@@ -176,6 +190,64 @@
 
             await Assert.ThrowsAsync<InvalidOperationException>(
                 () => this.sut.GetFavoritePostIdsAsync(1));
+        }
+
+        [Fact]
+        public async Task AddToFavoritesAsync_WhenLimitReached_ReturnsFailure()
+        {
+            var customSettings = new AppSettings { MaxFavoritesPerUser = 2 };
+            var customOptions = Options.Create(customSettings);
+
+            var serviceWithLimit = new FavoriteService(
+                this.favoriteRepositoryMock.Object,
+                this.loggerMock.Object,
+                customOptions);
+
+            this.favoriteRepositoryMock
+                .Setup(r => r.ExistsAsync(1, 10))
+                .ReturnsAsync(false);
+
+            var existingIds = new HashSet<int> { 101, 102 };
+            this.favoriteRepositoryMock
+                .Setup(r => r.GetFavoritePostIdsAsync(1))
+                .ReturnsAsync(existingIds);
+
+            var result = await serviceWithLimit.AddToFavoritesAsync(1, 10);
+
+            Assert.True(result.IsFailure);
+            Assert.Contains("Ви досягли ліміту", result.Error);
+
+            this.favoriteRepositoryMock.Verify(
+                r => r.AddAsync(It.IsAny<Favorites>()),
+                Times.Never);
+        }
+
+        [Fact]
+        public async Task AddToFavoritesAsync_WhenUnderLimit_AllowsAdding()
+        {
+            var customSettings = new AppSettings { MaxFavoritesPerUser = 2 };
+            var customOptions = Options.Create(customSettings);
+
+            var serviceWithLimit = new FavoriteService(
+                this.favoriteRepositoryMock.Object,
+                this.loggerMock.Object,
+                customOptions);
+
+            this.favoriteRepositoryMock
+                .Setup(r => r.ExistsAsync(1, 10))
+                .ReturnsAsync(false);
+
+            this.favoriteRepositoryMock
+                .Setup(r => r.GetFavoritePostIdsAsync(1))
+                .ReturnsAsync(new HashSet<int>());
+
+            var result = await serviceWithLimit.AddToFavoritesAsync(1, 10);
+
+            Assert.True(result.IsSuccess);
+
+            this.favoriteRepositoryMock.Verify(
+                r => r.AddAsync(It.Is<Favorites>(f => f.UserId == 1 && f.PostId == 10)),
+                Times.Once);
         }
 
         private static IEnumerable<Favorites> SampleFavorites() => new List<Favorites>
