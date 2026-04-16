@@ -166,7 +166,7 @@
                 {
                     TotalUsers = users.Count(),
                     TotalPosts = posts.Count(),
-                    ActivePosts = posts.Count(),
+                    ActivePosts = posts.Count(p => p.IsActive),
                     TotalComplaints = complaints.Count(),
                     PendingComplaints = complaints.Count(),
                     TopCities = cityStats,

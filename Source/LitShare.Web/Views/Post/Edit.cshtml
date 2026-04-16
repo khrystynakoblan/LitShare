@@ -4,6 +4,7 @@
 }
 
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
 <style>
     .select2-container--default .select2-selection--multiple {
         border: 1px solid #dee2e6;
@@ -30,30 +31,38 @@
 
         <div class="row">
             <div class="col-md-4 text-center">
-                <div id="imagePreviewContainer" class="border mb-2 d-flex align-items-center justify-content-center"
+                <div id="imagePreviewContainer"
+                     class="border mb-2 d-flex align-items-center justify-content-center"
                      style="height: 350px; background-color: #f8f9fa; overflow: hidden; border-radius: 0.375rem;">
+
                     @if (!string.IsNullOrEmpty(Model.PhotoUrl))
                     {
                         <img id="imagePreview" src="@Model.PhotoUrl"
-                             style="width: 100%; height: 100%; object-fit: cover;" alt="Book cover" />
+                             style="width: 100%; height: 100%; object-fit: cover;" />
                     }
                     else
                     {
                         <img id="imagePreview" src="#"
-                             style="display: none; width: 100%; height: 100%; object-fit: cover;" alt="Book cover" />
+                             style="display: none; width: 100%; height: 100%; object-fit: cover;" />
+
                         <div id="placeholderContent" class="text-muted">
                             <i class="bi bi-image" style="font-size: 4rem;"></i>
                         </div>
                     }
                 </div>
+
                 <input type="file" asp-for="NewPhoto" id="imageInput" class="d-none" accept="image/*" />
-                <button type="button" class="btn btn-dark w-100 py-2" onclick="document.getElementById('imageInput').click();">
+
+                <button type="button" class="btn btn-dark w-100 py-2"
+                        onclick="document.getElementById('imageInput').click();">
                     Змінити фото
                 </button>
+
                 <span asp-validation-for="NewPhoto" class="text-danger"></span>
             </div>
 
             <div class="col-md-8">
+
                 <div class="mb-3 row">
                     <label asp-for="Title" class="col-sm-3 col-form-label">Назва книги:</label>
                     <div class="col-sm-9">
@@ -61,6 +70,7 @@
                         <span asp-validation-for="Title" class="text-danger"></span>
                     </div>
                 </div>
+
                 <div class="mb-3 row">
                     <label asp-for="Author" class="col-sm-3 col-form-label">Автор книги:</label>
                     <div class="col-sm-9">
@@ -68,48 +78,93 @@
                         <span asp-validation-for="Author" class="text-danger"></span>
                     </div>
                 </div>
+
                 <div class="mb-3 row">
                     <label asp-for="SelectedGenreIds" class="col-sm-3 col-form-label">Жанри:</label>
                     <div class="col-sm-9">
-                        <select asp-for="SelectedGenreIds" asp-items="Model.Genres" class="form-select js-select2" multiple="multiple">
+                        <select asp-for="SelectedGenreIds"
+                                asp-items="Model.Genres"
+                                class="form-select js-select2"
+                                multiple="multiple">
                         </select>
-                        <span asp-validation-for="SelectedGenreIds" class="text-danger"></span>
                     </div>
                 </div>
+
                 <div class="mb-3 row">
                     <label asp-for="DealType" class="col-sm-3 col-form-label">Тип угоди:</label>
                     <div class="col-sm-9">
-                        <select asp-for="DealType" asp-items="Model.DealTypes" class="form-select"></select>
+                        <select asp-for="DealType"
+                                asp-items="Model.DealTypes"
+                                class="form-select"></select>
                     </div>
                 </div>
+
             </div>
         </div>
 
         <div class="mt-4">
             <h4 class="text-center mb-3 fw-normal">Опис</h4>
+
             <textarea asp-for="Description" class="form-control mb-4" rows="8"></textarea>
+
             <span asp-validation-for="Description" class="text-danger"></span>
         </div>
 
         <div class="row gx-2 mb-3">
             <div class="col-6">
-                <button type="submit" class="btn btn-dark w-100 py-2 fw-bold">Зберегти</button>
+                <button type="submit" class="btn btn-dark w-100 py-2 fw-bold">
+                    Зберегти
+                </button>
             </div>
+
             <div class="col-6">
-                <button type="submit" class="btn btn-outline-dark w-100 py-2">Відхилити зміни</button>
+                <button type="submit" class="btn btn-outline-dark w-100 py-2">
+                    Відхилити зміни
+                </button>
             </div>
         </div>
     </form>
 
-    <form asp-controller="Profile" asp-action="DeletePostConfirmed" method="post"
-          onsubmit="return confirm('Точно хочеш видалити книгу? Це незворотно');">
+    <button type="button"
+            class="btn btn-danger w-100 py-2"
+            data-bs-toggle="modal"
+            data-bs-target="#deleteModal">
+        Видалити книгу
+    </button>
+</div>
 
-        <input type="hidden" name="postId" value="@Model.Id" />
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
 
-        <button type="submit" class="btn btn-outline-danger w-100 py-2">
-            Видалити книгу
-        </button>
-    </form>
+            <div class="modal-header">
+                <h5 class="modal-title">Видалення книги</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                Точно хочеш видалити книгу? Це незворотно 
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Скасувати
+                </button>
+
+                <form asp-controller="Profile"
+                      asp-action="DeletePostConfirmed"
+                      method="post">
+
+                    <input type="hidden" name="postId" value="@Model.Id" />
+
+                    <button type="submit" class="btn btn-danger">
+                        Видалити
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </div>
 </div>
 
 @section Scripts {
@@ -117,7 +172,7 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             $('.js-select2').select2({
                 closeOnSelect: false,
                 width: '100%',
@@ -130,14 +185,17 @@
             if (file) {
                 const preview = document.getElementById('imagePreview');
                 const placeholder = document.getElementById('placeholderContent');
+
                 preview.src = URL.createObjectURL(file);
                 preview.style.display = 'block';
+
                 if (placeholder) {
                     placeholder.style.display = 'none';
                 }
             }
         };
     </script>
+
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
