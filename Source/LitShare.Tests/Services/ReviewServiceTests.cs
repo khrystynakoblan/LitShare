@@ -309,5 +309,186 @@
                     It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
                 Times.AtLeastOnce);
         }
+
+        private static EditReviewDto ValidEditDto() => new EditReviewDto
+        {
+            ReviewId = 1,
+            Rating = 4,
+            Text = "Оновлений відгук",
+        };
+
+        private static Reviews SampleReview() => new Reviews
+        {
+            Id = 1,
+            Rating = 5,
+            Text = "Старий відгук",
+            ReviewerId = ReviewerId,
+            ReviewedUserId = ReviewedUserId,
+            Date = DateTime.UtcNow,
+        };
+
+
+        [Fact]
+        public async Task GetByIdAsync_ReviewExists_ReturnsSuccess()
+        {
+            var review = SampleReview();
+            this.reviewRepositoryMock.Setup(r => r.GetByIdAsync(review.Id)).ReturnsAsync(review);
+
+            var result = await this.sut.GetByIdAsync(review.Id);
+
+            Assert.True(result.IsSuccess);
+        }
+
+        [Fact]
+        public async Task GetByIdAsync_ReviewExists_MapsFieldsCorrectly()
+        {
+            var review = SampleReview();
+            this.reviewRepositoryMock.Setup(r => r.GetByIdAsync(review.Id)).ReturnsAsync(review);
+
+            var result = await this.sut.GetByIdAsync(review.Id);
+
+            Assert.Equal(review.Id, result.Value!.Id);
+            Assert.Equal(review.Rating, result.Value.Rating);
+            Assert.Equal(review.ReviewerId, result.Value.ReviewerId);
+            Assert.Equal(review.ReviewedUserId, result.Value.ReviewedUserId);
+        }
+
+        [Fact]
+        public async Task GetByIdAsync_ReviewNotFound_ReturnsFailure()
+        {
+            this.reviewRepositoryMock.Setup(r => r.GetByIdAsync(It.IsAny<int>())).ReturnsAsync((Reviews?)null);
+
+            var result = await this.sut.GetByIdAsync(999);
+
+            Assert.False(result.IsSuccess);
+            Assert.Equal("Відгук не знайдено.", result.Error);
+        }
+
+
+        [Fact]
+        public async Task EditReviewAsync_ValidData_ReturnsSuccess()
+        {
+            var review = SampleReview();
+            this.reviewRepositoryMock.Setup(r => r.GetByIdAsync(review.Id)).ReturnsAsync(review);
+
+            var result = await this.sut.EditReviewAsync(ValidEditDto(), ReviewerId);
+
+            Assert.True(result.IsSuccess);
+            Assert.True(result.Value);
+        }
+
+        [Fact]
+        public async Task EditReviewAsync_ReviewNotFound_ReturnsFailure()
+        {
+            this.reviewRepositoryMock.Setup(r => r.GetByIdAsync(It.IsAny<int>())).ReturnsAsync((Reviews?)null);
+
+            var result = await this.sut.EditReviewAsync(ValidEditDto(), ReviewerId);
+
+            Assert.False(result.IsSuccess);
+            Assert.Equal("Відгук не знайдено.", result.Error);
+        }
+
+        [Fact]
+        public async Task EditReviewAsync_WrongUser_ReturnsFailure()
+        {
+            var review = SampleReview();
+            this.reviewRepositoryMock.Setup(r => r.GetByIdAsync(review.Id)).ReturnsAsync(review);
+
+            var result = await this.sut.EditReviewAsync(ValidEditDto(), 999);
+
+            Assert.False(result.IsSuccess);
+            Assert.Equal("Ви не можете редагувати чужий відгук.", result.Error);
+        }
+
+        [Fact]
+        public async Task EditReviewAsync_WrongUser_DoesNotCallUpdate()
+        {
+            var review = SampleReview();
+            this.reviewRepositoryMock.Setup(r => r.GetByIdAsync(review.Id)).ReturnsAsync(review);
+
+            await this.sut.EditReviewAsync(ValidEditDto(), 999);
+
+            this.reviewRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<Reviews>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task EditReviewAsync_ValidData_UpdatesRating()
+        {
+            var review = SampleReview();
+            this.reviewRepositoryMock.Setup(r => r.GetByIdAsync(review.Id)).ReturnsAsync(review);
+            var dto = ValidEditDto();
+            dto.Rating = 3;
+
+            await this.sut.EditReviewAsync(dto, ReviewerId);
+
+            Assert.Equal(3, review.Rating);
+        }
+
+        [Fact]
+        public async Task EditReviewAsync_ValidData_UpdatesText()
+        {
+            var review = SampleReview();
+            this.reviewRepositoryMock.Setup(r => r.GetByIdAsync(review.Id)).ReturnsAsync(review);
+            var dto = ValidEditDto();
+            dto.Text = "Оновлений коментар";
+
+            await this.sut.EditReviewAsync(dto, ReviewerId);
+
+            Assert.Equal("Оновлений коментар", review.Text);
+        }
+
+        [Fact]
+        public async Task EditReviewAsync_ValidData_CallsUpdateAsyncOnce()
+        {
+            var review = SampleReview();
+            this.reviewRepositoryMock.Setup(r => r.GetByIdAsync(review.Id)).ReturnsAsync(review);
+
+            await this.sut.EditReviewAsync(ValidEditDto(), ReviewerId);
+
+            this.reviewRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<Reviews>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task EditReviewAsync_ValidData_CallsSaveChangesAsyncOnce()
+        {
+            var review = SampleReview();
+            this.reviewRepositoryMock.Setup(r => r.GetByIdAsync(review.Id)).ReturnsAsync(review);
+
+            await this.sut.EditReviewAsync(ValidEditDto(), ReviewerId);
+
+            this.reviewRepositoryMock.Verify(r => r.SaveChangesAsync(), Times.Once);
+        }
+
+        [Fact]
+        public async Task EditReviewAsync_ValidData_LogsStartMessage()
+        {
+            var review = SampleReview();
+            this.reviewRepositoryMock.Setup(r => r.GetByIdAsync(review.Id)).ReturnsAsync(review);
+
+            await this.sut.EditReviewAsync(ValidEditDto(), ReviewerId);
+
+            this.VerifyLog(LogLevel.Information, $"User {ReviewerId} editing review {review.Id}");
+        }
+
+        [Fact]
+        public async Task EditReviewAsync_ValidData_LogsSuccessMessage()
+        {
+            var review = SampleReview();
+            this.reviewRepositoryMock.Setup(r => r.GetByIdAsync(review.Id)).ReturnsAsync(review);
+
+            await this.sut.EditReviewAsync(ValidEditDto(), ReviewerId);
+
+            this.VerifyLog(LogLevel.Information, $"Review {review.Id} successfully edited by user {ReviewerId}");
+        }
+
+        [Fact]
+        public async Task EditReviewAsync_RepositoryFails_PropagatesException()
+        {
+            var review = SampleReview();
+            this.reviewRepositoryMock.Setup(r => r.GetByIdAsync(review.Id)).ReturnsAsync(review);
+            this.reviewRepositoryMock.Setup(r => r.UpdateAsync(It.IsAny<Reviews>())).ThrowsAsync(new InvalidOperationException("DB error"));
+
+            await Assert.ThrowsAsync<InvalidOperationException>(() => this.sut.EditReviewAsync(ValidEditDto(), ReviewerId));
+        }
     }
 }

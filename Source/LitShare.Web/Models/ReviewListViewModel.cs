@@ -16,5 +16,7 @@
         public bool CanLeaveReview { get; set; }
 
         public IEnumerable<ReviewDto> Reviews { get; set; } = new List<ReviewDto>();
+
+        public ReviewDto? CurrentUserReview { get; set; }
     }
 }

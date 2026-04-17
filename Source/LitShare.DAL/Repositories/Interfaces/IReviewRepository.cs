@@ -13,5 +13,9 @@
         Task<IEnumerable<Reviews>> GetByReviewedUserIdAsync(int reviewedUserId);
 
         Task<bool> ExistsAsync(int reviewerId, int reviewedUserId);
+
+        Task<Reviews?> GetByIdAsync(int id);
+
+        Task UpdateAsync(Reviews review);
     }
 }

@@ -1,0 +1,67 @@
+﻿@model LitShare.Web.Models.EditReviewViewModel
+@{
+    ViewData["Title"] = "Редагувати відгук";
+}
+
+<div class="container mt-5 d-flex justify-content-center">
+    <div class="border rounded p-5" style="width: 520px;">
+        <h4 class="fw-bold text-center mb-4">Редагувати відгук</h4>
+
+        <form asp-action="Edit" method="post">
+            <input type="hidden" asp-for="ReviewId" />
+            <input type="hidden" asp-for="ReviewedUserId" />
+
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <p class="fw-bold mb-2">Оцінка:</p>
+            <div class="d-flex gap-2 mb-4" id="star-rating">
+                @for (int i = 1; i <= 5; i++)
+                {
+                    <i class="bi @(i <= Model.Rating ? "bi-star-fill" : "bi-star") fs-2 text-warning star-btn" style="cursor:pointer;" data-value="@i"></i>
+                }
+            </div>
+            <input type="hidden" asp-for="Rating" id="ratingInput" />
+            <span asp-validation-for="Rating" class="text-danger"></span>
+
+            <div class="mb-4 mt-3">
+                <label class="fw-bold mb-2">Коментар (необов'язково):</label>
+                <textarea asp-for="Text" class="form-control" rows="5" placeholder="Ваш коментар..."></textarea>
+                <span asp-validation-for="Text" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-dark w-100 py-2">Зберегти зміни</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    const stars = document.querySelectorAll('.star-btn');
+    const ratingInput = document.getElementById('ratingInput');
+
+    stars.forEach(star => {
+        star.addEventListener('click', () => {
+            const value = parseInt(star.getAttribute('data-value'));
+            ratingInput.value = value;
+            stars.forEach((s, i) => {
+                s.classList.toggle('bi-star-fill', i < value);
+                s.classList.toggle('bi-star', i >= value);
+            });
+        });
+
+        star.addEventListener('mouseover', () => {
+            const value = parseInt(star.getAttribute('data-value'));
+            stars.forEach((s, i) => {
+                s.classList.toggle('bi-star-fill', i < value);
+                s.classList.toggle('bi-star', i >= value);
+            });
+        });
+
+        star.addEventListener('mouseout', () => {
+            const current = parseInt(ratingInput.value) || 0;
+            stars.forEach((s, i) => {
+                s.classList.toggle('bi-star-fill', i < current);
+                s.classList.toggle('bi-star', i >= current);
+            });
+        });
+    });
+</script>

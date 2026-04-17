@@ -12,5 +12,9 @@
         Task<Result<IEnumerable<ReviewDto>>> GetReviewsByUserIdAsync(int reviewedUserId);
 
         Task<Result<bool>> HasReviewedAsync(int reviewerId, int reviewedUserId);
+
+        Task<Result<ReviewDto>> GetByIdAsync(int reviewId);
+
+        Task<Result<bool>> EditReviewAsync(EditReviewDto dto, int reviewerId);
     }
 }

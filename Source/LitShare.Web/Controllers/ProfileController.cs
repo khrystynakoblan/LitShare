@@ -50,6 +50,7 @@ namespace LitShare.Web.Controllers
 
             var model = new ProfileViewModel
             {
+                UserId = userId,
                 Name = user.Name,
                 Email = user.Email,
                 Phone = user.Phone ?? string.Empty,

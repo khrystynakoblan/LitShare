@@ -14,6 +14,8 @@
 
         public int ReviewerId { get; set; }
 
+        public int ReviewedUserId { get; set; }
+
         public string ReviewerName { get; set; } = string.Empty;
 
         public string? ReviewerPhotoUrl { get; set; }

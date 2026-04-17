@@ -44,13 +44,18 @@
             var reviewList = reviews.ToList();
 
             bool canLeaveReview = false;
+            ReviewDto? currentUserReview = null;
 
             if (this.User.Identity != null && this.User.Identity.IsAuthenticated)
             {
                 int currentUserId = int.Parse(this.User.FindFirstValue(ClaimTypes.NameIdentifier) !);
-                var hasReviewed = await this.reviewService.HasReviewedAsync(currentUserId, userId);
-                canLeaveReview = !hasReviewed.Value && currentUserId != userId;
+                currentUserReview = reviewList.FirstOrDefault(r => r.ReviewerId == currentUserId);
+                canLeaveReview = currentUserReview == null && currentUserId != userId;
             }
+
+            var otherReviews = currentUserReview != null
+                ? reviewList.Where(r => r.Id != currentUserReview.Id)
+                : reviewList;
 
             var model = new ReviewListViewModel
             {
@@ -59,7 +64,8 @@
                 AverageRating = reviewList.Any() ? reviewList.Average(r => r.Rating) : 0,
                 TotalReviews = reviewList.Count,
                 CanLeaveReview = canLeaveReview,
-                Reviews = reviewList,
+                CurrentUserReview = currentUserReview,
+                Reviews = otherReviews,
             };
 
             return this.View(model);
@@ -116,6 +122,67 @@
             };
 
             var result = await this.reviewService.CreateReviewAsync(dto, currentUserId);
+
+            if (result.IsFailure)
+            {
+                this.ModelState.AddModelError(string.Empty, result.Error);
+                return this.View(model);
+            }
+
+            return this.RedirectToAction("Index", new { userId = model.ReviewedUserId, success = true });
+        }
+
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> Edit(int reviewId)
+        {
+            this.logger.LogInformation("Navigating to edit review page. ReviewId: {ReviewId}", reviewId);
+
+            var result = await this.reviewService.GetByIdAsync(reviewId);
+
+            if (result.IsFailure)
+            {
+                return this.NotFound();
+            }
+
+            int currentUserId = int.Parse(this.User.FindFirstValue(ClaimTypes.NameIdentifier) !);
+
+            if (result.Value!.ReviewerId != currentUserId)
+            {
+                return this.Forbid();
+            }
+
+            var model = new EditReviewViewModel
+            {
+                ReviewId = reviewId,
+                ReviewedUserId = result.Value.ReviewedUserId,
+                Rating = result.Value.Rating,
+                Text = result.Value.Text,
+            };
+
+            return this.View(model);
+        }
+
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(EditReviewViewModel model)
+        {
+            if (!this.ModelState.IsValid)
+            {
+                return this.View(model);
+            }
+
+            int currentUserId = int.Parse(this.User.FindFirstValue(ClaimTypes.NameIdentifier) !);
+
+            var dto = new EditReviewDto
+            {
+                ReviewId = model.ReviewId,
+                Rating = model.Rating,
+                Text = model.Text,
+            };
+
+            var result = await this.reviewService.EditReviewAsync(dto, currentUserId);
 
             if (result.IsFailure)
             {

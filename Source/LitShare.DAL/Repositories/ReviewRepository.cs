@@ -41,5 +41,16 @@
             return await this.context.Reviews
                 .AnyAsync(r => r.ReviewerId == reviewerId && r.ReviewedUserId == reviewedUserId);
         }
+
+        public async Task<Reviews?> GetByIdAsync(int id)
+        {
+            return await this.context.Reviews.FirstOrDefaultAsync(r => r.Id == id);
+        }
+
+        public Task UpdateAsync(Reviews review)
+        {
+            this.context.Reviews.Update(review);
+            return Task.CompletedTask;
+        }
     }
 }

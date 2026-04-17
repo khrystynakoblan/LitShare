@@ -63,6 +63,7 @@
                 Rating = r.Rating,
                 Date = r.Date,
                 ReviewerId = r.ReviewerId,
+                ReviewedUserId = r.ReviewedUserId,
                 ReviewerName = r.Reviewer?.Name ?? "Користувач",
                 ReviewerPhotoUrl = r.Reviewer?.PhotoUrl,
             });
@@ -74,6 +75,53 @@
         {
             var exists = await this.reviewRepository.ExistsAsync(reviewerId, reviewedUserId);
             return Result<bool>.Success(exists);
+        }
+
+        public async Task<Result<ReviewDto>> GetByIdAsync(int reviewId)
+        {
+            var review = await this.reviewRepository.GetByIdAsync(reviewId);
+
+            if (review == null)
+            {
+                return Result<ReviewDto>.Failure("Відгук не знайдено.");
+            }
+
+            return Result<ReviewDto>.Success(new ReviewDto
+            {
+                Id = review.Id,
+                Text = review.Text,
+                Rating = review.Rating,
+                Date = review.Date,
+                ReviewerId = review.ReviewerId,
+                ReviewedUserId = review.ReviewedUserId,
+            });
+        }
+
+        public async Task<Result<bool>> EditReviewAsync(EditReviewDto dto, int reviewerId)
+        {
+            this.logger.LogInformation("User {ReviewerId} editing review {ReviewId}", reviewerId, dto.ReviewId);
+
+            var review = await this.reviewRepository.GetByIdAsync(dto.ReviewId);
+
+            if (review == null)
+            {
+                return Result<bool>.Failure("Відгук не знайдено.");
+            }
+
+            if (review.ReviewerId != reviewerId)
+            {
+                return Result<bool>.Failure("Ви не можете редагувати чужий відгук.");
+            }
+
+            review.Rating = dto.Rating;
+            review.Text = dto.Text;
+
+            await this.reviewRepository.UpdateAsync(review);
+            await this.reviewRepository.SaveChangesAsync();
+
+            this.logger.LogInformation("Review {ReviewId} successfully edited by user {ReviewerId}", dto.ReviewId, reviewerId);
+
+            return Result<bool>.Success(true);
         }
     }
 }
