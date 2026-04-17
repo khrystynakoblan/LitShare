@@ -13,7 +13,6 @@
             <h5 class="card-title">Текст скарги:</h5>
             <p class="card-text">@Model.Complaint.Text</p>
             <p class="text-muted small">
-                @* ВИПРАВЛЕНО ТУТ: Додано .Complaint перед ComplainantName *@
                 Від: <strong>@Model.Complaint.ComplainantName</strong> | Дата: @Model.Complaint.Date.ToString("dd.MM.yyyy HH:mm")
             </p>
         </div>

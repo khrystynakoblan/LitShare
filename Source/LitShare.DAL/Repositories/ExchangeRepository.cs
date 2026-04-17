@@ -1,7 +1,7 @@
 ﻿using LitShare.DAL.Context;
 using LitShare.DAL.Models;
 using LitShare.DAL.Repositories.Interfaces;
-using Microsoft.EntityFrameworkCore; // ЦЕЙ РЯДОК ОБОВ'ЯЗКОВИЙ ДЛЯ AnyAsync
+using Microsoft.EntityFrameworkCore;
 
 namespace LitShare.DAL.Repositories
 {
