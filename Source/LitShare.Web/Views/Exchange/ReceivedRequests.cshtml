@@ -1,0 +1,87 @@
+@model List<LitShare.BLL.DTOs.ReceivedRequestDto>
+
+@{
+    ViewData["Title"] = "Отримані запити";
+}
+
+<h2 class="mb-4">Отримані запити</h2>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        У вас поки немає отриманих запитів 
+    </div>
+}
+else
+{
+    <table class="table table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Книга</th>
+                <th>Від кого</th>
+                <th>Статус</th>
+                <th class="text-end">Дії</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var request in Model)
+            {
+                <tr>
+                    <td>
+                        <strong>@request.PostTitle</strong>
+                    </td>
+
+                    <td>
+                        @request.SenderName
+                    </td>
+
+                    <td>
+                        @if (request.Status == "Очікує")
+                        {
+                            <span class="badge bg-warning text-dark">Очікує</span>
+                        }
+                        else if (request.Status == "Прийнято")
+                        {
+                            <span class="badge bg-success">Прийнято</span>
+                        }
+                        else if (request.Status == "Відхилено")
+                        {
+                            <span class="badge bg-danger">Відхилено</span>
+                        }
+                    </td>
+
+                    <td class="text-end">
+                        <div class="d-flex justify-content-end gap-2">
+
+                            <a asp-controller="Post"
+                               asp-action="Details"
+                               asp-route-id="@request.PostId"
+                               class="btn btn-sm btn-outline-secondary">
+                                Деталі
+                            </a>
+
+                            <a asp-controller="Profile"
+                               asp-action="GuestProfile"
+                               asp-route-id="@request.SenderId"
+                               class="btn btn-sm btn-outline-info">
+                                Профіль
+                            </a>
+
+                            @if (request.Status == "Очікує")
+                            {
+                                <button class="btn btn-sm btn-success" disabled>
+                                    Прийняти
+                                </button>
+
+                                <button class="btn btn-sm btn-danger" disabled>
+                                    Відхилити
+                                </button>
+                            }
+
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

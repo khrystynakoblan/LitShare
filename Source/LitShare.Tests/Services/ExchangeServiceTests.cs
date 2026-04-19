@@ -96,7 +96,7 @@ namespace LitShare.Tests.BLL.Services
             Assert.Single(result);
             Assert.Equal("Кобзар", result[0].BookTitle);
             Assert.Equal(100, result[0].PostId);
-            Assert.Equal("Pending", result[0].Status);
+            Assert.Equal("Очікує", result[0].Status);
         }
 
         [Fact]
@@ -130,6 +130,156 @@ namespace LitShare.Tests.BLL.Services
 
             Assert.Equal("Без назви", result[0].BookTitle);
             Assert.Equal("Невідомий автор", result[0].BookAuthor);
+        }
+
+                [Fact]
+        public async Task GetReceivedRequestsAsync_ReturnsSuccess_WhenRequestsExist()
+        {
+            var requests = new List<ExchangeRequest>
+            {
+                new ExchangeRequest
+                {
+                    Id = 1,
+                    SenderId = 10,
+                    PostId = 5,
+                    Status = RequestStatus.Pending,
+                    Sender = new Users { Name = "User1" },
+                    Post = new Posts { Title = "Book1" }
+                }
+            };
+
+            _exchangeRepoMock
+                .Setup(r => r.GetReceivedRequestsAsync(1))
+                .ReturnsAsync(requests);
+
+            var result = await _service.GetReceivedRequestsAsync(1);
+
+            Assert.True(result.IsSuccess);
+            Assert.NotNull(result.Value);
+            Assert.Single(result.Value!);
+        }
+
+        [Fact]
+        public async Task GetReceivedRequestsAsync_ReturnsFailure_WhenNoRequests()
+        {
+            _exchangeRepoMock
+                .Setup(r => r.GetReceivedRequestsAsync(It.IsAny<int>()))
+                .ReturnsAsync(new List<ExchangeRequest>());
+
+            var result = await _service.GetReceivedRequestsAsync(1);
+
+            Assert.False(result.IsSuccess);
+            Assert.Equal("Запитів не знайдено", result.Error);
+        }
+
+        [Fact]
+        public async Task GetReceivedRequestsAsync_MapsStatus_Pending()
+        {
+            var requests = new List<ExchangeRequest>
+            {
+                new ExchangeRequest
+                {
+                    Status = RequestStatus.Pending,
+                    Sender = new Users(),
+                    Post = new Posts()
+                }
+            };
+
+            _exchangeRepoMock
+                .Setup(r => r.GetReceivedRequestsAsync(1))
+                .ReturnsAsync(requests);
+
+            var result = await _service.GetReceivedRequestsAsync(1);
+
+            Assert.Equal("Очікує", result.Value![0].Status);
+        }
+
+        [Fact]
+        public async Task GetReceivedRequestsAsync_MapsStatus_Accepted()
+        {
+            var requests = new List<ExchangeRequest>
+            {
+                new ExchangeRequest
+                {
+                    Status = RequestStatus.Accepted,
+                    Sender = new Users(),
+                    Post = new Posts()
+                }
+            };
+
+            _exchangeRepoMock
+                .Setup(r => r.GetReceivedRequestsAsync(1))
+                .ReturnsAsync(requests);
+
+            var result = await _service.GetReceivedRequestsAsync(1);
+
+            Assert.Equal("Прийнято", result.Value![0].Status);
+        }
+
+        [Fact]
+        public async Task GetReceivedRequestsAsync_MapsStatus_Rejected()
+        {
+            var requests = new List<ExchangeRequest>
+            {
+                new ExchangeRequest
+                {
+                    Status = RequestStatus.Rejected,
+                    Sender = new Users(),
+                    Post = new Posts()
+                }
+            };
+
+            _exchangeRepoMock
+                .Setup(r => r.GetReceivedRequestsAsync(1))
+                .ReturnsAsync(requests);
+
+            var result = await _service.GetReceivedRequestsAsync(1);
+
+            Assert.Equal("Відхилено", result.Value![0].Status);
+        }
+
+        [Fact]
+        public async Task GetReceivedRequestsAsync_UsesFallback_WhenNull()
+        {
+            var requests = new List<ExchangeRequest>
+            {
+                new ExchangeRequest
+                {
+                    Status = RequestStatus.Pending,
+                    Sender = null!,
+                    Post = null!
+                }
+            };
+
+            _exchangeRepoMock
+                .Setup(r => r.GetReceivedRequestsAsync(1))
+                .ReturnsAsync(requests);
+
+            var result = await _service.GetReceivedRequestsAsync(1);
+
+            var dto = result.Value![0];
+
+            Assert.Equal("Невідомий користувач", dto.SenderName);
+            Assert.Equal("Без назви", dto.PostTitle);
+        }
+
+        [Fact]
+        public async Task GetReceivedRequestsAsync_ReturnsCorrectCount()
+        {
+            var requests = new List<ExchangeRequest>
+            {
+                new ExchangeRequest(),
+                new ExchangeRequest(),
+                new ExchangeRequest()
+            };
+
+            _exchangeRepoMock
+                .Setup(r => r.GetReceivedRequestsAsync(1))
+                .ReturnsAsync(requests);
+
+            var result = await _service.GetReceivedRequestsAsync(1);
+
+            Assert.Equal(3, result.Value!.Count);
         }
     }
 }

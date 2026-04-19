@@ -8,5 +8,7 @@ namespace LitShare.BLL.Services.Interfaces
         Task<Result<bool>> CreateRequestAsync(int postId, int senderId);
 
         Task<IEnumerable<SentRequestDto>> GetSentRequestsAsync(int senderId);
+
+        Task<Result<List<ReceivedRequestDto>>> GetReceivedRequestsAsync(int userId);
     }
 }

@@ -69,9 +69,36 @@ namespace LitShare.BLL.Services
                 PostId = r.PostId,
                 BookTitle = r.Post.Title ?? "Без назви",
                 BookAuthor = r.Post.Author ?? "Невідомий автор",
-                Status = r.Status.ToString(),
+                Status = r.Status.ToDisplay(),
                 CreatedAt = r.CreatedAt
             });
+        }
+
+        public async Task<Result<List<ReceivedRequestDto>>> GetReceivedRequestsAsync(int userId)
+        {
+            this.logger.LogInformation("Fetching received exchange requests for UserId: {UserId}", userId);
+
+            var requests = await this.exchangeRepository.GetReceivedRequestsAsync(userId);
+
+            if (!requests.Any())
+            {
+                this.logger.LogWarning("No received requests found for UserId: {UserId}", userId);
+                return Result<List<ReceivedRequestDto>>.Failure("Запитів не знайдено");
+            }
+
+            var result = requests.Select(r => new ReceivedRequestDto
+            {
+                Id = r.Id,
+                SenderId = r.SenderId,
+                SenderName = r.Sender?.Name ?? "Невідомий користувач",
+                PostId = r.PostId,
+                PostTitle = r.Post?.Title ?? "Без назви",
+                Status = r.Status.ToDisplay()
+            }).ToList();
+
+            this.logger.LogInformation("Successfully fetched {Count} received requests for UserId: {UserId}", result.Count, userId);
+
+            return result;
         }
     }
 }

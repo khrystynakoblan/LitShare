@@ -38,5 +38,15 @@ namespace LitShare.DAL.Repositories
                 .OrderByDescending(r => r.CreatedAt)
                 .ToListAsync();
         }
+
+        public async Task<List<ExchangeRequest>> GetReceivedRequestsAsync(int userId)
+        {
+            return await this.context.ExchangeRequests
+                .Include(r => r.Post)
+                .Include(r => r.Sender)
+                .Where(r => r.Post.UserId == userId)
+                .OrderByDescending(r => r.CreatedAt)
+                .ToListAsync();
+        }
     }
 }
