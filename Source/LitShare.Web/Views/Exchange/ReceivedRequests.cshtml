@@ -83,13 +83,21 @@ else
 
                             @if (request.Status == "Очікує")
                             {
-                                <button class="btn btn-sm btn-success" disabled>
-                                    Прийняти
-                                </button>
+                                <div class="d-flex gap-1">
+                                    <form asp-action="AcceptRequest" method="post">
+                                        <input type="hidden" name="requestId" value="@request.Id" />
+                                        <button type="submit" class="btn btn-sm btn-success">
+                                            Прийняти
+                                        </button>
+                                    </form>
 
-                                <button class="btn btn-sm btn-danger" disabled>
-                                    Відхилити
-                                </button>
+                                    <form asp-action="RejectRequest" method="post">
+                                        <input type="hidden" name="requestId" value="@request.Id" />
+                                        <button type="submit" class="btn btn-sm btn-danger">
+                                            Відхилити
+                                        </button>
+                                    </form>
+                                </div>
                             }
 
                         </div>

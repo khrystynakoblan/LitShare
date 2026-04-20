@@ -1,4 +1,6 @@
-﻿using LitShare.BLL.Services.Interfaces;
+﻿using System.Security.Claims;
+using LitShare.BLL.Services.Interfaces;
+using LitShare.DAL.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -85,6 +87,44 @@ namespace LitShare.Web.Controllers
             this.logger.LogInformation("Successfully retrieved received requests for UserId: {UserId}", userId);
 
             return this.View(result.Value);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AcceptRequest(int requestId)
+        {
+            var currentUserId = this.GetCurrentUserId();
+
+            var result = await this.exchangeService.UpdateRequestStatusAsync(requestId, currentUserId, RequestStatus.Accepted);
+
+            if (result.IsSuccess)
+            {
+                TempData["SuccessMessage"] = "Запит успішно прийнято!";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = result.Error;
+            }
+
+            return RedirectToAction("ReceivedRequests");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RejectRequest(int requestId)
+        {
+            var currentUserId = this.GetCurrentUserId();
+
+            var result = await this.exchangeService.UpdateRequestStatusAsync(requestId, currentUserId, RequestStatus.Rejected);
+
+            if (result.IsSuccess)
+            {
+                TempData["SuccessMessage"] = "Запит відхилено.";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = result.Error;
+            }
+
+            return RedirectToAction("ReceivedRequests");
         }
     }
 }
