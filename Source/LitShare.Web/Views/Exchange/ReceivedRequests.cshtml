@@ -8,8 +8,22 @@
 
 @if (!Model.Any())
 {
-    <div class="alert alert-info">
-        У вас поки немає отриманих запитів 
+    <div class="text-center mt-5">
+        <div style="font-size: 60px;"></div>
+
+        <h4 class="text-muted mt-3">
+            У вас поки немає отриманих запитів
+        </h4>
+
+        <p class="text-secondary">
+            Коли хтось надішле вам запит — він з’явиться тут 
+        </p>
+
+        <a asp-controller="Home"
+           asp-action="Index"
+           class="btn btn-outline-primary mt-3">
+            Перейти до оголошень
+        </a>
     </div>
 }
 else

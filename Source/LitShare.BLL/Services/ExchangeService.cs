@@ -80,12 +80,6 @@ namespace LitShare.BLL.Services
 
             var requests = await this.exchangeRepository.GetReceivedRequestsAsync(userId);
 
-            if (!requests.Any())
-            {
-                this.logger.LogWarning("No received requests found for UserId: {UserId}", userId);
-                return Result<List<ReceivedRequestDto>>.Failure("Запитів не знайдено");
-            }
-
             var result = requests.Select(r => new ReceivedRequestDto
             {
                 Id = r.Id,
