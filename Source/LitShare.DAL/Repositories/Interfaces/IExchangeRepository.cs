@@ -13,5 +13,7 @@ namespace LitShare.DAL.Repositories.Interfaces
         Task<IEnumerable<ExchangeRequest>> GetBySenderIdAsync(int senderId);
 
         Task<List<ExchangeRequest>> GetReceivedRequestsAsync(int userId);
+
+        Task<ExchangeRequest?> GetByIdAsync(int id);
     }
 }

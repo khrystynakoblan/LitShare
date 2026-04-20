@@ -94,5 +94,35 @@ namespace LitShare.BLL.Services
 
             return result;
         }
+
+        public async Task<Result<bool>> UpdateRequestStatusAsync(int requestId, int ownerId, RequestStatus newStatus)
+        {
+            this.logger.LogInformation("Attempting to update request {RequestId} to status {Status} by User {OwnerId}", requestId, newStatus, ownerId);
+
+            var request = await this.exchangeRepository.GetByIdAsync(requestId);
+
+            if (request == null)
+            {
+                this.logger.LogWarning("Update status failed: Request {RequestId} not found.", requestId);
+                return Result<bool>.Failure("Запит не знайдено.");
+            }
+
+            if (request.Post.UserId != ownerId)
+            {
+                this.logger.LogWarning("User {OwnerId} tried to modify request {RequestId} they don't own.", ownerId, requestId);
+                return Result<bool>.Failure("Ви не маєте прав для цієї дії.");
+            }
+
+            if (request.Status != RequestStatus.Pending)
+            {
+                return Result<bool>.Failure("Цей запит вже був опрацьований.");
+            }
+
+            request.Status = newStatus;
+            await this.exchangeRepository.SaveChangesAsync();
+
+            this.logger.LogInformation("Request {RequestId} successfully updated to {Status}", requestId, newStatus);
+            return true;
+        }
     }
 }

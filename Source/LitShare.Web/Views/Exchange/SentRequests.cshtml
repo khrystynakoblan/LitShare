@@ -38,9 +38,9 @@
                                 @{
                                     var badgeClass = request.Status switch
                                     {
-                                        "Pending" => "bg-warning text-dark",
-                                        "Accepted" => "bg-success",
-                                        "Rejected" => "bg-danger",
+                                        "Pending" or "Очікує" => "bg-warning text-dark",
+                                        "Accepted" or "Прийнято" => "bg-success",
+                                        "Rejected" or "Відхилено" => "bg-danger",
                                         _ => "bg-secondary"
                                     };
                                     var statusUkf = request.Status switch

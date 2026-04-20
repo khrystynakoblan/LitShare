@@ -160,7 +160,7 @@ namespace LitShare.Tests.BLL.Services
         }
 
         [Fact]
-        public async Task GetReceivedRequestsAsync_ReturnsFailure_WhenNoRequests()
+        public async Task GetReceivedRequestsAsync_ShouldReturnSuccessWithEmptyList_WhenNoRequestsFound()
         {
             _exchangeRepoMock
                 .Setup(r => r.GetReceivedRequestsAsync(It.IsAny<int>()))
@@ -168,8 +168,9 @@ namespace LitShare.Tests.BLL.Services
 
             var result = await _service.GetReceivedRequestsAsync(1);
 
-            Assert.False(result.IsSuccess);
-            Assert.Equal("Запитів не знайдено", result.Error);
+            Assert.True(result.IsSuccess);
+            Assert.NotNull(result.Value);
+            Assert.Empty(result.Value!);
         }
 
         [Fact]
@@ -280,6 +281,67 @@ namespace LitShare.Tests.BLL.Services
             var result = await _service.GetReceivedRequestsAsync(1);
 
             Assert.Equal(3, result.Value!.Count);
+        }
+
+        [Fact]
+        public async Task UpdateRequestStatusAsync_ShouldReturnFailure_WhenRequestNotFound()
+        {
+            _exchangeRepoMock.Setup(r => r.GetByIdAsync(It.IsAny<int>()))
+                             .ReturnsAsync((ExchangeRequest)null!);
+
+            var result = await _service.UpdateRequestStatusAsync(1, 10, RequestStatus.Accepted);
+
+            Assert.False(result.IsSuccess);
+            Assert.Equal("Запит не знайдено.", result.Error);
+        }
+
+        [Fact]
+        public async Task UpdateRequestStatusAsync_ShouldReturnFailure_WhenUserIsNotOwner()
+        {
+            var request = new ExchangeRequest
+            {
+                Post = new Posts { UserId = 99 }
+            };
+            _exchangeRepoMock.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(request);
+
+            var result = await _service.UpdateRequestStatusAsync(1, 10, RequestStatus.Accepted);
+
+            Assert.False(result.IsSuccess);
+            Assert.Equal("Ви не маєте прав для цієї дії.", result.Error);
+        }
+
+        [Fact]
+        public async Task UpdateRequestStatusAsync_ShouldReturnFailure_WhenStatusIsNotPending()
+        {
+            var request = new ExchangeRequest
+            {
+                Post = new Posts { UserId = 10 },
+                Status = RequestStatus.Accepted
+            };
+            _exchangeRepoMock.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(request);
+
+            var result = await _service.UpdateRequestStatusAsync(1, 10, RequestStatus.Rejected);
+
+            Assert.False(result.IsSuccess);
+            Assert.Equal("Цей запит вже був опрацьований.", result.Error);
+        }
+
+        [Fact]
+        public async Task UpdateRequestStatusAsync_ShouldReturnSuccess_AndChangeStatus()
+        {
+            var request = new ExchangeRequest
+            {
+                Id = 1,
+                Post = new Posts { UserId = 10 },
+                Status = RequestStatus.Pending
+            };
+            _exchangeRepoMock.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(request);
+
+            var result = await _service.UpdateRequestStatusAsync(1, 10, RequestStatus.Accepted);
+
+            Assert.True(result.IsSuccess);
+            Assert.Equal(RequestStatus.Accepted, request.Status);
+            _exchangeRepoMock.Verify(r => r.SaveChangesAsync(), Times.Once);
         }
     }
 }
