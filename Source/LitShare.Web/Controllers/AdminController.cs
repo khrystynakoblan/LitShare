@@ -8,15 +8,17 @@ namespace LitShare.Web.Controllers
     using Microsoft.Extensions.Logging;
 
     [Authorize(Roles = "Admin")]
-    public class AdminController : Controller
+    public class AdminController : BaseController
     {
         private readonly IAdminService adminService;
+        private readonly IProfileService profileService;
         private readonly ILogger<AdminController> logger;
 
-        public AdminController(IAdminService adminService, ILogger<AdminController> logger)
+        public AdminController(IAdminService adminService, ILogger<AdminController> logger, IProfileService profileService)
         {
             this.adminService = adminService;
             this.logger = logger;
+            this.profileService = profileService;
         }
 
         [HttpGet]
@@ -109,6 +111,34 @@ namespace LitShare.Web.Controllers
             var model = new AdminStatsViewModel
             {
                 Stats = result.Value!
+            };
+
+            return this.View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> MyProfile()
+        {
+            var userId = this.GetCurrentUserId();
+            this.logger.LogInformation("Admin opening their profile. UserId: {UserId}", userId);
+
+            var result = await this.profileService.GetUserByIdAsync(userId);
+
+            if (result.IsFailure)
+            {
+                return this.HandleFailure(result.Error);
+            }
+
+            var user = result.Value!;
+
+            var model = new ProfileViewModel
+            {
+                UserId = userId,
+                Name = user.Name,
+                Email = user.Email,
+                Phone = user.Phone ?? string.Empty,
+                PhotoUrl = user.PhotoUrl,
+                About = user.About ?? "????????????? ??????? LitShare",
             };
 
             return this.View(model);

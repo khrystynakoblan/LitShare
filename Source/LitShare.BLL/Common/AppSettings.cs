@@ -13,5 +13,7 @@
         public int AdminStatsTopCitiesCount { get; set; } = 5;
 
         public int AdminStatsTopGenresCount { get; set; } = 5;
+
+        public int GenresCacheDurationMinutes { get; set; } = 60;
     }
 }

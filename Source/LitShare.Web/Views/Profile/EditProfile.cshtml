@@ -73,9 +73,15 @@
 
                         <div class="d-flex gap-3">
                             <button type="submit" class="btn btn-dark px-4">Зберегти</button>
-                            <a asp-controller="Profile" asp-action="MyProfile" class="btn btn-outline-secondary px-4">
-                                Скасувати
-                            </a>
+
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <a asp-controller="Admin" asp-action="MyProfile" class="btn btn-outline-secondary px-4">Скасувати</a>
+                            }
+                            else
+                            {
+                                <a asp-controller="Profile" asp-action="MyProfile" class="btn btn-outline-secondary px-4">Скасувати</a>
+                            }
                         </div>
 
                     </form>
