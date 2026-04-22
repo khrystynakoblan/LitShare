@@ -168,6 +168,11 @@ namespace LitShare.Web.Controllers
 
             this.logger.LogInformation("Profile updated successfully. UserId: {UserId}", userId);
 
+            if (User.IsInRole("Admin"))
+            {
+                return this.RedirectToAction("MyProfile", "Admin");
+            }
+
             return this.RedirectToAction("MyProfile", "Profile");
         }
 
