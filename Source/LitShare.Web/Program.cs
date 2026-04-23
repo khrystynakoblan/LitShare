@@ -61,7 +61,6 @@ try
     builder.Services.AddScoped<IComplaintService, ComplaintService>();
     builder.Services.AddScoped<IAdminService, AdminService>();
     builder.Services.AddControllersWithViews();
-    builder.Services.AddScoped<IComplaintRepository, ComplaintRepository>();
     builder.Services.AddScoped<IProfileService, ProfileService>();
     builder.Services.AddScoped<IFavoriteRepository, FavoriteRepository>();
 
@@ -76,6 +75,7 @@ try
         .AddCookie(options =>
         {
             options.LoginPath = "/Account/Login";
+            options.AccessDeniedPath = "/Home/Error";
             options.ExpireTimeSpan = TimeSpan.FromDays(7);
         });
 
@@ -88,6 +88,8 @@ try
         app.UseHsts();
     }
 
+    app.UseMiddleware<RequestTimingMiddleware>();
+
     app.UseSerilogRequestLogging(options =>
     {
         options.MessageTemplate =
@@ -99,6 +101,8 @@ try
     app.UseRouting();
     app.UseAuthentication();
     app.UseAuthorization();
+
+    app.UseMiddleware<RequestLoggingMiddleware>();
 
     app.MapControllerRoute(
         name: "default",
