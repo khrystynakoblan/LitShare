@@ -2,9 +2,17 @@ namespace LitShare.Web.Middleware
 {
     using System.Security.Claims;
     using System.Text;
+    using System.Web;
 
     public class RequestLoggingMiddleware
     {
+        private static readonly HashSet<string> SensitiveFields = new (StringComparer.OrdinalIgnoreCase)
+        {
+            "Password",
+            "ConfirmPassword",
+            "__RequestVerificationToken",
+        };
+
         private readonly RequestDelegate next;
         private readonly ILogger<RequestLoggingMiddleware> logger;
 
@@ -26,14 +34,10 @@ namespace LitShare.Web.Middleware
                 request.EnableBuffering();
                 using var memoryStream = new MemoryStream();
                 await request.Body.CopyToAsync(memoryStream);
-                requestBody = Encoding.UTF8.GetString(memoryStream.ToArray());
+                var rawBody = Encoding.UTF8.GetString(memoryStream.ToArray());
                 request.Body.Position = 0;
 
-                if (requestBody.Contains("Password") ||
-                    requestBody.Contains("__RequestVerificationToken"))
-                {
-                    requestBody = "[sensitive data hidden]";
-                }
+                requestBody = this.RedactSensitiveFields(rawBody, request.ContentType);
             }
 
             var headers = request.Headers
@@ -53,6 +57,38 @@ namespace LitShare.Web.Middleware
                 string.IsNullOrWhiteSpace(requestBody) ? "(empty)" : requestBody);
 
             await this.next(context);
+        }
+
+        private string RedactSensitiveFields(string rawBody, string? contentType)
+        {
+            if (contentType != null && contentType.Contains("multipart/form-data", StringComparison.OrdinalIgnoreCase))
+            {
+                return "[multipart form data — not logged]";
+            }
+
+            if (contentType != null && contentType.Contains("application/x-www-form-urlencoded", StringComparison.OrdinalIgnoreCase))
+            {
+                var pairs = rawBody.Split('&');
+                var redacted = pairs.Select(pair =>
+                {
+                    var eqIndex = pair.IndexOf('=');
+                    if (eqIndex < 0)
+                    {
+                        return pair;
+                    }
+
+                    var key = HttpUtility.UrlDecode(pair[..eqIndex]);
+                    var value = HttpUtility.UrlDecode(pair[(eqIndex + 1) ..]);
+
+                    return SensitiveFields.Contains(key)
+                        ? $"{key}=[REDACTED]"
+                        : $"{key}={value}";
+                });
+
+                return string.Join(" & ", redacted);
+            }
+
+            return rawBody;
         }
     }
 }
