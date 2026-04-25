@@ -13,5 +13,7 @@ namespace LitShare.BLL.Services.Interfaces
         Task<Result<List<ReceivedRequestDto>>> GetReceivedRequestsAsync(int userId);
 
         Task<Result<bool>> UpdateRequestStatusAsync(int requestId, int ownerId, RequestStatus newStatus);
+
+        Task<Result<bool>> CompleteDealAsync(int requestId, int ownerId);
     }
 }

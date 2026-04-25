@@ -20,6 +20,12 @@
         /// Request has been rejected by the owner. Maps to 'rejected' in the database.
         /// </summary>
         [PgName("rejected")]
-        Rejected
+        Rejected,
+
+        /// <summary>
+        /// Request has been completed by the owner. Maps to 'completed' in the database.
+        /// </summary>
+        [PgName("completed")]
+        Completed
     }
 }

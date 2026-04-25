@@ -132,7 +132,7 @@ namespace LitShare.Tests.BLL.Services
             Assert.Equal("Невідомий автор", result[0].BookAuthor);
         }
 
-                [Fact]
+        [Fact]
         public async Task GetReceivedRequestsAsync_ReturnsSuccess_WhenRequestsExist()
         {
             var requests = new List<ExchangeRequest>
@@ -341,6 +341,93 @@ namespace LitShare.Tests.BLL.Services
 
             Assert.True(result.IsSuccess);
             Assert.Equal(RequestStatus.Accepted, request.Status);
+            _exchangeRepoMock.Verify(r => r.SaveChangesAsync(), Times.Once);
+        }
+        [Fact]
+        public async Task CompleteDealAsync_ShouldReturnFailure_WhenRequestNotFound()
+        {
+            _exchangeRepoMock
+                .Setup(r => r.GetByIdAsync(It.IsAny<int>()))
+                .ReturnsAsync((ExchangeRequest)null!);
+
+            var result = await _service.CompleteDealAsync(1, 1);
+
+            Assert.False(result.IsSuccess);
+            Assert.Equal("Запит не знайдено.", result.Error);
+        }
+
+        [Fact]
+        public async Task CompleteDealAsync_ShouldReturnFailure_WhenUserIsNotOwner()
+        {
+            var request = new ExchangeRequest
+            {
+                Id = 1,
+                Status = RequestStatus.Accepted,
+                Post = new Posts { UserId = 99 }
+            };
+
+            _exchangeRepoMock
+                .Setup(r => r.GetByIdAsync(1))
+                .ReturnsAsync(request);
+
+            var result = await _service.CompleteDealAsync(1, 1);
+
+            Assert.False(result.IsSuccess);
+            Assert.Equal("Ви не маєте прав для цієї дії.", result.Error);
+        }
+
+        [Fact]
+        public async Task CompleteDealAsync_ShouldReturnFailure_WhenStatusIsNotAccepted()
+        {
+            var request = new ExchangeRequest
+            {
+                Id = 1,
+                Status = RequestStatus.Pending,
+                Post = new Posts { UserId = 1 }
+            };
+
+            _exchangeRepoMock
+                .Setup(r => r.GetByIdAsync(1))
+                .ReturnsAsync(request);
+
+            var result = await _service.CompleteDealAsync(1, 1);
+
+            Assert.False(result.IsSuccess);
+            Assert.Equal("Можна завершити тільки прийнятий запит.", result.Error);
+        }
+
+       [Fact]
+        public async Task CompleteDealAsync_ShouldReturnSuccess_AndUpdateStatusAndPost()
+        {
+            var post = new Posts
+            {
+                Id = 10,
+                UserId = 1,
+                IsActive = true
+            };
+
+            var request = new ExchangeRequest
+            {
+                Id = 1,
+                Status = RequestStatus.Accepted,
+                PostId = 10,
+                Post = post
+            };
+
+            _exchangeRepoMock
+                .Setup(r => r.GetByIdAsync(It.IsAny<int>()))
+                .ReturnsAsync(request);
+
+            _postRepoMock
+                .Setup(r => r.GetByIdAsync(It.IsAny<int>()))
+                .ReturnsAsync(post);
+
+            var result = await _service.CompleteDealAsync(1, 1);
+
+            Assert.True(result.IsSuccess);
+            Assert.Equal(RequestStatus.Completed, request.Status);
+            Assert.False(post.IsActive);
+
             _exchangeRepoMock.Verify(r => r.SaveChangesAsync(), Times.Once);
         }
     }
