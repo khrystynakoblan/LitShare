@@ -132,7 +132,7 @@ else
                                 </div>
                             }
 
-                            @if (request.Status == "Прийнято") // 🔥 ДОДАНО
+                            @if (request.Status == "Прийнято") 
                             {
                                 <form asp-action="CompleteDeal" method="post">
                                     <input type="hidden" name="requestId" value="@request.Id" />
