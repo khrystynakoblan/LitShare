@@ -345,5 +345,77 @@
             Assert.True(result.IsFailure);
             Assert.Equal("Не вдалося завантажити статистику", result.Error);
         }
+
+        [Fact]
+        public async Task GetAllUsersAsync_WhenUsersExist_ReturnsSuccessWithMappedDtos()
+        {
+            var users = new List<Users>
+            {
+                new Users
+                {
+                    Id = 1,
+                    Name = "User1",
+                    Email = "user1@example.com",
+                    Phone = "+380970000000",
+                    City = "Lviv",
+                    Region = "Lvivska",
+                    Role = RoleType.Admin
+                },
+                new Users
+                {
+                    Id = 2,
+                    Name = null,
+                    Email = null,
+                    Phone = null,
+                    City = "Kyiv",
+                    Region = "Kyivska",
+                    Role = RoleType.User
+                }
+            };
+
+            this.userRepositoryMock
+                .Setup(r => r.GetAllAsync())
+                .ReturnsAsync(users);
+
+            var result = await this.adminService.GetAllUsersAsync();
+
+            Assert.True(result.IsSuccess);
+            var dtos = result.Value!.ToList();
+            Assert.Equal(2, dtos.Count);
+
+            Assert.Equal("User1", dtos[0].Name);
+            Assert.Equal("Lviv, Lvivska", dtos[0].Location);
+            Assert.Equal("Admin", dtos[0].Role);
+
+            Assert.Equal("Без імені", dtos[1].Name);
+            Assert.Equal("Не вказано", dtos[1].Email);
+            Assert.Equal("-", dtos[1].Phone);
+        }
+
+        [Fact]
+        public async Task GetAllUsersAsync_WhenNoUsers_ReturnsSuccessWithEmptyList()
+        {
+            this.userRepositoryMock
+                .Setup(r => r.GetAllAsync())
+                .ReturnsAsync(new List<Users>());
+
+            var result = await this.adminService.GetAllUsersAsync();
+
+            Assert.True(result.IsSuccess);
+            Assert.Empty(result.Value!);
+        }
+
+        [Fact]
+        public async Task GetAllUsersAsync_WhenRepositoryThrowsException_ReturnsFailure()
+        {
+            this.userRepositoryMock
+                .Setup(r => r.GetAllAsync())
+                .ThrowsAsync(new Exception("Database connection failed"));
+
+            var result = await this.adminService.GetAllUsersAsync();
+
+            Assert.True(result.IsFailure);
+            Assert.Equal("Не вдалося завантажити список користувачів.", result.Error);
+        }
     }
 }

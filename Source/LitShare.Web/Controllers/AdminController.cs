@@ -143,5 +143,21 @@ namespace LitShare.Web.Controllers
 
             return this.View(model);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Users()
+        {
+            this.logger.LogInformation("Admin viewing users list.");
+
+            var result = await this.adminService.GetAllUsersAsync();
+
+            if (result.IsFailure)
+            {
+                TempData["ErrorMessage"] = result.Error;
+                return this.RedirectToAction(nameof(this.Index));
+            }
+
+            return this.View(result.Value);
+        }
     }
 }
