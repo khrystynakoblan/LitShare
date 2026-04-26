@@ -124,5 +124,50 @@ namespace LitShare.BLL.Services
             this.logger.LogInformation("Request {RequestId} successfully updated to {Status}", requestId, newStatus);
             return true;
         }
+
+        public async Task<Result<bool>> CompleteDealAsync(int requestId, int ownerId)
+        {
+            this.logger.LogInformation(
+                "Attempting to complete deal. RequestId: {RequestId}, OwnerId: {OwnerId}",
+                requestId,
+                ownerId);
+
+            var request = await this.exchangeRepository.GetByIdAsync(requestId);
+
+            if (request == null)
+            {
+                return Result<bool>.Failure("Запит не знайдено.");
+            }
+
+            // 🔥 ДОДАТИ ОЦЕ
+            if (request.Post == null)
+            {
+                return Result<bool>.Failure("Оголошення не знайдено.");
+            }
+
+            if (request.Post.UserId != ownerId)
+            {
+                return Result<bool>.Failure("Ви не маєте прав для цієї дії.");
+            }
+
+            if (request.Status != RequestStatus.Accepted)
+            {
+                return Result<bool>.Failure("Можна завершити тільки прийнятий запит.");
+            }
+
+            request.Status = RequestStatus.Completed;
+
+            var post = await this.postRepository.GetByIdAsync(request.PostId);
+
+            if (post == null)
+            {
+                return Result<bool>.Failure("Оголошення не знайдено.");
+            }
+
+            post.IsActive = false;
+            await this.exchangeRepository.SaveChangesAsync();
+
+            return true;
+        }
     }
 }

@@ -126,5 +126,38 @@ namespace LitShare.Web.Controllers
 
             return RedirectToAction("ReceivedRequests");
         }
+
+        [HttpPost]
+        public async Task<IActionResult> CompleteDeal(int requestId)
+        {
+            var currentUserId = this.GetCurrentUserId();
+
+            this.logger.LogInformation(
+                "User {UserId} is attempting to complete deal for RequestId: {RequestId}",
+                currentUserId,
+                requestId);
+
+            var result = await this.exchangeService.CompleteDealAsync(requestId, currentUserId);
+
+            if (result.IsSuccess)
+            {
+                this.logger.LogInformation(
+                    "Deal successfully completed. RequestId: {RequestId}",
+                    requestId);
+
+                TempData["SuccessMessage"] = "Угоду виконано";
+            }
+            else
+            {
+                this.logger.LogWarning(
+                    "Failed to complete deal. RequestId: {RequestId}, Error: {Error}",
+                    requestId,
+                    result.Error);
+
+                TempData["ErrorMessage"] = result.Error;
+            }
+
+            return RedirectToAction("ReceivedRequests");
+        }
     }
 }

@@ -6,6 +6,34 @@
 
 <h2 class="mb-4">Отримані запити</h2>
 
+@if (TempData["SuccessMessage"] != null)
+
+{
+
+    <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+
+        @TempData["SuccessMessage"]
+
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+
+    </div>
+
+}
+
+@if (TempData["ErrorMessage"] != null)
+
+{
+
+    <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+
+        @TempData["ErrorMessage"]
+
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+
+    </div>
+
+}
+
 @if (!Model.Any())
 {
     <div class="text-center mt-5">
@@ -62,6 +90,10 @@ else
                         {
                             <span class="badge bg-danger">Відхилено</span>
                         }
+                        else if (request.Status == "Завершено") 
+                        {
+                            <span class="badge bg-secondary">Завершено</span>
+                        }
                     </td>
 
                     <td class="text-end">
@@ -98,6 +130,16 @@ else
                                         </button>
                                     </form>
                                 </div>
+                            }
+
+                            @if (request.Status == "Прийнято") 
+                            {
+                                <form asp-action="CompleteDeal" method="post">
+                                    <input type="hidden" name="requestId" value="@request.Id" />
+                                    <button type="submit" class="btn btn-sm btn-primary">
+                                        Завершити угоду
+                                    </button>
+                                </form>
                             }
 
                         </div>

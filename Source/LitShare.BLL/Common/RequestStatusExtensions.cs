@@ -11,6 +11,7 @@ namespace LitShare.BLL.Common
                 RequestStatus.Pending => "Очікує",
                 RequestStatus.Accepted => "Прийнято",
                 RequestStatus.Rejected => "Відхилено",
+                RequestStatus.Completed => "Завершено",
                 _ => "Невідомо"
             };
         }
