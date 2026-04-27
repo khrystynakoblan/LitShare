@@ -181,5 +181,32 @@
                 return Result<AdminStatsDto>.Failure("Не вдалося завантажити статистику");
             }
         }
+
+        public async Task<Result<IEnumerable<AdminUserListDto>>> GetAllUsersAsync()
+        {
+            this.logger.LogInformation("Fetching all users for admin panel.");
+
+            try
+            {
+                var users = await this.userRepository.GetAllAsync();
+
+                var dtos = users.Select(u => new AdminUserListDto
+                {
+                    Id = u.Id,
+                    Name = u.Name ?? "Без імені",
+                    Email = u.Email ?? "Не вказано",
+                    Phone = u.Phone ?? "-",
+                    Location = $"{u.City}, {u.Region}",
+                    Role = u.Role.ToString()
+                });
+
+                return Result<IEnumerable<AdminUserListDto>>.Success(dtos);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "Error occurred while fetching users list.");
+                return Result<IEnumerable<AdminUserListDto>>.Failure("Не вдалося завантажити список користувачів.");
+            }
+        }
     }
 }

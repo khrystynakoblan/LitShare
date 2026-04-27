@@ -14,5 +14,7 @@
         Task<Result<bool>> RejectComplaintAsync(int id);
 
         Task<Result<AdminStatsDto>> GetStatisticsAsync();
+
+        Task<Result<IEnumerable<AdminUserListDto>>> GetAllUsersAsync();
     }
 }
