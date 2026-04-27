@@ -123,5 +123,29 @@
 
             return Result<bool>.Success(true);
         }
+
+        public async Task<Result<bool>> DeleteReviewAsync(int reviewId, int reviewerId)
+        {
+            this.logger.LogInformation("User {ReviewerId} deleting review {ReviewId}", reviewerId, reviewId);
+
+            var review = await this.reviewRepository.GetByIdAsync(reviewId);
+
+            if (review == null)
+            {
+                return Result<bool>.Failure("Відгук не знайдено.");
+            }
+
+            if (review.ReviewerId != reviewerId)
+            {
+                return Result<bool>.Failure("Ви не можете видалити чужий відгук.");
+            }
+
+            await this.reviewRepository.DeleteAsync(review);
+            await this.reviewRepository.SaveChangesAsync();
+
+            this.logger.LogInformation("Review {ReviewId} successfully deleted by user {ReviewerId}", reviewId, reviewerId);
+
+            return Result<bool>.Success(true);
+        }
     }
 }

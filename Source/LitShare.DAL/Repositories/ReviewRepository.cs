@@ -52,5 +52,11 @@
             this.context.Reviews.Update(review);
             return Task.CompletedTask;
         }
+
+        public Task DeleteAsync(Reviews review)
+        {
+            this.context.Reviews.Remove(review);
+            return Task.CompletedTask;
+        }
     }
 }

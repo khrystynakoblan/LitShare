@@ -16,5 +16,7 @@
         Task<Result<ReviewDto>> GetByIdAsync(int reviewId);
 
         Task<Result<bool>> EditReviewAsync(EditReviewDto dto, int reviewerId);
+
+        Task<Result<bool>> DeleteReviewAsync(int reviewId, int reviewerId);
     }
 }

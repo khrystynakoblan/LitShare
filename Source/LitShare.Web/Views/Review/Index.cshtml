@@ -8,7 +8,8 @@
         <div class="alert alert-success">Відгук успішно збережено!</div>
     }
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4 class="fw-bold mb-0">Відгуки</h4>
+        <h4 class="fw-bold mb-0">Відгуки про @Model.ReviewedUserName</h4>
+        <a asp-controller="Profile" asp-action="GuestProfile" asp-route-id="@Model.ReviewedUserId" class="btn btn-outline-dark btn-sm">← До профілю</a>
     </div>
     <div class="border rounded p-4 mb-4 bg-white shadow-sm text-center">
         <h2 class="fw-bold mb-1">@Model.AverageRating.ToString("0.0")</h2>
@@ -46,7 +47,34 @@
             {
                 <p class="mb-2 text-muted">@Model.CurrentUserReview.Text</p>
             }
-            <a asp-action="Edit" asp-route-reviewId="@Model.CurrentUserReview.Id" class="btn btn-outline-dark btn-sm">Редагувати</a>
+            <div class="mt-2 d-flex gap-2">
+                <a asp-action="Edit" asp-route-reviewId="@Model.CurrentUserReview.Id" class="btn btn-outline-dark btn-sm">Редагувати</a>
+                <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteReviewModal">
+                    Видалити
+                </button>
+            </div>
+        </div>
+
+        <div class="modal fade" id="deleteReviewModal" tabindex="-1" aria-labelledby="deleteReviewModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header border-0">
+                        <h5 class="modal-title fw-bold" id="deleteReviewModalLabel">Видалення відгуку</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Ви впевнені, що хочете видалити свій відгук? Цю дію неможливо скасувати.
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Скасувати</button>
+                        <form asp-action="Delete" method="post">
+                            <input type="hidden" name="reviewId" value="@Model.CurrentUserReview.Id" />
+                            <input type="hidden" name="reviewedUserId" value="@Model.ReviewedUserId" />
+                            <button type="submit" class="btn btn-danger">Видалити</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
     }
 
@@ -56,6 +84,7 @@
     }
     else if (Model.Reviews.Any())
     {
+        <h6 class="text-muted mb-2">Інші відгуки</h6>
         @foreach (var review in Model.Reviews)
         {
             <div class="border rounded p-3 mb-3 bg-white shadow-sm">

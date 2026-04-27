@@ -490,5 +490,115 @@
 
             await Assert.ThrowsAsync<InvalidOperationException>(() => this.sut.EditReviewAsync(ValidEditDto(), ReviewerId));
         }
+
+        [Fact]
+        public async Task DeleteReviewAsync_ValidData_ReturnsSuccess()
+        {
+            var review = SampleReview();
+            this.reviewRepositoryMock.Setup(r => r.GetByIdAsync(review.Id)).ReturnsAsync(review);
+
+            var result = await this.sut.DeleteReviewAsync(review.Id, ReviewerId);
+
+            Assert.True(result.IsSuccess);
+            Assert.True(result.Value);
+        }
+
+        [Fact]
+        public async Task DeleteReviewAsync_ReviewNotFound_ReturnsFailure()
+        {
+            this.reviewRepositoryMock.Setup(r => r.GetByIdAsync(It.IsAny<int>())).ReturnsAsync((Reviews?)null);
+
+            var result = await this.sut.DeleteReviewAsync(999, ReviewerId);
+
+            Assert.False(result.IsSuccess);
+            Assert.Equal("Відгук не знайдено.", result.Error);
+        }
+
+        [Fact]
+        public async Task DeleteReviewAsync_WrongUser_ReturnsFailure()
+        {
+            var review = SampleReview();
+            this.reviewRepositoryMock.Setup(r => r.GetByIdAsync(review.Id)).ReturnsAsync(review);
+
+            var result = await this.sut.DeleteReviewAsync(review.Id, 999);
+
+            Assert.False(result.IsSuccess);
+            Assert.Equal("Ви не можете видалити чужий відгук.", result.Error);
+        }
+
+        [Fact]
+        public async Task DeleteReviewAsync_WrongUser_DoesNotCallDelete()
+        {
+            var review = SampleReview();
+            this.reviewRepositoryMock.Setup(r => r.GetByIdAsync(review.Id)).ReturnsAsync(review);
+
+            await this.sut.DeleteReviewAsync(review.Id, 999);
+
+            this.reviewRepositoryMock.Verify(r => r.DeleteAsync(It.IsAny<Reviews>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task DeleteReviewAsync_ReviewNotFound_DoesNotCallDelete()
+        {
+            this.reviewRepositoryMock.Setup(r => r.GetByIdAsync(It.IsAny<int>())).ReturnsAsync((Reviews?)null);
+
+            await this.sut.DeleteReviewAsync(999, ReviewerId);
+
+            this.reviewRepositoryMock.Verify(r => r.DeleteAsync(It.IsAny<Reviews>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task DeleteReviewAsync_ValidData_CallsDeleteAsyncOnce()
+        {
+            var review = SampleReview();
+            this.reviewRepositoryMock.Setup(r => r.GetByIdAsync(review.Id)).ReturnsAsync(review);
+
+            await this.sut.DeleteReviewAsync(review.Id, ReviewerId);
+
+            this.reviewRepositoryMock.Verify(r => r.DeleteAsync(It.IsAny<Reviews>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task DeleteReviewAsync_ValidData_CallsSaveChangesAsyncOnce()
+        {
+            var review = SampleReview();
+            this.reviewRepositoryMock.Setup(r => r.GetByIdAsync(review.Id)).ReturnsAsync(review);
+
+            await this.sut.DeleteReviewAsync(review.Id, ReviewerId);
+
+            this.reviewRepositoryMock.Verify(r => r.SaveChangesAsync(), Times.Once);
+        }
+
+        [Fact]
+        public async Task DeleteReviewAsync_ValidData_LogsStartMessage()
+        {
+            var review = SampleReview();
+            this.reviewRepositoryMock.Setup(r => r.GetByIdAsync(review.Id)).ReturnsAsync(review);
+
+            await this.sut.DeleteReviewAsync(review.Id, ReviewerId);
+
+            this.VerifyLog(LogLevel.Information, $"User {ReviewerId} deleting review {review.Id}");
+        }
+
+        [Fact]
+        public async Task DeleteReviewAsync_ValidData_LogsSuccessMessage()
+        {
+            var review = SampleReview();
+            this.reviewRepositoryMock.Setup(r => r.GetByIdAsync(review.Id)).ReturnsAsync(review);
+
+            await this.sut.DeleteReviewAsync(review.Id, ReviewerId);
+
+            this.VerifyLog(LogLevel.Information, $"Review {review.Id} successfully deleted by user {ReviewerId}");
+        }
+
+        [Fact]
+        public async Task DeleteReviewAsync_RepositoryFails_PropagatesException()
+        {
+            var review = SampleReview();
+            this.reviewRepositoryMock.Setup(r => r.GetByIdAsync(review.Id)).ReturnsAsync(review);
+            this.reviewRepositoryMock.Setup(r => r.DeleteAsync(It.IsAny<Reviews>())).ThrowsAsync(new InvalidOperationException("DB error"));
+
+            await Assert.ThrowsAsync<InvalidOperationException>(() => this.sut.DeleteReviewAsync(review.Id, ReviewerId));
+        }
     }
 }

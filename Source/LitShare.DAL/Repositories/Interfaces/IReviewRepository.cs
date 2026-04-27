@@ -17,5 +17,7 @@
         Task<Reviews?> GetByIdAsync(int id);
 
         Task UpdateAsync(Reviews review);
+
+        Task DeleteAsync(Reviews review);
     }
 }

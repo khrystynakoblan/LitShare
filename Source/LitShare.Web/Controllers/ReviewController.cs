@@ -192,5 +192,24 @@
 
             return this.RedirectToAction("Index", new { userId = model.ReviewedUserId, success = true });
         }
+
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int reviewId, int reviewedUserId)
+        {
+            this.logger.LogInformation("User requesting delete of review ID: {ReviewId}", reviewId);
+
+            int currentUserId = int.Parse(this.User.FindFirstValue(ClaimTypes.NameIdentifier) !);
+
+            var result = await this.reviewService.DeleteReviewAsync(reviewId, currentUserId);
+
+            if (result.IsFailure)
+            {
+                this.TempData["ErrorMessage"] = result.Error;
+            }
+
+            return this.RedirectToAction("Index", new { userId = reviewedUserId });
+        }
     }
 }
