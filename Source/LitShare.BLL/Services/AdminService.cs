@@ -3,6 +3,7 @@
     using LitShare.BLL.Common;
     using LitShare.BLL.DTOs;
     using LitShare.BLL.Services.Interfaces;
+    using LitShare.DAL.Models;
     using LitShare.DAL.Repositories.Interfaces;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Logging;
@@ -190,15 +191,18 @@
             {
                 var users = await this.userRepository.GetAllAsync();
 
-                var dtos = users.Select(u => new AdminUserListDto
-                {
-                    Id = u.Id,
-                    Name = u.Name ?? "Без імені",
-                    Email = u.Email ?? "Не вказано",
-                    Phone = u.Phone ?? "-",
-                    Location = $"{u.City}, {u.Region}",
-                    Role = u.Role.ToString()
-                });
+                var dtos = users
+                            .OrderBy(u => u.Id)
+                            .Select(u => new AdminUserListDto
+                            {
+                                Id = u.Id,
+                                Name = u.Name ?? "Без імені",
+                                Email = u.Email ?? "Не вказано",
+                                Phone = u.Phone ?? "-",
+                                Location = $"{u.City}, {u.Region}",
+                                Role = u.Role.ToString(),
+                                IsBlocked = u.IsBlocked
+                            });
 
                 return Result<IEnumerable<AdminUserListDto>>.Success(dtos);
             }
@@ -207,6 +211,29 @@
                 this.logger.LogError(ex, "Error occurred while fetching users list.");
                 return Result<IEnumerable<AdminUserListDto>>.Failure("Не вдалося завантажити список користувачів.");
             }
+        }
+
+        public async Task<Result<bool>> ToggleUserBlockAsync(int userId)
+        {
+            this.logger.LogInformation("Toggling block status for user. UserId: {UserId}", userId);
+
+            var user = await this.userRepository.GetByIdAsync(userId);
+            if (user == null)
+            {
+                return Result<bool>.Failure("Користувача не знайдено.");
+            }
+
+            if (user.Role == RoleType.Admin)
+            {
+                return Result<bool>.Failure("Неможливо заблокувати адміністратора.");
+            }
+
+            user.IsBlocked = !user.IsBlocked;
+
+            await this.userRepository.UpdateAsync(user);
+            this.logger.LogInformation("User {UserId} block status changed to {IsBlocked}", userId, user.IsBlocked);
+
+            return true;
         }
     }
 }

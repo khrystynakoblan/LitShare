@@ -138,7 +138,7 @@ namespace LitShare.Web.Controllers
                 Email = user.Email,
                 Phone = user.Phone ?? string.Empty,
                 PhotoUrl = user.PhotoUrl,
-                About = user.About ?? "????????????? ??????? LitShare",
+                About = user.About ?? "????????????? ????????? LitShare",
             };
 
             return this.View(model);
@@ -158,6 +158,21 @@ namespace LitShare.Web.Controllers
             }
 
             return this.View(result.Value);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ToggleBlockUser(int id)
+        {
+            this.logger.LogInformation("Admin requested to toggle block status for user {Id}", id);
+
+            var result = await this.adminService.ToggleUserBlockAsync(id);
+
+            if (result.IsFailure)
+            {
+                TempData["ErrorMessage"] = result.Error;
+            }
+
+            return this.RedirectToAction(nameof(this.Users));
         }
     }
 }

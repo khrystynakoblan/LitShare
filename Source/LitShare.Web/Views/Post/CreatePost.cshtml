@@ -49,15 +49,21 @@
                 <div class="mb-3 row">
                     <label asp-for="Title" class="col-sm-2 col-form-label text-start">Назва книги:</label>
                     <div class="col-sm-10">
-                        <input asp-for="Title" class="form-control" placeholder="Введіть назву" />
-                        <span asp-validation-for="Title" class="text-danger"></span>
+                        <div class="input-group">
+                            <input asp-for="Title" class="form-control" id="bookTitleInput" placeholder="Введіть назву" />
+                            <button class="btn btn-outline-primary" type="button" id="autoFillBtn">
+                                <i class="bi bi-magic me-1"></i> Автозаповнити
+                            </button>
+                        </div>
+                        <span asp-validation-for="Title" class="text-danger d-block"></span>
+                        <span id="apiMessage" style="display: none;"></span>
                     </div>
                 </div>
 
                 <div class="mb-3 row">
                     <label asp-for="Author" class="col-sm-2 col-form-label text-start">Автор книги:</label>
                     <div class="col-sm-10">
-                        <input asp-for="Author" class="form-control" placeholder="Введіть автора" />
+                        <input asp-for="Author" class="form-control" id="Author" placeholder="Введіть автора" />
                         <span asp-validation-for="Author" class="text-danger"></span>
                     </div>
                 </div>
@@ -86,7 +92,7 @@
         <div class="row mt-4">
             <div class="col-12 text-center">
                 <h4 class="fw-normal mb-3">Опис</h4>
-                <textarea asp-for="Description" class="form-control mb-4" rows="8" placeholder="Додайте опис книги..."></textarea>
+                <textarea asp-for="Description" class="form-control mb-4" id="Description" rows="8" placeholder="Додайте опис книги..."></textarea>
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
         </div>
@@ -124,6 +130,46 @@
                 placeholder.style.display = 'none';
             }
         };
+
+        document.getElementById('autoFillBtn').addEventListener('click', async function () {
+            const titleInput = document.getElementById('bookTitleInput').value.trim();
+            const btn = this;
+            const msgSpan = document.getElementById('apiMessage');
+
+            const showMsg = (text, isError) => {
+                msgSpan.textContent = text;
+                msgSpan.className = isError ? 'text-danger small mt-1 d-block fw-bold' : 'text-success small mt-1 d-block fw-bold';
+                msgSpan.style.display = 'block';
+                setTimeout(() => { msgSpan.style.display = 'none'; }, 4000);
+            };
+
+            if (!titleInput) {
+                showMsg('Спочатку введіть назву книги!', true);
+                return;
+            }
+
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm" aria-hidden="true"></span>...';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(`/Post/AutoFillBookData?title=${encodeURIComponent(titleInput)}`);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.author) document.getElementById('Author').value = data.author;
+                    if (data.description) document.getElementById('Description').value = data.description;
+                    showMsg('Дані успішно підтягнуто!', false);
+                } else {
+                    showMsg('Книгу не знайдено в базі Google.', true);
+                }
+            } catch (error) {
+                showMsg('Помилка з\'єднання з сервером.', true);
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        });
     </script>
 
     @{

@@ -49,6 +49,9 @@
         [Column("photo_url")]
         public string? PhotoUrl { get; set; }
 
+        [Column("is_blocked")]
+        public bool IsBlocked { get; set; } = false;
+
         public ICollection<Posts>? Posts { get; set; }
 
         public ICollection<Complaints>? Complaints { get; set; }

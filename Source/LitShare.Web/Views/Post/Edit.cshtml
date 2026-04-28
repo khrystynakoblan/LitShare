@@ -25,7 +25,6 @@
         <a asp-controller="Profile" asp-action="Index" class="text-decoration-none text-dark">Мій профіль</a>
     </div>
 
-
     <form asp-action="Edit" method="post" enctype="multipart/form-data">
         <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
@@ -66,15 +65,21 @@
                 <div class="mb-3 row">
                     <label asp-for="Title" class="col-sm-3 col-form-label">Назва книги:</label>
                     <div class="col-sm-9">
-                        <input asp-for="Title" class="form-control" />
-                        <span asp-validation-for="Title" class="text-danger"></span>
+                        <div class="input-group">
+                            <input asp-for="Title" class="form-control" id="bookTitleInput" />
+                            <button class="btn btn-outline-primary" type="button" id="autoFillBtn">
+                                <i class="bi bi-magic me-1"></i> Автозаповнити
+                            </button>
+                        </div>
+                        <span asp-validation-for="Title" class="text-danger d-block"></span>
+                        <span id="apiMessage" style="display: none;"></span>
                     </div>
                 </div>
 
                 <div class="mb-3 row">
                     <label asp-for="Author" class="col-sm-3 col-form-label">Автор книги:</label>
                     <div class="col-sm-9">
-                        <input asp-for="Author" class="form-control" />
+                        <input asp-for="Author" class="form-control" id="Author" />
                         <span asp-validation-for="Author" class="text-danger"></span>
                     </div>
                 </div>
@@ -104,31 +109,21 @@
 
         <div class="mt-4">
             <h4 class="text-center mb-3 fw-normal">Опис</h4>
-
-            <textarea asp-for="Description" class="form-control mb-4" rows="8"></textarea>
-
+            <textarea asp-for="Description" class="form-control mb-4" id="Description" rows="8"></textarea>
             <span asp-validation-for="Description" class="text-danger"></span>
         </div>
 
         <div class="row gx-2 mb-3">
             <div class="col-6">
-                <button type="submit" class="btn btn-dark w-100 py-2 fw-bold">
-                    Зберегти
-                </button>
+                <button type="submit" class="btn btn-dark w-100 py-2 fw-bold">Зберегти</button>
             </div>
-
             <div class="col-6">
-                <button type="submit" class="btn btn-outline-dark w-100 py-2">
-                    Відхилити зміни
-                </button>
+                <button type="submit" class="btn btn-outline-dark w-100 py-2">Відхилити зміни</button>
             </div>
         </div>
     </form>
 
-    <button type="button"
-            class="btn btn-danger w-100 py-2"
-            data-bs-toggle="modal"
-            data-bs-target="#deleteModal">
+    <button type="button" class="btn btn-danger w-100 py-2" data-bs-toggle="modal" data-bs-target="#deleteModal">
         Видалити книгу
     </button>
 </div>
@@ -136,33 +131,18 @@
 <div class="modal fade" id="deleteModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-
             <div class="modal-header">
                 <h5 class="modal-title">Видалення книги</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-
-            <div class="modal-body">
-                Точно хочеш видалити книгу? Це незворотно 
-            </div>
-
+            <div class="modal-body">Точно хочеш видалити книгу? Це незворотно</div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    Скасувати
-                </button>
-
-                <form asp-controller="Profile"
-                      asp-action="DeletePostConfirmed"
-                      method="post">
-
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Скасувати</button>
+                <form asp-controller="Profile" asp-action="DeletePostConfirmed" method="post">
                     <input type="hidden" name="postId" value="@Model.Id" />
-
-                    <button type="submit" class="btn btn-danger">
-                        Видалити
-                    </button>
+                    <button type="submit" class="btn btn-danger">Видалити</button>
                 </form>
             </div>
-
         </div>
     </div>
 </div>
@@ -185,15 +165,51 @@
             if (file) {
                 const preview = document.getElementById('imagePreview');
                 const placeholder = document.getElementById('placeholderContent');
-
                 preview.src = URL.createObjectURL(file);
                 preview.style.display = 'block';
-
-                if (placeholder) {
-                    placeholder.style.display = 'none';
-                }
+                if (placeholder) placeholder.style.display = 'none';
             }
         };
+
+        document.getElementById('autoFillBtn').addEventListener('click', async function () {
+            const titleInput = document.getElementById('bookTitleInput').value.trim();
+            const btn = this;
+            const msgSpan = document.getElementById('apiMessage');
+
+            const showMsg = (text, isError) => {
+                msgSpan.textContent = text;
+                msgSpan.className = isError ? 'text-danger small mt-1 d-block fw-bold' : 'text-success small mt-1 d-block fw-bold';
+                msgSpan.style.display = 'block';
+                setTimeout(() => { msgSpan.style.display = 'none'; }, 4000);
+            };
+
+            if (!titleInput) {
+                showMsg('Спочатку введіть назву книги!', true);
+                return;
+            }
+
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm" aria-hidden="true"></span>...';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(`/Post/AutoFillBookData?title=${encodeURIComponent(titleInput)}`);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.author) document.getElementById('Author').value = data.author;
+                    if (data.description) document.getElementById('Description').value = data.description;
+                    showMsg('Дані оновлено!', false);
+                } else {
+                    showMsg('Книгу не знайдено.', true);
+                }
+            } catch (error) {
+                showMsg('Помилка з\'єднання.', true);
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        });
     </script>
 
     @{

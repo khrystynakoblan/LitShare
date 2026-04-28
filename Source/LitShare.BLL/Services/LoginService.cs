@@ -40,6 +40,12 @@
 
             var user = await this.userRepository.GetByEmailAsync(dto.Email);
 
+            if (user != null && user.IsBlocked)
+            {
+                this.logger.LogWarning("Blocked user attempted to login. Email: {Email}", dto.Email);
+                return Result<LoginResultDto>.Failure("Ваш обліковий запис заблоковано адміністратором.");
+            }
+
             if (user is null || string.IsNullOrEmpty(user.PasswordHash))
             {
                 this.logger.LogWarning("Login failed. Email: {Email}", dto.Email);

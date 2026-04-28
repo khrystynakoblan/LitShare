@@ -19,5 +19,7 @@ namespace LitShare.BLL.DTOs
         public string Location { get; set; } = string.Empty;
 
         public string Role { get; set; } = string.Empty;
+
+        public bool IsBlocked { get; set; }
     }
 }

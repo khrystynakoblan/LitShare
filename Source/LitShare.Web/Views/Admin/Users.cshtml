@@ -29,7 +29,13 @@
                         <tr>
                             <td class="ps-4 text-muted">#@user.Id</td>
                             <td>
-                                <div class="fw-bold">@user.Name</div>
+                                <div class="fw-bold">
+                                    @user.Name
+                                    @if (user.IsBlocked)
+                                    {
+                                        <span class="badge bg-danger ms-2" style="font-size: 0.7em;">Заблоковано</span>
+                                    }
+                                </div>
                             </td>
                             <td>
                                 <div class="small">@user.Email</div>
@@ -49,16 +55,22 @@
                             <td class="text-end pe-4">
                                 @if (user.Role != "Admin")
                                 {
-                                    <button type="button"
-                                            class="btn btn-sm btn-outline-danger px-3"
-                                            onclick="alert('Функція блокування буде доступна незабаром')">
-                                        Заблокувати
-                                    </button>
+                                    <form asp-controller="Admin" asp-action="ToggleBlockUser" asp-route-id="@user.Id" method="post" class="d-inline">
+                                        @if (user.IsBlocked)
+                                        {
+                                            <button type="submit" class="btn btn-sm btn-outline-success px-3 me-1">Розблокувати</button>
+                                        }
+                                        else
+                                        {
+                                            <button type="submit" class="btn btn-sm btn-outline-danger px-3 me-1">Заблокувати</button>
+                                        }
+                                    </form>
                                 }
+
                                 <a asp-controller="Profile"
-                                       asp-action="GuestProfile"
-                                       asp-route-id="@user.Id"
-                                       class="btn btn-sm btn-outline-primary px-3">
+                                   asp-action="GuestProfile"
+                                   asp-route-id="@user.Id"
+                                   class="btn btn-sm btn-outline-primary px-3">
                                     Профіль
                                 </a>
                             </td>

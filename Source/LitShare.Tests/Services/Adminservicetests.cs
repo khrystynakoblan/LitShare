@@ -417,5 +417,68 @@
             Assert.True(result.IsFailure);
             Assert.Equal("Не вдалося завантажити список користувачів.", result.Error);
         }
+
+        [Fact]
+        public async Task ToggleUserBlockAsync_WhenUserExists_TogglesStatusAndCallsUpdate()
+        {
+            var user = new Users
+            {
+                Id = 1,
+                Name = "Test User",
+                Role = RoleType.User,
+                IsBlocked = false
+            };
+
+            this.userRepositoryMock
+                .Setup(r => r.GetByIdAsync(1))
+                .ReturnsAsync(user);
+
+            this.userRepositoryMock
+                .Setup(r => r.UpdateAsync(It.IsAny<Users>()))
+                .Returns(Task.CompletedTask);
+
+            var result = await this.adminService.ToggleUserBlockAsync(1);
+
+            Assert.True(result.IsSuccess);
+            Assert.True(user.IsBlocked);
+            this.userRepositoryMock.Verify(r => r.UpdateAsync(user), Times.Once);
+        }
+
+        [Fact]
+        public async Task ToggleUserBlockAsync_WhenUserIsAdmin_ReturnsFailure()
+        {
+            var adminUser = new Users
+            {
+                Id = 1,
+                Name = "Big Boss",
+                Role = RoleType.Admin,
+                IsBlocked = false
+            };
+
+            this.userRepositoryMock
+                .Setup(r => r.GetByIdAsync(1))
+                .ReturnsAsync(adminUser);
+
+            var result = await this.adminService.ToggleUserBlockAsync(1);
+
+            Assert.True(result.IsFailure);
+            Assert.Equal("Неможливо заблокувати адміністратора.", result.Error);
+            Assert.False(adminUser.IsBlocked);
+            this.userRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<Users>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task ToggleUserBlockAsync_WhenUserNotFound_ReturnsFailure()
+        {
+            this.userRepositoryMock
+                .Setup(r => r.GetByIdAsync(999))
+                .ReturnsAsync((Users?)null);
+
+            var result = await this.adminService.ToggleUserBlockAsync(999);
+
+            Assert.True(result.IsFailure);
+            Assert.Equal("Користувача не знайдено.", result.Error);
+            this.userRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<Users>()), Times.Never);
+        }
     }
 }
