@@ -16,5 +16,7 @@
         Task<Result<AdminStatsDto>> GetStatisticsAsync();
 
         Task<Result<IEnumerable<AdminUserListDto>>> GetAllUsersAsync();
+
+        Task<Result<bool>> ToggleUserBlockAsync(int userId);
     }
 }

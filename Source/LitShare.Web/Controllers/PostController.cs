@@ -21,6 +21,7 @@
         private readonly IGenreService genreService;
         private readonly IPostService postService;
         private readonly IExchangeService exchangeService;
+        private readonly IExternalBookApiService externalBookApiService;
         private readonly ILogger<PostController> logger;
 
         public PostController(
@@ -29,6 +30,7 @@
             IGenreService genreService,
             IPostService postService,
             IExchangeService exchangeService,
+            IExternalBookApiService externalBookApiService,
             ILogger<PostController> logger)
         {
             this.createPostService = createPostService;
@@ -36,6 +38,7 @@
             this.genreService = genreService;
             this.postService = postService;
             this.exchangeService = exchangeService;
+            this.externalBookApiService = externalBookApiService;
             this.logger = logger;
         }
 
@@ -230,6 +233,28 @@
             }
 
             return RedirectToAction("MyBooks", "Profile");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> AutoFillBookData(string title)
+        {
+            if (string.IsNullOrWhiteSpace(title))
+            {
+                return this.BadRequest("Назва книги порожня");
+            }
+
+            var bookInfo = await this.externalBookApiService.GetBookDetailsAsync(title);
+
+            if (bookInfo == null)
+            {
+                return this.NotFound("Книгу не знайдено");
+            }
+
+            return this.Json(new
+            {
+                author = bookInfo.Authors != null ? string.Join(", ", bookInfo.Authors) : string.Empty,
+                description = bookInfo.Description ?? string.Empty
+            });
         }
 
         private SelectList BuildDealTypeSelectList(int? selectedValue = null)

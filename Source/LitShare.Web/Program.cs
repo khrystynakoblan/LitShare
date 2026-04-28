@@ -71,6 +71,13 @@ try
     builder.Services.AddScoped<IExchangeRepository, ExchangeRepository>();
     builder.Services.AddScoped<IExchangeService, ExchangeService>();
 
+    builder.Services.AddHttpClient<LitShare.BLL.Services.Interfaces.IExternalBookApiService, LitShare.BLL.Services.GoogleBooksApiService>(client =>
+    {
+        client.BaseAddress = new Uri("https://www.googleapis.com/books/v1/");
+        client.Timeout = TimeSpan.FromSeconds(10);
+        client.DefaultRequestHeaders.Add("Accept", "application/json");
+    });
+
     builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
         .AddCookie(options =>
         {
@@ -100,6 +107,7 @@ try
     app.UseStaticFiles();
     app.UseRouting();
     app.UseAuthentication();
+    app.UseMiddleware<LitShare.Web.Middleware.BlockCheckMiddleware>();
     app.UseAuthorization();
 
     app.UseMiddleware<RequestLoggingMiddleware>();
