@@ -20,29 +20,21 @@
         {
             this.logger.LogInformation("Fetching external data for book: {BookTitle}", bookTitle);
 
-            try
+            var response = await this.httpClient.GetFromJsonAsync<GoogleBooksResponseDto>(
+                $"volumes?q=intitle:{bookTitle}&maxResults=1&langRestrict=uk");
+
+            var bookInfo = response?.Items?.FirstOrDefault()?.VolumeInfo;
+
+            if (bookInfo != null)
             {
-                var response = await this.httpClient.GetFromJsonAsync<GoogleBooksResponseDto>(
-                    $"volumes?q=intitle:{bookTitle}&maxResults=1&langRestrict=uk");
-
-                var bookInfo = response?.Items?.FirstOrDefault()?.VolumeInfo;
-
-                if (bookInfo != null)
-                {
-                    this.logger.LogInformation("Successfully found external data for: {BookTitle}", bookTitle);
-                }
-                else
-                {
-                    this.logger.LogWarning("No external data found for: {BookTitle}", bookTitle);
-                }
-
-                return bookInfo;
+                this.logger.LogInformation("Successfully found external data for: {BookTitle}", bookTitle);
             }
-            catch (Exception ex)
+            else
             {
-                this.logger.LogError(ex, "Error occurred while fetching data from Google Books API");
-                return null;
+                this.logger.LogWarning("No external data found for: {BookTitle}", bookTitle);
             }
+
+            return bookInfo;
         }
     }
 }
