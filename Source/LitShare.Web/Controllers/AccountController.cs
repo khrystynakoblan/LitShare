@@ -4,6 +4,7 @@
     using LitShare.BLL.DTOs;
     using LitShare.BLL.Services.Interfaces;
     using LitShare.DAL.Models;
+    using LitShare.Web.Filters;
     using LitShare.Web.Models;
     using Microsoft.AspNetCore.Authentication;
     using Microsoft.AspNetCore.Authentication.Cookies;
@@ -34,6 +35,7 @@
         }
 
         [HttpPost]
+        [RateLimit(MaxRequests = 1, WindowSeconds = 60)]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
             if (!this.ModelState.IsValid)
@@ -81,6 +83,7 @@
         }
 
         [HttpPost]
+        [RateLimit(MaxRequests = 3, WindowSeconds = 60)]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
             if (!this.ModelState.IsValid)

@@ -1,0 +1,18 @@
+@{
+    ViewData["Title"] = "Забагато запитів";
+}
+
+<div class="container text-center mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 border rounded shadow-sm p-5 bg-white">
+            <i class="bi bi-stopwatch text-warning" style="font-size: 4rem;"></i>
+            <h1 class="display-5 text-warning mt-3 fw-bold">429 — Забагато запитів</h1>
+            <p class="lead text-secondary mt-3">
+                Ви надсилаєте запити надто часто. Будь ласка, зачекайте хвилину та спробуйте знову.
+            </p>
+            <a asp-controller="Home" asp-action="Index" class="btn btn-dark mt-3">
+                ← Повернутись на головну
+            </a>
+        </div>
+    </div>
+</div>

@@ -3,6 +3,7 @@ namespace LitShare.Web.Controllers
     using LitShare.BLL.DTOs;
     using LitShare.BLL.Services.Interfaces;
     using LitShare.DAL.Models;
+    using LitShare.Web.Filters;
     using LitShare.Web.Models;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
@@ -29,6 +30,7 @@ namespace LitShare.Web.Controllers
         }
 
         [HttpGet]
+        [RateLimit(MaxRequests = 10, WindowSeconds = 60)]
         public async Task<IActionResult> Index(
             string? searchTerm,
             string? location,
@@ -59,9 +61,7 @@ namespace LitShare.Web.Controllers
             if (result.IsFailure)
             {
                 this.logger.LogWarning("Failed to load posts: {Error}", result.Error);
-
                 ModelState.AddModelError(string.Empty, result.Error);
-
                 return this.View(new HomeViewModel
                 {
                     AllGenres = genresResult.IsSuccess ? genresResult.Value! : new List<GenreDto>(),
@@ -69,7 +69,7 @@ namespace LitShare.Web.Controllers
                     Location = location,
                     DealType = dealType,
                     SelectedGenres = genres,
-                    Posts = new List<PostCardDto>()
+                    Posts = new List<PostCardDto>(),
                 });
             }
 
@@ -92,8 +92,17 @@ namespace LitShare.Web.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult Error()
         {
+            return this.View();
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult TooManyRequests()
+        {
+            this.Response.StatusCode = StatusCodes.Status429TooManyRequests;
             return this.View();
         }
     }

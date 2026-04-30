@@ -7,6 +7,7 @@
     using LitShare.BLL.DTOs;
     using LitShare.BLL.Services.Interfaces;
     using LitShare.DAL.Models;
+    using LitShare.Web.Filters;
     using LitShare.Web.Models;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
@@ -53,6 +54,7 @@
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [RateLimit(MaxRequests = 1, WindowSeconds = 60)]
         public async Task<IActionResult> CreatePost(CreatePostModel model)
         {
             if (!this.ModelState.IsValid)
@@ -140,7 +142,7 @@
                 Description = model.Description,
                 DealTypeId = (int)model.DealType,
                 GenreIds = model.SelectedGenreIds,
-                NewPhoto = model.NewPhoto
+                NewPhoto = model.NewPhoto,
             };
 
             var result = await this.editPostService.EditPostAsync(dto, currentUserId);
@@ -186,13 +188,12 @@
                 DealType = post.DealType,
                 Genres = post.Genres,
                 UserId = post.UserId,
-                HasAlreadyRequested = false
+                HasAlreadyRequested = false,
             };
 
             if (this.User.Identity?.IsAuthenticated == true)
             {
                 int currentUserId = this.GetCurrentUserId();
-
                 var sentRequests = await this.exchangeService.GetSentRequestsAsync(currentUserId);
                 model.HasAlreadyRequested = sentRequests.Any(r => r.PostId == id);
             }
@@ -203,36 +204,34 @@
         [HttpGet]
         public async Task<IActionResult> Delete(int id)
         {
-            var userId = GetCurrentUserId();
-
-            var post = await postService.GetPostDetailsAsync(id);
+            var userId = this.GetCurrentUserId();
+            var post = await this.postService.GetPostDetailsAsync(id);
 
             if (post.IsFailure)
             {
-                return HandleFailure(post.Error);
+                return this.HandleFailure(post.Error);
             }
 
             if (post.Value!.UserId != userId)
             {
-                return HandleFailure("Немає доступу");
+                return this.HandleFailure("Немає доступу");
             }
 
-            return View(post.Value);
+            return this.View(post.Value);
         }
 
         [HttpPost]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var userId = GetCurrentUserId();
-
-            var result = await postService.DeletePostAsync(id, userId);
+            var userId = this.GetCurrentUserId();
+            var result = await this.postService.DeletePostAsync(id, userId);
 
             if (result.IsFailure)
             {
-                return HandleFailure(result.Error);
+                return this.HandleFailure(result.Error);
             }
 
-            return RedirectToAction("MyBooks", "Profile");
+            return this.RedirectToAction("MyBooks", "Profile");
         }
 
         [HttpGet]
@@ -253,7 +252,7 @@
             return this.Json(new
             {
                 author = bookInfo.Authors != null ? string.Join(", ", bookInfo.Authors) : string.Empty,
-                description = bookInfo.Description ?? string.Empty
+                description = bookInfo.Description ?? string.Empty,
             });
         }
 
@@ -284,7 +283,6 @@
         {
             var genreResult = await this.genreService.GetAllGenresAsync();
             var genres = genreResult.IsSuccess ? genreResult.Value! : new List<GenreDto>();
-
             return new MultiSelectList(genres, "Id", "Name", selectedGenreIds);
         }
     }
