@@ -44,39 +44,6 @@
 </div>
 
 @section Scripts {
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const stars = document.querySelectorAll('.star-btn');
-            const ratingInput = document.getElementById('ratingInput');
-
-            function updateStars(value) {
-                stars.forEach((s, i) => {
-                    if (i < value) {
-                        s.classList.replace('bi-star', 'bi-star-fill');
-                    } else {
-                        s.classList.replace('bi-star-fill', 'bi-star');
-                    }
-                });
-            }
-
-            stars.forEach(star => {
-                star.addEventListener('click', () => {
-                    const value = parseInt(star.getAttribute('data-value'));
-                    ratingInput.value = value;
-                    updateStars(value);
-                });
-
-                star.addEventListener('mouseover', () => {
-                    const value = parseInt(star.getAttribute('data-value'));
-                    updateStars(value);
-                });
-
-                star.addEventListener('mouseout', () => {
-                    const current = parseInt(ratingInput.value) || 0;
-                    updateStars(current);
-                });
-            });
-        });
-    </script>
+    <script src="~/js/rating.js" asp-append-version="true"></script>
     @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 }
