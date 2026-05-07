@@ -1,0 +1,28 @@
+.profile-card {
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    padding: 20px;
+  }
+  
+  .profile-avatar {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  
+  .profile-actions .btn {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  
+  .book-card {
+    border-radius: 10px;
+    overflow: hidden;
+    transition: 0.2s;
+  }
+  
+  .book-card:hover {
+    transform: translateY(-2px);
+  }

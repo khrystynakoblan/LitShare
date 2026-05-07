@@ -1,22 +1,53 @@
 @model LitShare.BLL.DTOs.PostDetailsDto
 
-<div class="container mt-5 text-center">
-    <h3 class="mb-4">Ви впевнені, що хочете видалити цю книгу?</h3>
+<div class="container mt-5">
 
-    <div class="card p-4 mx-auto" style="max-width: 400px;">
-        <h5>@Model.Title</h5>
-        <p class="text-muted">@Model.Author</p>
+    <div class="row justify-content-center">
 
-        <form asp-action="DeleteConfirmed" method="post">
-            <input type="hidden" name="id" value="@Model.Id" />
+        <div class="col-md-5">
 
-            <button type="submit" class="btn btn-danger w-100 mb-2">
-                Видалити
-            </button>
-        </form>
+            <div class="card shadow-sm p-4 text-center">
 
-        <a asp-controller="Profile" asp-action="MyBooks" class="btn btn-outline-secondary w-100">
-            Скасувати
-        </a>
+                <h4 class="fw-bold mb-3">
+                    Видалення оголошення
+                </h4>
+
+                <p class="text-muted mb-4">
+                    Ви впевнені, що хочете видалити цю книгу?
+                </p>
+
+                <div class="border rounded p-3 mb-4 bg-light">
+
+                    <h5 class="mb-1">
+                        @Model.Title
+                    </h5>
+
+                    <p class="text-muted mb-0">
+                        @Model.Author
+                    </p>
+
+                </div>
+
+                <form asp-action="DeleteConfirmed" method="post">
+
+                    <input type="hidden" name="id" value="@Model.Id" />
+
+                    <button type="submit" class="btn btn-danger w-100 mb-2">
+                        Видалити
+                    </button>
+
+                </form>
+
+                <a asp-controller="Profile"
+                   asp-action="MyBooks"
+                   class="btn btn-outline-dark w-100">
+                    Скасувати
+                </a>
+
+            </div>
+
+        </div>
+
     </div>
+
 </div>

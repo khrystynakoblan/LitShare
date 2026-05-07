@@ -4,80 +4,130 @@
     ViewData["Title"] = "Користувачі";
 }
 
-<div class="container-fluid mt-4">
+<div class="container mt-4">
+
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold">Користувачі системи</h2>
-        <div class="text-muted">Всього зареєстровано: @Model.Count()</div>
+
+        <h2 class="mb-0">Користувачі системи</h2>
+
+        <div class="text-muted">
+            Всього: @Model.Count()
+        </div>
+
     </div>
 
-    <div class="card border-0 shadow-sm">
+    <div class="card shadow-sm">
+
         <div class="table-responsive">
+
             <table class="table table-hover align-middle mb-0">
-                <thead class="table-dark">
+
+                <thead class="table-light">
                     <tr>
-                        <th class="ps-4">ID</th>
-                        <th>Ім'я</th>
-                        <th>Email / Телефон</th>
+                        <th>ID</th>
+                        <th>Імʼя</th>
+                        <th>Контакти</th>
                         <th>Локація</th>
                         <th>Роль</th>
-                        <th class="text-end pe-4">Дії</th>
+                        <th class="text-end">Дії</th>
                     </tr>
                 </thead>
+
                 <tbody>
+
                     @foreach (var user in Model)
                     {
                         <tr>
-                            <td class="ps-4 text-muted">#@user.Id</td>
+
+                            <td class="text-muted">
+                                #@user.Id
+                            </td>
+
                             <td>
                                 <div class="fw-bold">
                                     @user.Name
+
                                     @if (user.IsBlocked)
                                     {
-                                        <span class="badge bg-danger ms-2" style="font-size: 0.7em;">Заблоковано</span>
+                                        <span class="badge bg-dark ms-2">
+                                            Заблоковано
+                                        </span>
                                     }
                                 </div>
                             </td>
+
                             <td>
-                                <div class="small">@user.Email</div>
+                                <div>@user.Email</div>
                                 <div class="text-muted small">@user.Phone</div>
                             </td>
-                            <td>@user.Location</td>
+
                             <td>
+                                @user.Location
+                            </td>
+
+                            <td>
+
                                 @if (user.Role == "Admin")
                                 {
-                                    <span class="badge rounded-pill bg-danger px-3">Адмін</span>
+                                    <span class="badge bg-danger">
+                                        Адмін
+                                    </span>
                                 }
                                 else
                                 {
-                                    <span class="badge rounded-pill bg-info text-dark px-3">Користувач</span>
+                                    <span class="badge bg-secondary">
+                                        Користувач
+                                    </span>
                                 }
+
                             </td>
-                            <td class="text-end pe-4">
+
+                            <td class="text-end">
+
                                 @if (user.Role != "Admin")
                                 {
-                                    <form asp-controller="Admin" asp-action="ToggleBlockUser" asp-route-id="@user.Id" method="post" class="d-inline">
+                                    <form asp-controller="Admin"
+                                          asp-action="ToggleBlockUser"
+                                          asp-route-id="@user.Id"
+                                          method="post"
+                                          class="d-inline">
+
                                         @if (user.IsBlocked)
                                         {
-                                            <button type="submit" class="btn btn-sm btn-outline-success px-3 me-1">Розблокувати</button>
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-outline-success">
+                                                Розблокувати
+                                            </button>
                                         }
                                         else
                                         {
-                                            <button type="submit" class="btn btn-sm btn-outline-danger px-3 me-1">Заблокувати</button>
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-outline-danger">
+                                                Заблокувати
+                                            </button>
                                         }
+
                                     </form>
                                 }
 
                                 <a asp-controller="Profile"
                                    asp-action="GuestProfile"
                                    asp-route-id="@user.Id"
-                                   class="btn btn-sm btn-outline-primary px-3">
+                                   class="btn btn-sm btn-outline-dark">
                                     Профіль
                                 </a>
+
                             </td>
+
                         </tr>
                     }
+
                 </tbody>
+
             </table>
+
         </div>
+
     </div>
+
 </div>

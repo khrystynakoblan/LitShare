@@ -1,0 +1,30 @@
+.form-control,
+.form-select {
+  border-radius: 10px;
+  border: 1px solid #dee2e6;
+  font-size: 14px;
+  padding: 8px 12px;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #111;
+  box-shadow: 0 0 0 0.15rem rgba(0,0,0,0.1);
+}
+
+.form-label {
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+textarea {
+  resize: none;
+}
+
+.input-group .btn {
+  border-radius: 0 10px 10px 0;
+}
+
+.input-group .form-control {
+  border-radius: 10px 0 0 10px;
+}

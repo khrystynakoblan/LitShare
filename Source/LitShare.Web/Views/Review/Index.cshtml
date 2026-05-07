@@ -1,111 +1,237 @@
 ﻿@model LitShare.Web.Models.ReviewListViewModel
+
 @{
     ViewData["Title"] = "Відгуки";
 }
-<div class="container mt-4" style="max-width: 700px;">
+
+<div class="container mt-4" style="max-width: 800px;">
+
     @if (Context.Request.Query.ContainsKey("success"))
     {
-        <div class="alert alert-success">Відгук успішно збережено!</div>
+        <div class="alert alert-success">
+            Відгук успішно збережено!
+        </div>
     }
+
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4 class="fw-bold mb-0">Відгуки про @Model.ReviewedUserName</h4>
-        <a asp-controller="Profile" asp-action="GuestProfile" asp-route-id="@Model.ReviewedUserId" class="btn btn-outline-dark btn-sm">← До профілю</a>
+
+        <h4 class="fw-bold mb-0">
+            Відгуки про @Model.ReviewedUserName
+        </h4>
+
+        <a asp-controller="Profile"
+           asp-action="GuestProfile"
+           asp-route-id="@Model.ReviewedUserId"
+           class="btn btn-outline-dark btn-sm">
+            ← Профіль
+        </a>
+
     </div>
-    <div class="border rounded p-4 mb-4 bg-white shadow-sm text-center">
-        <h2 class="fw-bold mb-1">@Model.AverageRating.ToString("0.0")</h2>
+
+    <div class="card shadow-sm text-center p-4 mb-4">
+
+        <h2 class="fw-bold mb-1">
+            @Model.AverageRating.ToString("0.0")
+        </h2>
+
         <div class="mb-1">
+
             @for (int i = 1; i <= 5; i++)
             {
-                <i class="bi @(i <= Math.Round(Model.AverageRating) ? "bi-star-fill" : "bi-star") text-warning fs-5"></i>
+                <i class="bi @(i <= Math.Round(Model.AverageRating)
+                    ? "bi-star-fill"
+                    : "bi-star") text-warning fs-5"></i>
             }
+
         </div>
-        <p class="text-muted small">@Model.TotalReviews відгуків</p>
+
+        <p class="text-muted small">
+            @Model.TotalReviews відгуків
+        </p>
+
         @if (Model.CanLeaveReview)
         {
-            <a asp-action="Create" asp-route-userId="@Model.ReviewedUserId" class="btn btn-dark px-4">Залишити відгук</a>
+            <a asp-action="Create"
+               asp-route-userId="@Model.ReviewedUserId"
+               class="btn btn-dark">
+                Залишити відгук
+            </a>
         }
+
     </div>
 
     @if (Model.CurrentUserReview != null)
     {
         <h6 class="text-muted mb-2">Ваш відгук</h6>
-        <div class="border rounded p-3 mb-4 bg-white shadow-sm border-dark">
+
+        <div class="card shadow-sm p-3 mb-4 border-dark">
+
             <div class="d-flex align-items-center mb-2">
-                <a asp-controller="Profile" asp-action="GuestProfile" asp-route-id="@Model.CurrentUserReview.ReviewerId" class="text-decoration-none text-dark d-flex align-items-center gap-2">
-                    <img src="@(string.IsNullOrEmpty(Model.CurrentUserReview.ReviewerPhotoUrl) ? "https://cdn-icons-png.flaticon.com/512/149/149071.png" : Model.CurrentUserReview.ReviewerPhotoUrl)" class="rounded-circle" style="width:40px; height:40px; object-fit:cover;" />
-                    <span class="fw-bold">@Model.CurrentUserReview.ReviewerName</span>
+
+                <a asp-controller="Profile"
+                   asp-action="GuestProfile"
+                   asp-route-id="@Model.CurrentUserReview.ReviewerId"
+                   class="d-flex align-items-center gap-2 text-dark text-decoration-none">
+
+                    <img src="@(string.IsNullOrEmpty(Model.CurrentUserReview.ReviewerPhotoUrl)
+                                ? "https://cdn-icons-png.flaticon.com/512/149/149071.png"
+                                : Model.CurrentUserReview.ReviewerPhotoUrl)"
+                         class="rounded-circle"
+                         style="width:40px; height:40px; object-fit:cover;" />
+
+                    <span class="fw-bold">
+                        @Model.CurrentUserReview.ReviewerName
+                    </span>
+
                 </a>
-                <span class="ms-auto text-muted small">@Model.CurrentUserReview.Date.ToString("dd.MM.yyyy")</span>
+
+                <span class="ms-auto text-muted small">
+                    @Model.CurrentUserReview.Date.ToString("dd.MM.yyyy")
+                </span>
+
             </div>
+
             <div class="mb-2">
+
                 @for (int i = 1; i <= 5; i++)
                 {
-                    <i class="bi @(i <= Model.CurrentUserReview.Rating ? "bi-star-fill" : "bi-star") text-warning"></i>
+                    <i class="bi @(i <= Model.CurrentUserReview.Rating
+                        ? "bi-star-fill"
+                        : "bi-star") text-warning"></i>
                 }
+
             </div>
+
             @if (!string.IsNullOrEmpty(Model.CurrentUserReview.Text))
             {
-                <p class="mb-2 text-muted">@Model.CurrentUserReview.Text</p>
+                <p class="text-muted mb-2">
+                    @Model.CurrentUserReview.Text
+                </p>
             }
-            <div class="mt-2 d-flex gap-2">
-                <a asp-action="Edit" asp-route-reviewId="@Model.CurrentUserReview.Id" class="btn btn-outline-dark btn-sm">Редагувати</a>
-                <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteReviewModal">
+
+            <div class="d-flex gap-2">
+
+                <a asp-action="Edit"
+                   asp-route-reviewId="@Model.CurrentUserReview.Id"
+                   class="btn btn-outline-dark btn-sm">
+                    Редагувати
+                </a>
+
+                <button class="btn btn-outline-danger btn-sm"
+                        data-bs-toggle="modal"
+                        data-bs-target="#deleteReviewModal">
                     Видалити
                 </button>
+
             </div>
+
         </div>
 
-        <div class="modal fade" id="deleteReviewModal" tabindex="-1" aria-labelledby="deleteReviewModalLabel" aria-hidden="true">
+        <div class="modal fade" id="deleteReviewModal" tabindex="-1">
+
             <div class="modal-dialog modal-dialog-centered">
+
                 <div class="modal-content">
+
                     <div class="modal-header border-0">
-                        <h5 class="modal-title fw-bold" id="deleteReviewModalLabel">Видалення відгуку</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <h5 class="fw-bold">Видалення відгуку</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
+
                     <div class="modal-body">
-                        Ви впевнені, що хочете видалити свій відгук? Цю дію неможливо скасувати.
+                        Ви впевнені, що хочете видалити відгук?
                     </div>
+
                     <div class="modal-footer border-0">
-                        <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Скасувати</button>
+
+                        <button class="btn btn-outline-dark" data-bs-dismiss="modal">
+                            Скасувати
+                        </button>
+
                         <form asp-action="Delete" method="post">
-                            <input type="hidden" name="reviewId" value="@Model.CurrentUserReview.Id" />
-                            <input type="hidden" name="reviewedUserId" value="@Model.ReviewedUserId" />
-                            <button type="submit" class="btn btn-danger">Видалити</button>
+
+                            <input type="hidden"
+                                   name="reviewId"
+                                   value="@Model.CurrentUserReview.Id" />
+
+                            <input type="hidden"
+                                   name="reviewedUserId"
+                                   value="@Model.ReviewedUserId" />
+
+                            <button type="submit" class="btn btn-danger">
+                                Видалити
+                            </button>
+
                         </form>
+
                     </div>
+
                 </div>
+
             </div>
+
         </div>
     }
 
     @if (!Model.Reviews.Any() && Model.CurrentUserReview == null)
     {
-        <p class="text-muted text-center">Поки що відгуків немає.</p>
+        <p class="text-muted text-center">
+            Відгуків поки немає
+        </p>
     }
     else if (Model.Reviews.Any())
     {
         <h6 class="text-muted mb-2">Інші відгуки</h6>
+
         @foreach (var review in Model.Reviews)
         {
-            <div class="border rounded p-3 mb-3 bg-white shadow-sm">
+            <div class="card shadow-sm p-3 mb-3">
+
                 <div class="d-flex align-items-center mb-2">
-                    <a asp-controller="Profile" asp-action="GuestProfile" asp-route-id="@review.ReviewerId" class="text-decoration-none text-dark d-flex align-items-center gap-2">
-                        <img src="@(string.IsNullOrEmpty(review.ReviewerPhotoUrl) ? "https://cdn-icons-png.flaticon.com/512/149/149071.png" : review.ReviewerPhotoUrl)" class="rounded-circle" style="width:40px; height:40px; object-fit:cover;" />
-                        <span class="fw-bold">@review.ReviewerName</span>
+
+                    <a asp-controller="Profile"
+                       asp-action="GuestProfile"
+                       asp-route-id="@review.ReviewerId"
+                       class="d-flex align-items-center gap-2 text-dark text-decoration-none">
+
+                        <img src="@(string.IsNullOrEmpty(review.ReviewerPhotoUrl)
+                                    ? "https://cdn-icons-png.flaticon.com/512/149/149071.png"
+                                    : review.ReviewerPhotoUrl)"
+                             class="rounded-circle"
+                             style="width:40px; height:40px; object-fit:cover;" />
+
+                        <span class="fw-bold">
+                            @review.ReviewerName
+                        </span>
+
                     </a>
-                    <span class="ms-auto text-muted small">@review.Date.ToString("dd.MM.yyyy")</span>
+
+                    <span class="ms-auto text-muted small">
+                        @review.Date.ToString("dd.MM.yyyy")
+                    </span>
+
                 </div>
+
                 <div class="mb-2">
+
                     @for (int i = 1; i <= 5; i++)
                     {
-                        <i class="bi @(i <= review.Rating ? "bi-star-fill" : "bi-star") text-warning"></i>
+                        <i class="bi @(i <= review.Rating
+                            ? "bi-star-fill"
+                            : "bi-star") text-warning"></i>
                     }
+
                 </div>
+
                 @if (!string.IsNullOrEmpty(review.Text))
                 {
-                    <p class="mb-0 text-muted">@review.Text</p>
+                    <p class="text-muted mb-0">
+                        @review.Text
+                    </p>
                 }
+
             </div>
         }
     }
+
 </div>

@@ -1,78 +1,123 @@
-﻿@model LitShare.Web.Models.ComplaintViewModel
+﻿@model LitShare.Web.Models.ComplaintDetailsViewModel
+
 @{
-    ViewData["Title"] = "Звіт про проблему";
-    var complaintOptions = new[]
-    {
-        "Неправдива інформація в оголошенні",
-        "Неприпустимий контент або спам",
-        "Проблеми з обміном",
-        "Інше",
-    };
+    ViewData["Title"] = "Деталі скарги";
 }
 
-<div class="container mt-5 d-flex justify-content-center">
-    <div class="border rounded p-5" style="width: 520px;">
-        <h4 class="fw-bold text-center mb-4">Звіт про проблему</h4>
+@if (Model.Complaint == null)
+{
+    <div class="container mt-4">
+        <div class="alert alert-warning">
+            Скаргу не знайдено
+        </div>
+        <a asp-action="Index" class="btn btn-secondary">Назад</a>
+    </div>
+    return;
+}
 
-        <form asp-action="Create" method="post">
-            <input type="hidden" asp-for="PostId" />
-            <p class="fw-bold mb-3">Оберіть проблему:</p>
+<div class="container mt-4">
 
-            <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
-            <span asp-validation-for="ComplaintType" class="text-danger d-block mb-2"></span>
+    <h2 class="mb-3">Деталі скарги #@Model.Complaint.Id</h2>
 
-            @foreach (var option in complaintOptions)
+    <div class="card mb-4 p-3 shadow-sm">
+        <h5 class="mb-2">Текст скарги</h5>
+
+        <p class="mb-2">@Model.Complaint.Text</p>
+
+        <p class="text-muted small">
+            Від: <strong>@Model.Complaint.ComplainantName</strong> |
+            @Model.Complaint.Date.ToString("dd.MM.yyyy HH:mm")
+        </p>
+    </div>
+
+    <div class="card mb-4 p-3 shadow-sm">
+
+        <h5 class="mb-3">Оголошення</h5>
+
+        <div class="row">
+
+            @if (!string.IsNullOrEmpty(Model.Complaint.BookPhotoUrl))
             {
-                <div class="form-check mb-3">
-                    <input class="form-check-input complaint-radio" type="radio" asp-for="ComplaintType" value="@option" id="type_@option.GetHashCode()" />
-                    <label class="form-check-label" for="type_@option.GetHashCode()">
-                        @option
-                    </label>
+                <div class="col-md-3 text-center mb-3">
+                    <img src="@Model.Complaint.BookPhotoUrl"
+                         class="img-fluid rounded"
+                         alt="Book cover" />
                 </div>
             }
 
-            <div class="mb-4">
-                <textarea asp-for="AdditionalText" id="AdditionalText" class="form-control" rows="7"
-                          placeholder="Будь ласка, опишіть проблему тут..."></textarea>
-                <span asp-validation-for="AdditionalText" class="text-danger"></span>
-            </div>
+            <div class="col-md-9">
 
-            <div class="d-flex justify-content-between mt-4">
-                <a asp-controller="Post" asp-action="Details" asp-route-id="@Model.PostId" class="btn btn-outline-secondary px-4 py-2 w-100 me-2">
-                    Скасувати
-                </a>
-                <button type="submit" class="btn btn-dark px-4 py-2 w-100 ms-2">
-                    Надіслати
-                </button>
+                <h4>@Model.Complaint.BookTitle</h4>
+
+                <p><strong>Автор:</strong> @Model.Complaint.BookAuthor</p>
+
+                <hr />
+
+                <p class="complaint-text">
+                    @Model.Complaint.BookDescription
+                </p>
+
             </div>
-        </form>
+        </div>
     </div>
+
+    <div class="d-flex gap-2 mb-5">
+
+        <form asp-action="Approve" asp-route-id="@Model.Complaint.Id" method="post" id="approveForm">
+            <button type="button" class="btn btn-primary" onclick="confirmApprove()">
+                Підтвердити
+            </button>
+        </form>
+
+        <form asp-action="Reject" asp-route-id="@Model.Complaint.Id" method="post" id="rejectForm">
+            <button type="button" class="btn btn-outline-dark" onclick="confirmReject()">
+                Відхилити
+            </button>
+        </form>
+
+        <a asp-action="Index" class="btn btn-secondary">
+            Назад
+        </a>
+
+    </div>
+
 </div>
+
+<style>
+    .complaint-text {
+        white-space: pre-line;
+    }
+</style>
 
 @section Scripts {
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const textParams = document.getElementById("AdditionalText");
-            const radios = document.querySelectorAll(".complaint-radio");
-
-            function toggleTextArea() {
-                const selectedRadio = document.querySelector(".complaint-radio:checked");
-
-                if (selectedRadio && selectedRadio.value === "Інше") {
-                    textParams.disabled = false; 
-                    textParams.placeholder = "Будь ласка, опишіть проблему детально ...";
-                } else {
-                    textParams.disabled = true; 
-                    textParams.value = ""; 
-                    textParams.placeholder = "Опишіть проблему (доступно при виборі 'Інше')";
+        function confirmApprove() {
+            Swal.fire({
+                title: 'Підтвердити скаргу?',
+                text: "Оголошення буде видалено",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Так',
+                cancelButtonText: 'Ні'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('approveForm').submit();
                 }
-            }
-
-            radios.forEach(radio => {
-                radio.addEventListener("change", toggleTextArea);
             });
+        }
 
-            toggleTextArea();
-        });
+        function confirmReject() {
+            Swal.fire({
+                title: 'Відхилити скаргу?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Так',
+                cancelButtonText: 'Ні'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('rejectForm').submit();
+                }
+            });
+        }
     </script>
 }

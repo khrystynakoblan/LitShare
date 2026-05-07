@@ -1,16 +1,19 @@
 @model LitShare.Web.Models.AdminStatsViewModel
+
 @{
     ViewData["Title"] = "Статистика";
 }
 
 <div class="container mt-4">
+
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Статистика</h2>
-        <div>
-            <a asp-action="Index" class="btn btn-outline-secondary me-2">
-                ← Скарги
-            </a>
-        </div>
+
+        <h2 class="mb-0">Статистика</h2>
+
+        <a asp-action="Index" class="btn btn-outline-dark">
+            ← Назад до скарг
+        </a>
+
     </div>
 
     @if (Model.Stats == null)
@@ -21,96 +24,92 @@
     }
     else
     {
+
         <div class="row g-4 mb-4">
+
             <div class="col-md-3">
-                <div class="card text-center shadow-sm border-0 bg-light">
-                    <div class="card-body py-4">
-                        <p class="text-uppercase small fw-bold text-primary mb-1">Користувачів</p>
-                        <h2 class="display-6 fw-bold mb-0">@Model.Stats.TotalUsers</h2>
-                    </div>
+                <div class="card p-3 shadow-sm text-center">
+                    <div class="text-muted small">Користувачі</div>
+                    <h3 class="fw-bold mb-0">@Model.Stats.TotalUsers</h3>
                 </div>
             </div>
 
             <div class="col-md-3">
-                <div class="card text-center shadow-sm border-0 bg-light">
-                    <div class="card-body py-4">
-                        <p class="text-uppercase small fw-bold text-success mb-1">Всіх оголошень</p>
-                        <h2 class="display-6 fw-bold mb-0">@Model.Stats.TotalPosts</h2>
-                    </div>
+                <div class="card p-3 shadow-sm text-center">
+                    <div class="text-muted small">Оголошення</div>
+                    <h3 class="fw-bold mb-0">@Model.Stats.TotalPosts</h3>
                 </div>
             </div>
 
             <div class="col-md-3">
-                <div class="card text-center shadow-sm border-0 bg-light">
-                    <div class="card-body py-4">
-                        <p class="text-uppercase small fw-bold text-info mb-1">Активних</p>
-                        <h2 class="display-6 fw-bold mb-0">@Model.Stats.ActivePosts</h2>
-                    </div>
+                <div class="card p-3 shadow-sm text-center">
+                    <div class="text-muted small">Активні</div>
+                    <h3 class="fw-bold mb-0">@Model.Stats.ActivePosts</h3>
                 </div>
             </div>
 
             <div class="col-md-3">
-                <div class="card text-center shadow-sm border-0 bg-light">
-                    <div class="card-body py-4">
-                        <p class="text-uppercase small fw-bold text-warning mb-1">Скарг</p>
-                        <h2 class="display-6 fw-bold mb-0">@Model.Stats.TotalComplaints</h2>
-                    </div>
+                <div class="card p-3 shadow-sm text-center">
+                    <div class="text-muted small">Скарги</div>
+                    <h3 class="fw-bold mb-0">@Model.Stats.TotalComplaints</h3>
                 </div>
             </div>
+
         </div>
 
         <div class="row g-4">
+
             <div class="col-md-6">
-                <div class="card shadow-sm border-0">
-                    <div class="card-header bg-white py-3">
-                        <h5 class="mb-0 fw-bold">Топ міст за активністю</h5>
-                    </div>
-                    <div class="card-body">
-                        @if (!Model.Stats.TopCities.Any())
-                        {
-                            <p class="text-muted text-center mb-0">Немає даних</p>
-                        }
-                        else
-                        {
-                            <ul class="list-group list-group-flush">
-                                @foreach (var city in Model.Stats.TopCities)
-                                {
-                                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                                        @city.City
-                                        <span class="badge bg-secondary rounded-pill">@city.Count оголошень</span>
-                                    </li>
-                                }
-                            </ul>
-                        }
-                    </div>
+                <div class="card p-3 shadow-sm h-100">
+
+                    <h5 class="mb-3">Топ міст</h5>
+
+                    @if (Model.Stats.TopCities == null || !Model.Stats.TopCities.Any())
+                    {
+                        <p class="text-muted mb-0">Немає даних</p>
+                    }
+                    else
+                    {
+                        <ul class="list-group list-group-flush">
+                            @foreach (var city in Model.Stats.TopCities)
+                            {
+                                <li class="list-group-item d-flex justify-content-between px-0">
+                                    <span>@city.City</span>
+                                    <span class="badge bg-dark">@city.Count</span>
+                                </li>
+                            }
+                        </ul>
+                    }
+
                 </div>
             </div>
 
             <div class="col-md-6">
-                <div class="card shadow-sm border-0">
-                    <div class="card-header bg-white py-3">
-                        <h5 class="mb-0 fw-bold">Популярні жанри</h5>
-                    </div>
-                    <div class="card-body">
-                        @if (!Model.Stats.TopGenres.Any())
-                        {
-                            <p class="text-muted text-center mb-0">Немає даних</p>
-                        }
-                        else
-                        {
-                            <ul class="list-group list-group-flush">
-                                @foreach (var genre in Model.Stats.TopGenres)
-                                {
-                                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                                        @genre.GenreName
-                                        <span class="badge bg-secondary rounded-pill">@genre.Count книг</span>
-                                    </li>
-                                }
-                            </ul>
-                        }
-                    </div>
+                <div class="card p-3 shadow-sm h-100">
+
+                    <h5 class="mb-3">Популярні жанри</h5>
+
+                    @if (Model.Stats.TopGenres == null || !Model.Stats.TopGenres.Any())
+                    {
+                        <p class="text-muted mb-0">Немає даних</p>
+                    }
+                    else
+                    {
+                        <ul class="list-group list-group-flush">
+                            @foreach (var genre in Model.Stats.TopGenres)
+                            {
+                                <li class="list-group-item d-flex justify-content-between px-0">
+                                    <span>@genre.GenreName</span>
+                                    <span class="badge bg-dark">@genre.Count</span>
+                                </li>
+                            }
+                        </ul>
+                    }
+
                 </div>
             </div>
+
         </div>
     }
+
 </div>

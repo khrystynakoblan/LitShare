@@ -4,101 +4,99 @@
     ViewData["Title"] = "Деталі скарги";
 }
 
-<div class="container mt-4">
-    <h2>Деталі скарги #@Model.Complaint!.Id</h2>
-    <hr />
-
-    <div class="card mb-4">
-        <div class="card-body">
-            <h5 class="card-title">Текст скарги:</h5>
-            <p class="card-text">@Model.Complaint.Text</p>
-            <p class="text-muted small">
-                Від: <strong>@Model.Complaint.ComplainantName</strong> | Дата: @Model.Complaint.Date.ToString("dd.MM.yyyy HH:mm")
-            </p>
-        </div>
-    </div>
-
-    @if (Model.Complaint != null)
+@if (Model.Complaint == null)
 {
-    <div class="card mb-4 shadow-sm">
-        <div class="card-header bg-light">
-            <strong>Об'єкт скарги (Оголошення)</strong>
+    <div class="container mt-4">
+        <div class="alert alert-warning">
+            Скаргу не знайдено
         </div>
-        <div class="card-body">
-            <div class="row">
-                @if (!string.IsNullOrEmpty(Model.Complaint.BookPhotoUrl))
-                {
-                    <div class="col-md-3 text-center mb-3 mb-md-0">
-                        <img src="@Model.Complaint.BookPhotoUrl" 
-                             alt="Book cover" 
-                             class="img-fluid rounded border" 
-                             style="max-height: 250px; object-fit: contain;" />
-                    </div>
-                }
-
-                <div class="@(string.IsNullOrEmpty(Model.Complaint.BookPhotoUrl) ? "col-12" : "col-md-9")">
-                    <h4 class="mb-2">@Model.Complaint.BookTitle</h4>
-                    <p class="mb-1"><strong>Автор:</strong> @Model.Complaint.BookAuthor</p>
-                    <hr />
-                    <h6>Опис оголошення:</h6>
-                    <p class="mb-0 text-dark" style="white-space: pre-line;">@Model.Complaint.BookDescription</p>
-                </div>
-            </div>
-        </div>
+        <a asp-action="Index" class="btn btn-secondary">Назад</a>
     </div>
+    return;
 }
 
-    <div class="d-flex gap-2 mb-5">
-        <form asp-action="Approve" asp-route-id="@Model.Complaint!.Id" method="post" id="approveForm">
-            <button type="button" class="btn btn-success" onclick="confirmApprove()">
-                Підтвердити скаргу (Видалити пост)
-            </button>
-        </form>
+<div class="container mt-4">
 
-        <form asp-action="Reject" asp-route-id="@Model.Complaint.Id" method="post" id="rejectForm">
-            <button type="button" class="btn btn-outline-danger" onclick="confirmReject()">
-                Відхилити скаргу
-            </button>
-        </form>
+    <h2 class="mb-3">Деталі скарги #@Model.Complaint.Id</h2>
 
-        <a asp-action="Index" class="btn btn-secondary">Назад до списку</a>
+    <div class="card mb-4 p-3 shadow-sm">
+        <h5 class="mb-2">Текст скарги</h5>
+
+        <p class="mb-2">@Model.Complaint.Text</p>
+
+        <p class="text-muted small">
+            Від: <strong>@Model.Complaint.ComplainantName</strong> |
+            @Model.Complaint.Date.ToString("dd.MM.yyyy HH:mm")
+        </p>
     </div>
+
+    <div class="card mb-4 p-3 shadow-sm">
+
+        <h5 class="mb-3">Оголошення</h5>
+
+        <div class="row">
+
+            @if (!string.IsNullOrEmpty(Model.Complaint.BookPhotoUrl))
+            {
+                <div class="col-md-3 text-center mb-3">
+                    <img src="@Model.Complaint.BookPhotoUrl"
+                         class="img-fluid rounded"
+                         alt="Book cover" />
+                </div>
+            }
+
+            <div class="col-md-9">
+
+                <h4>@Model.Complaint.BookTitle</h4>
+
+                <p><strong>Автор:</strong> @Model.Complaint.BookAuthor</p>
+
+                <hr />
+
+                <p style="white-space: pre-line;">
+                    @Model.Complaint.BookDescription
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="d-flex gap-2 mb-5">
+
+        <form asp-action="Approve"
+              asp-route-id="@Model.Complaint.Id"
+              method="post"
+              id="approveForm">
+
+            <button type="button"
+                    class="btn btn-primary js-approve-btn">
+                Підтвердити
+            </button>
+
+        </form>
+
+        <form asp-action="Reject"
+              asp-route-id="@Model.Complaint.Id"
+              method="post"
+              id="rejectForm">
+
+            <button type="button"
+                    class="btn btn-outline-dark js-reject-btn">
+                Відхилити
+            </button>
+
+        </form>
+
+        <a asp-action="Index" class="btn btn-secondary">
+            Назад
+        </a>
+
+    </div>
+
 </div>
 
 @section Scripts {
-    <script>
-        function confirmApprove() {
-            Swal.fire({
-                title: 'Ви впевнені?',
-                text: "Оголошення буде назавжди видалено з платформи!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#198754',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Так, видалити пост!',
-                cancelButtonText: 'Скасувати'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    document.getElementById('approveForm').submit();
-                }
-            })
-        }
-
-        function confirmReject() {
-            Swal.fire({
-                title: 'Відхилити скаргу?',
-                text: "Скаргу буде видалено, а оголошення залишиться.",
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#dc3545',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Так, відхилити',
-                cancelButtonText: 'Скасувати'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    document.getElementById('rejectForm').submit();
-                }
-            })
-        }
-    </script>
+    <script src="~/js/complaints.js" asp-append-version="true"></script>
 }

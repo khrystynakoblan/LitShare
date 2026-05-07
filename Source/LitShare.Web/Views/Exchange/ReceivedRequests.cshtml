@@ -4,148 +4,163 @@
     ViewData["Title"] = "Отримані запити";
 }
 
-<h2 class="mb-4">Отримані запити</h2>
+<div class="container mt-4">
 
-@if (TempData["SuccessMessage"] != null)
+    <h2 class="mb-4">Отримані запити</h2>
 
-{
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show mb-3">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
 
-    <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show mb-3">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
 
-        @TempData["SuccessMessage"]
+    @if (Model == null || !Model.Any())
+    {
+        <div class="text-center mt-5">
 
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <h5 class="text-muted">
+                У вас поки немає отриманих запитів
+            </h5>
 
-    </div>
+            <p class="text-secondary">
+                Як тільки хтось надішле запит — він зʼявиться тут
+            </p>
 
-}
+            <a asp-controller="Home"
+               asp-action="Index"
+               class="btn btn-outline-dark mt-3">
+                Перейти до оголошень
+            </a>
 
-@if (TempData["ErrorMessage"] != null)
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-sm">
 
-{
+            <div class="table-responsive">
 
-    <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+                <table class="table table-hover align-middle mb-0">
 
-        @TempData["ErrorMessage"]
+                    <thead class="table-light">
+                        <tr>
+                            <th>Книга</th>
+                            <th>Від кого</th>
+                            <th>Статус</th>
+                            <th class="text-end">Дії</th>
+                        </tr>
+                    </thead>
 
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    <tbody>
 
-    </div>
-
-}
-
-@if (!Model.Any())
-{
-    <div class="text-center mt-5">
-        <div style="font-size: 60px;"></div>
-
-        <h4 class="text-muted mt-3">
-            У вас поки немає отриманих запитів
-        </h4>
-
-        <p class="text-secondary">
-            Коли хтось надішле вам запит — він з’явиться тут 
-        </p>
-
-        <a asp-controller="Home"
-           asp-action="Index"
-           class="btn btn-outline-primary mt-3">
-            Перейти до оголошень
-        </a>
-    </div>
-}
-else
-{
-    <table class="table table-hover align-middle">
-        <thead class="table-light">
-            <tr>
-                <th>Книга</th>
-                <th>Від кого</th>
-                <th>Статус</th>
-                <th class="text-end">Дії</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var request in Model)
-            {
-                <tr>
-                    <td>
-                        <strong>@request.PostTitle</strong>
-                    </td>
-
-                    <td>
-                        @request.SenderName
-                    </td>
-
-                    <td>
-                        @if (request.Status == "Очікує")
+                        @foreach (var request in Model)
                         {
-                            <span class="badge bg-warning text-dark">Очікує</span>
+                            <tr>
+
+                                <td>
+                                    <strong>@request.PostTitle</strong>
+                                </td>
+
+                                <td>
+                                    @request.SenderName
+                                </td>
+
+                                <td>
+
+                                    @switch (request.Status)
+                                    {
+                                        case "Очікує":
+                                            <span class="badge bg-warning text-dark">Очікує</span>
+                                            break;
+
+                                        case "Прийнято":
+                                            <span class="badge bg-success">Прийнято</span>
+                                            break;
+
+                                        case "Відхилено":
+                                            <span class="badge bg-danger">Відхилено</span>
+                                            break;
+
+                                        case "Завершено":
+                                            <span class="badge bg-secondary">Завершено</span>
+                                            break;
+
+                                        default:
+                                            <span class="badge bg-light text-dark">@request.Status</span>
+                                            break;
+                                    }
+
+                                </td>
+
+                                <td class="text-end">
+
+                                    <div class="d-flex gap-2 justify-content-end flex-wrap">
+
+                                        <a asp-controller="Post"
+                                           asp-action="Details"
+                                           asp-route-id="@request.PostId"
+                                           class="btn btn-sm btn-outline-dark">
+                                            Деталі
+                                        </a>
+
+                                        <a asp-controller="Profile"
+                                           asp-action="GuestProfile"
+                                           asp-route-id="@request.SenderId"
+                                           class="btn btn-sm btn-outline-dark">
+                                            Профіль
+                                        </a>
+
+                                        @if (request.Status == "Очікує")
+                                        {
+                                            <form asp-action="AcceptRequest" method="post">
+                                                <input type="hidden" name="requestId" value="@request.Id" />
+                                                <button class="btn btn-sm btn-primary">
+                                                    Прийняти
+                                                </button>
+                                            </form>
+
+                                            <form asp-action="RejectRequest" method="post">
+                                                <input type="hidden" name="requestId" value="@request.Id" />
+                                                <button class="btn btn-sm btn-outline-dark">
+                                                    Відхилити
+                                                </button>
+                                            </form>
+                                        }
+
+                                        @if (request.Status == "Прийнято")
+                                        {
+                                            <form asp-action="CompleteDeal" method="post">
+                                                <input type="hidden" name="requestId" value="@request.Id" />
+                                                <button class="btn btn-sm btn-primary">
+                                                    Завершити
+                                                </button>
+                                            </form>
+                                        }
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
                         }
-                        else if (request.Status == "Прийнято")
-                        {
-                            <span class="badge bg-success">Прийнято</span>
-                        }
-                        else if (request.Status == "Відхилено")
-                        {
-                            <span class="badge bg-danger">Відхилено</span>
-                        }
-                        else if (request.Status == "Завершено") 
-                        {
-                            <span class="badge bg-secondary">Завершено</span>
-                        }
-                    </td>
 
-                    <td class="text-end">
-                        <div class="d-flex justify-content-end gap-2">
+                    </tbody>
 
-                            <a asp-controller="Post"
-                               asp-action="Details"
-                               asp-route-id="@request.PostId"
-                               class="btn btn-sm btn-outline-secondary">
-                                Деталі
-                            </a>
+                </table>
 
-                            <a asp-controller="Profile"
-                               asp-action="GuestProfile"
-                               asp-route-id="@request.SenderId"
-                               class="btn btn-sm btn-outline-info">
-                                Профіль
-                            </a>
+            </div>
 
-                            @if (request.Status == "Очікує")
-                            {
-                                <div class="d-flex gap-1">
-                                    <form asp-action="AcceptRequest" method="post">
-                                        <input type="hidden" name="requestId" value="@request.Id" />
-                                        <button type="submit" class="btn btn-sm btn-success">
-                                            Прийняти
-                                        </button>
-                                    </form>
+        </div>
+    }
 
-                                    <form asp-action="RejectRequest" method="post">
-                                        <input type="hidden" name="requestId" value="@request.Id" />
-                                        <button type="submit" class="btn btn-sm btn-danger">
-                                            Відхилити
-                                        </button>
-                                    </form>
-                                </div>
-                            }
-
-                            @if (request.Status == "Прийнято") 
-                            {
-                                <form asp-action="CompleteDeal" method="post">
-                                    <input type="hidden" name="requestId" value="@request.Id" />
-                                    <button type="submit" class="btn btn-sm btn-primary">
-                                        Завершити угоду
-                                    </button>
-                                </form>
-                            }
-
-                        </div>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+</div>

@@ -3,25 +3,39 @@
 }
 
 <div class="container mt-5">
-    <div class="border rounded p-4 mx-auto text-center" style="max-width: 500px;">
 
-        <h3 class="text-danger fw-bold mb-3">
-            Ви впевнені, що хочете видалити акаунт?
-        </h3>
+    <div class="row justify-content-center">
 
-        <p class="text-muted mb-4">
-            Цю дію неможливо скасувати.
-        </p>
+        <div class="col-md-6">
 
-        <form asp-action="DeleteAccountConfirmed" method="post">
-            <button type="submit" class="btn btn-danger px-4">
-                Видалити акаунт
-            </button>
+            <div class="card shadow-sm text-center p-4">
 
-            <a asp-action="MyProfile" class="btn btn-outline-secondary px-4 ms-2">
-                Скасувати
-            </a>
-        </form>
+                <h4 class="fw-bold text-danger mb-3">
+                    Видалення акаунту
+                </h4>
+
+                <p class="text-muted mb-4">
+                    Ви впевнені, що хочете видалити акаунт?  
+                    Цю дію неможливо скасувати.
+                </p>
+
+                <form asp-action="DeleteAccountConfirmed" method="post" class="mb-3">
+
+                    <button type="submit" class="btn btn-danger px-4">
+                        Видалити акаунт
+                    </button>
+
+                </form>
+
+                <a asp-action="MyProfile"
+                   class="btn btn-outline-dark px-4">
+                    Скасувати
+                </a>
+
+            </div>
+
+        </div>
 
     </div>
+
 </div>

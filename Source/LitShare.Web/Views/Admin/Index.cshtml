@@ -1,44 +1,100 @@
 @model LitShare.Web.Models.AdminViewModel
+
 @{
     ViewData["Title"] = "Список скарг";
 }
-        @if (User.IsInRole("Admin"))
-        {
-            <a asp-controller="Admin" asp-action="Statistics" class="btn btn-primary">
-                <i class="me-2"></i>Переглянути статистику
-            </a>
-            <a asp-controller="Admin" asp-action="Users" class="btn btn-outline-dark">
-                <i class="bi btn-outline-dark"></i>Користувачі
-            </a>
-        }
 
 <div class="container mt-4">
+
     <div class="d-flex justify-content-between align-items-center mb-4">
+
         <div>
             <h4 class="mb-0">Список скарг</h4>
-            <p class="text-muted mb-0">Всього скарг: @Model.TotalCount</p>
+            <p class="text-muted mb-0">
+                Всього: @Model.TotalCount
+            </p>
         </div>
+
+        @if (User.IsInRole("Admin"))
+        {
+            <div class="d-flex gap-2">
+
+                <a asp-controller="Admin"
+                   asp-action="Statistics"
+                   class="btn btn-primary">
+                    Статистика
+                </a>
+
+                <a asp-controller="Admin"
+                   asp-action="Users"
+                   class="btn btn-outline-dark">
+                    Користувачі
+                </a>
+
+            </div>
+        }
+
     </div>
-        <table class="table table-bordered table-hover">
-            <thead class="table-light">
-                <tr>
-                    <th>Скарга</th>
-                    <th>Назва книги</th>
-                    <th>Ім'я</th>
-                    <th>Дата</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var complaint in Model.Complaints)
-                {
-                    <tr style="cursor: pointer;"
-                        onclick="window.location='@Url.Action("Details", "Admin", new { id = complaint.Id })'">
-                        <td>@complaint.Text</td>
-                        <td>@complaint.BookTitle</td>
-                        <td>@complaint.ComplainantName</td>
-                        <td>@complaint.Date.ToString("dd/MM/yyyy")</td>
+
+    <div class="card p-3 shadow-sm">
+
+        @if (Model.Complaints == null || !Model.Complaints.Any())
+        {
+            <div class="text-center text-muted py-4">
+                Немає скарг
+            </div>
+        }
+        else
+        {
+            <table class="table table-hover align-middle mb-0">
+
+                <thead class="table-light">
+                    <tr>
+                        <th>Скарга</th>
+                        <th>Книга</th>
+                        <th>Користувач</th>
+                        <th>Дата</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+
+                <tbody>
+                    @foreach (var complaint in Model.Complaints)
+                    {
+                        var url = Url.Action("Details", "Admin", new { id = complaint.Id });
+
+                        <tr>
+
+                            <td>
+                                <a href="@url" class="text-decoration-none text-dark">
+                                    @complaint.Text
+                                </a>
+                            </td>
+
+                            <td>
+                                <a href="@url" class="text-decoration-none text-dark">
+                                    @complaint.BookTitle
+                                </a>
+                            </td>
+
+                            <td>
+                                <a href="@url" class="text-decoration-none text-dark">
+                                    @complaint.ComplainantName
+                                </a>
+                            </td>
+
+                            <td>
+                                <a href="@url" class="text-decoration-none text-dark">
+                                    @complaint.Date.ToString("dd.MM.yyyy")
+                                </a>
+                            </td>
+
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+        }
+
+    </div>
+
 </div>
