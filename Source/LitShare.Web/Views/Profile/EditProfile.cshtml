@@ -4,90 +4,112 @@
     ViewData["Title"] = "Редагування профілю";
 }
 
-<div class="container-fluid mt-4">
-    <div class="border rounded p-4 mx-auto" style="max-width: 1200px;">
-
-        <h2 class="text-center fw-bold mb-4">Редагування профілю</h2>
+<div class="container mt-4">
+    <div class="card p-4 mx-auto border-0 shadow-sm">
+        <h2 class="text-center fw-bold mb-4">@ViewData["Title"]</h2>
 
         <div class="row g-4">
-
             <div class="col-md-4">
-                <div class="border rounded p-4 text-center">
-                    <img src="@(string.IsNullOrEmpty(Model.PhotoUrl)
-                            ? "https://cdn-icons-png.flaticon.com/512/149/149071.png"
-                            : Model.PhotoUrl)"
-                         alt="Фото профілю"
-                         class="rounded-circle mb-3"
-                         style="width:160px; height:160px; object-fit:cover;" />
+                <div class="card h-100 p-4 text-center d-flex flex-column align-items-center justify-content-center border-0 bg-light">
+                    <div class="mb-3">
+                        <img src="@(string.IsNullOrEmpty(Model.PhotoUrl) 
+                                ? "https://cdn-icons-png.flaticon.com/512/149/149071.png" 
+                                : Model.PhotoUrl)"
+                             alt="Фото профілю"
+                             class="rounded-circle shadow-sm border border-3 border-white"
+                             style="width:160px; height:160px; object-fit: contain; background-color: white;" />
+                    </div>
 
-                    <div class="d-grid">
+                    <div class="w-100">
                         <form asp-controller="Profile" asp-action="GenerateAvatar" method="post">
-                            <button type="submit" class="btn btn-dark">Змінити фото</button>
+
+                            <input type="hidden" asp-for="Name" />
+                            <input type="hidden" asp-for="City" />
+                            <input type="hidden" asp-for="District" />
+                            <input type="hidden" asp-for="Region" />
+                            <input type="hidden" asp-for="Phone" />
+                            <input type="hidden" asp-for="Email" />
+                            <input type="hidden" asp-for="About" />
+                            
+                            <button type="submit" class="btn btn-dark w-100 py-2">
+                                <i class="bi bi-arrow-repeat me-2"></i>Згенерувати аватар
+                            </button>
                         </form>
+                        <p class="text-muted small mt-2">Створіть унікальний образ за допомогою AI</p>
                     </div>
                 </div>
             </div>
 
             <div class="col-md-8">
-                <div class="border rounded p-4">
+                <div class="card p-4 h-100 border-0 shadow-sm">
                     <form asp-controller="Profile" asp-action="EditProfile" method="post">
-
                         <input type="hidden" asp-for="PhotoUrl" />
+                        <input type="hidden" asp-for="Name" /> 
                         
-                        <h4 class="fw-bold mb-4">Основна інформація</h4>
+                        <h4 class="fw-bold mb-4 border-bottom pb-2">Основна інформація</h4>
 
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Ім'я</label>
-                            <input class="form-control" value="@Model.Name" disabled />
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Ім'я користувача</label>
+                                <input class="form-control bg-light" value="@Model.Name" readonly />
+                                <div class="form-text">Ім'я підтягується з вашого облікового запису</div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" asp-for="City">Місто</label>
+                                <input class="form-control" asp-for="City" placeholder="Напр. Київ" />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" asp-for="District">Район</label>
+                                <input class="form-control" asp-for="District" placeholder="Напр. Печерський" />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" asp-for="Region">Область</label>
+                                <input class="form-control" asp-for="Region" placeholder="Напр. Київська" />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" asp-for="Phone">Телефон</label>
+                                <input class="form-control" asp-for="Phone" placeholder="+380..." />
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label fw-semibold" asp-for="Email">Контактний Email</label>
+                                <input class="form-control" asp-for="Email" type="email" />
+                                <span asp-validation-for="Email" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label fw-semibold" asp-for="About">Про себе</label>
+                                <textarea class="form-control" asp-for="About" rows="4" placeholder="Розкажіть про свої книги..."></textarea>
+                            </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold" for="City">Населений пункт</label>
-                            <input class="form-control" id="City" name="City" value="@Model.City" />
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold" for="District">Район</label>
-                            <input class="form-control" id="District" name="District" value="@Model.District" />
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold" for="Region">Область</label>
-                            <input class="form-control" id="Region" name="Region" value="@Model.Region" />
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold" for="Phone">Контактні дані</label>
-                            <input class="form-control" asp-for="Phone" />
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold" for="Email">Email</label>
-                            <input class="form-control" id="Email" name="Email" value="@Model.Email" />
-                        </div>
-
-                        <div class="mb-4">
-                            <label class="form-label fw-semibold" for="About">Про себе</label>
-                            <textarea class="form-control" id="About" name="About" rows="6">@Model.About</textarea>
-                        </div>
-
-                        <div class="d-flex gap-3">
-                            <button type="submit" class="btn btn-dark px-4">Зберегти</button>
-
-                            @if (User.IsInRole("Admin"))
-                            {
-                                <a asp-controller="Admin" asp-action="MyProfile" class="btn btn-outline-secondary px-4">Скасувати</a>
+                        <div class="d-flex flex-column flex-sm-row gap-2 mt-5">
+                            <button type="submit" class="btn btn-dark px-5 py-2 fw-bold shadow-sm">
+                                Зберегти зміни
+                            </button>
+                            
+                            @{
+                                var targetAction = "Index"; 
+                                var targetController = User.IsInRole("Admin") ? "Admin" : "Profile";
                             }
-                            else
-                            {
-                                <a asp-controller="Profile" asp-action="MyProfile" class="btn btn-outline-secondary px-4">Скасувати</a>
-                            }
+                            
+                            <a asp-controller="@targetController" 
+                            asp-action="@targetAction" 
+                            class="btn btn-outline-dark px-4 py-2">
+                                Скасувати   
+                            </a>
                         </div>
-
                     </form>
                 </div>
             </div>
-
         </div>
     </div>
 </div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

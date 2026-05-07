@@ -5,108 +5,103 @@
     ViewData["Title"] = "Мої книги";
 }
 
-<div class="container mt-5">
-    <h3 class="fw-bold mb-4 text-center">Мої книги</h3>
-
-    <div class="mb-4 text-center">
-        <a asp-action="MyBooks" class="btn btn-sm btn-outline-dark">Всі</a>
-        <a asp-action="MyBooks" asp-route-isActive="true" class="btn btn-sm btn-outline-success">Активні</a>
-        <a asp-action="MyBooks" asp-route-isActive="false" class="btn btn-sm btn-outline-secondary">Неактивні</a>
+<div class="container mt-4 mb-5">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-5">
+        <div>
+            <h2 class="fw-bold mb-1">@ViewData["Title"]</h2>
+            <p class="text-muted small mb-0">Керуйте публікаціями та їх видимістю для інших</p>
+        </div>
+        
+        <div class="btn-group shadow-sm rounded-pill overflow-hidden mt-3 mt-md-0">
+            @{
+                var activeQuery = Context.Request.Query["isActive"];
+            }
+            <a asp-action="MyBooks" class="btn btn-dark px-3 @(activeQuery.Count == 0 ? "active" : "")">Всі</a>
+            <a asp-action="MyBooks" asp-route-isActive="true" class="btn btn-dark px-3 @(activeQuery == "true" ? "active" : "")">Активні</a>
+            <a asp-action="MyBooks" asp-route-isActive="false" class="btn btn-dark px-3 @(activeQuery == "false" ? "active" : "")">Архів</a>
+        </div>
     </div>
 
-    <div class="row row-cols-2 row-cols-md-5 g-4">
-        @if (Model.UserBooks != null && Model.UserBooks.Any())
-        {
+    @if (Model.UserBooks != null && Model.UserBooks.Any())
+    {
+        <div class="row row-cols-2 row-cols-md-4 row-cols-lg-5 g-4">
             @foreach (var book in Model.UserBooks)
             {
                 bool isFavorited = Model.FavoritePostIds != null && Model.FavoritePostIds.Contains(book.Id);
 
-                <div class="col text-center">
-                    <div class="card h-100 border shadow-sm p-2 bg-white position-relative">
-
+                <div class="col">
+                    <div class="card h-100 p-2 border-0 shadow-sm card-hover position-relative rounded-4">
                         <form asp-controller="Favorite" asp-action="Toggle" method="post"
-                              class="position-absolute top-0 end-0 m-1" style="z-index: 1;">
+                              class="position-absolute top-0 end-0 m-2" style="z-index: 10;">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="postId" value="@book.Id" />
                             <input type="hidden" name="returnUrl" value="/Profile/MyBooks" />
-                            <button type="submit" class="btn btn-link p-1 border-0">
-                                <i class="bi @(isFavorited ? "bi-heart-fill text-danger" : "bi-heart text-muted")"
-                                   style="font-size: 1.2rem;"></i>
+                            <button type="submit" class="btn btn-light btn-sm rounded-circle shadow-sm p-0 d-flex align-items-center justify-content-center" 
+                                    style="width: 32px; height: 32px;">
+                                <i class="bi @(isFavorited ? "bi-heart-fill text-danger" : "bi-heart text-muted") fs-6"></i>
                             </button>
                         </form>
 
-                        <div class="bg-light rounded d-flex align-items-center justify-content-center overflow-hidden"
+                        <div class="bg-light rounded-3 overflow-hidden shadow-inner d-flex align-items-center justify-content-center position-relative" 
                              style="aspect-ratio: 3/4;">
+                            
+                            @if (!book.IsActive)
+                            {
+                                <div class="position-absolute top-50 start-50 translate-middle w-100 text-center" style="z-index: 2;">
+                                    <span class="badge bg-dark opacity-75 px-3 py-2 rounded-pill">В архіві</span>
+                                </div>
+                            }
+
                             @if (!string.IsNullOrEmpty(book.PhotoUrl))
                             {
-                                <img src="@book.PhotoUrl"
-                                     class="w-100 h-100"
-                                     style="object-fit: cover;"
-                                     alt="@book.Title" />
+                                <img src="@book.PhotoUrl" 
+                                    class="w-100 h-100 object-fit-cover transition-img @(book.IsActive ? "" : "grayscale-filter")" 
+                                    alt="@book.Title" />
                             }
                             else
                             {
-                                <i class="bi bi-image text-secondary" style="font-size: 2.5rem;"></i>
+                                <i class="bi bi-book text-muted display-6"></i>
                             }
                         </div>
 
-                        <div class="card-body px-0 py-2">
-                            <p class="mb-0 fw-bold small text-truncate">@book.Title</p>
-                            <p class="mb-0 text-muted extra-small">@book.Author</p>
+                        <div class="card-body px-1 py-3 d-flex flex-column text-center">
+                            <h6 class="mb-1 fw-bold text-truncate small" title="@book.Title">@book.Title</h6>
+                            <p class="mb-3 text-muted extra-small text-truncate">@book.Author</p>
 
-                            <!-- статус -->
-                            <p class="mb-1 extra-small">
-                                <span class="badge @(book.IsActive ? "bg-success" : "bg-secondary")">
-                                    @(book.IsActive ? "Активна" : "Неактивна")
-                                </span>
-                            </p>
+                            <div class="mt-auto d-grid gap-2">
+                                <a asp-controller="Post" asp-action="Edit" asp-route-id="@book.Id"
+                                   class="btn btn-outline-dark btn-sm rounded-pill py-1 small">
+                                    <i class="bi bi-pencil-square me-1"></i> Редагувати
+                                </a>
 
-                            <p class="mb-2 text-muted extra-small">
-                                <i class="bi bi-geo-alt"></i> @(book.City ?? "Київ")
-                            </p>
-
-                            <a asp-controller="Post"
-                               asp-action="Edit"
-                               asp-route-id="@book.Id"
-                               class="btn btn-dark w-100 extra-small py-1"
-                               style="border-radius: 4px;">
-                                Редагувати
-                            </a>
-
-                            <form asp-action="TogglePostStatus" method="post">
-                                <input type="hidden" name="postId" value="@book.Id" />
-                                <input type="hidden" name="isActive" value="@(!book.IsActive)" />
-
-                                <button type="submit"
-                                        class="btn w-100 extra-small py-1 mt-1 @(book.IsActive ? "btn-outline-danger" : "btn-outline-success")">
-                                    @(book.IsActive ? "Деактивувати" : "Активувати")
-                                </button>
-                            </form>
+                                <form asp-action="TogglePostStatus" method="post" class="d-grid">
+                                    <input type="hidden" name="postId" value="@book.Id" />
+                                    <input type="hidden" name="isActive" value="@(!book.IsActive)" />
+                                    <button type="submit" class="btn btn-sm rounded-pill py-1 small @(book.IsActive ? "btn-light text-muted" : "btn-dark")">
+                                        <i class="bi @(book.IsActive ? "bi-eye-slash" : "bi-eye") me-1"></i>
+                                        @(book.IsActive ? "Деактивувати" : "Активувати")
+                                    </button>
+                                </form>
+                            </div>
                         </div>
-
                     </div>
                 </div>
             }
-        }
-        else
-        {
-            <div class="col-12 text-center py-5">
-                <p class="text-muted">У вас ще немає доданих книг.</p>
-                <a asp-controller="Post" asp-action="CreatePost" class="btn btn-sm btn-outline-dark">
-                    Додати першу книгу
-                </a>
+        </div>
+    }
+    else
+    {
+        <div class="card text-center py-5 border-0 shadow-sm rounded-4 bg-white mt-4">
+            <div class="card-body">
+                <i class="bi bi-journal-x display-1 text-muted mb-4 d-block"></i>
+                <h4 class="fw-bold">Книг не знайдено</h4>
+                <p class="text-muted">Ви ще не додали жодної книги або налаштували фільтри занадто суворо.</p>
+                <div class="mt-4">
+                    <a asp-controller="Post" asp-action="CreatePost" class="btn btn-dark px-4 py-2 rounded-pill shadow-sm">
+                        <i class="bi bi-plus-lg me-2"></i>Додати першу книгу
+                    </a>
+                </div>
             </div>
-        }
-    </div>
+        </div>
+    }
 </div>
-
-<style>
-    .extra-small {
-        font-size: 0.75rem;
-    }
-
-    .card {
-        border: 1px solid #f0f0f0 !important;
-        border-radius: 8px;
-    }
-</style>

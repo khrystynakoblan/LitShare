@@ -2,111 +2,92 @@
 @using System.Security.Claims
 
 @{
-    ViewData["Title"] = "Оголошення";
+    ViewData["Title"] = Model.Title;
 }
 
-<div class="container mt-4">
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
-            <i class="bi bi-check-circle-fill me-2"></i>
-            @TempData["SuccessMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    }
-
-    @if (TempData["ErrorMessage"] != null)
-    {
-        <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
-            <i class="bi bi-exclamation-triangle-fill me-2"></i>
-            @TempData["ErrorMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    }
-
-    <div class="row">
-        <div class="col-md-4">
-            <div class="bg-secondary-subtle d-flex align-items-center justify-content-center"
-                 style="height: 400px;">
-                @if (!string.IsNullOrEmpty(Model.PhotoUrl))
-                {
-                    <img src="@Model.PhotoUrl" class="img-fluid h-100 w-100"
-                         style="object-fit: cover;" alt="Book cover" />
-                }
-                else
-                {
-                    <i class="bi bi-image text-muted" style="font-size: 5rem;"></i>
-                }
-            </div>
-        </div>
-
-        <div class="col-md-8 ps-5">
-            <h3 class="fw-bold mb-1">@Model.Title</h3>
-            <p class="text-muted mb-3">@Model.Author</p>
-
-            <p>
-                <strong>Жанр:</strong>
-                @string.Join(", ", Model.Genres)
-            </p>
-
-            <p class="fw-bold mb-1">Опис</p>
-            <p>@Model.Description</p>
-
-            <p>
-                <strong>Тип угоди:</strong>
-                @(Model.DealType == LitShare.DAL.Models.DealType.Exchange ? "Обмін" : "Дарування")
-            </p>
-        </div>
-    </div>
-
-    <div class="d-flex justify-content-between align-items-center mt-3">
-        <a asp-controller="Profile" asp-action="GuestProfile" asp-route-id="@Model.UserId"
-               class="btn btn-dark d-flex align-items-center justify-content-center"
-               style="width: 240px; height: 50px;">
-            Профіль користувача
-        </a>
-
-        @if (User.Identity?.IsAuthenticated == true)
-        {
-            var currentUserIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            int.TryParse(currentUserIdString, out int currentUserId);
-
-            @if (currentUserId == Model.UserId)
-            {
-                <a asp-controller="Post" asp-action="Edit" asp-route-id="@Model.Id"
-                       class="btn btn-outline-dark d-flex align-items-center justify-content-center"
-                       style="width: 240px; height: 50px;">
-                    Редагувати оголошення
-                </a>
-            }
-            else
-            {
-                <div class="d-flex gap-2">
-                    @if (Model.HasAlreadyRequested)
+<div class="container mt-5">
+    <div class="card shadow-sm border-0 overflow-hidden rounded-4">
+        <div class="row g-0">
+            @* Обкладинка *@
+            <div class="col-md-4 bg-light d-flex align-items-center justify-content-center p-4">
+                <div class="shadow-lg rounded-3 overflow-hidden" style="max-height: 500px; aspect-ratio: 3/4;">
+                    @if (!string.IsNullOrEmpty(Model.PhotoUrl))
                     {
-                        <button class="btn btn-secondary d-flex align-items-center justify-content-center"
-                                style="width: 240px; height: 50px;" disabled>
-                            Запит надіслано
-                        </button>
+                        <img src="@Model.PhotoUrl" class="w-100 h-100 object-fit-cover" alt="@Model.Title" />
                     }
                     else
                     {
-                        <form asp-controller="Exchange" asp-action="CreateRequest" method="post">
-                            <input type="hidden" name="postId" value="@Model.Id" />
-                            <button type="submit" class="btn btn-dark d-flex align-items-center justify-content-center"
-                                    style="width: 240px; height: 50px;">
-                                Надіслати запит
-                            </button>
-                        </form>
+                        <div class="p-5 text-center text-muted">
+                            <i class="bi bi-book display-1"></i>
+                        </div>
                     }
+                </div>
+            </div>
 
-                    <a asp-controller="Complaint" asp-action="Create" asp-route-postId="@Model.Id"
-                       class="btn btn-outline-dark d-flex align-items-center justify-content-center"
-                       style="width: 240px; height: 50px;">
-                        Поскаржитися
+            @* Контент *@
+            <div class="col-md-8 p-4 p-md-5">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h1 class="fw-bold mb-1">@Model.Title</h1>
+                        <p class="text-muted fs-4">@Model.Author</p>
+                    </div>
+                    <div>
+                        <span class="badge @(Model.DealType == LitShare.DAL.Models.DealType.Exchange ? "badge-user" : "bg-dark") px-4 py-2 fs-6">
+                            @(Model.DealType == LitShare.DAL.Models.DealType.Exchange ? "Обмін" : "Дарування")
+                        </span>
+                    </div>
+                </div>
+
+                <hr class="my-4 text-muted opacity-25">
+
+                <div class="mb-4">
+                    <h6 class="fw-bold small text-uppercase text-secondary mb-3">Опис книги:</h6>
+                    <p class="text-dark fs-5" style="white-space: pre-line; line-height: 1.6;">@Model.Description</p>
+                </div>
+
+                <div class="mb-5">
+                    <span class="text-muted small"><i class="bi bi-tags me-2"></i>@string.Join(", ", Model.Genres)</span>
+                </div>
+
+                <div class="d-flex flex-wrap gap-3 mt-auto">
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        var currentUserIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                        int.TryParse(currentUserIdString, out int currentUserId);
+
+                        @if (currentUserId == Model.UserId)
+                        {
+                            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-dark btn-lg px-5">
+                                <i class="bi bi-pencil-square me-2"></i>Редагувати
+                            </a>
+                        }
+                        else
+                        {
+                            @if (Model.HasAlreadyRequested)
+                            {
+                                <button class="btn btn-secondary btn-lg px-5 shadow-sm" disabled>
+                                    <i class="bi bi-check2-circle me-2"></i>Запит надіслано
+                                </button>
+                            }
+                            else
+                            {
+                                <form asp-controller="Exchange" asp-action="CreateRequest" method="post">
+                                    <input type="hidden" name="postId" value="@Model.Id" />
+                                    <button type="submit" class="btn btn-dark btn-lg px-5 shadow-sm">
+                                        Надіслати запит
+                                    </button>
+                                </form>
+                            }
+                            <a asp-controller="Complaint" asp-action="Create" asp-route-postId="@Model.Id" class="btn btn-outline-danger btn-lg px-4">
+                                <i class="bi bi-exclamation-octagon"></i>
+                            </a>
+                        }
+                    }
+                    <a asp-controller="Profile" asp-action="GuestProfile" asp-route-id="@Model.UserId" class="btn btn-outline-dark btn-lg px-4">
+                        <i class="bi bi-person-circle me-2"></i>Профіль власника
                     </a>
                 </div>
-            }
-        }
+            </div>
+        </div>
     </div>
 </div>
