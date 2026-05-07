@@ -185,6 +185,15 @@ namespace LitShare.BLL.Services
             }
 
             post.IsActive = false;
+
+            var notification = new Notifications
+            {
+                UserId = request.SenderId,
+                Message = $"Угоду по книзі '{request.Post.Title}' завершено!",
+                IsSent = false,
+            };
+            await this.notificationRepository.AddAsync(notification);
+
             await this.exchangeRepository.SaveChangesAsync();
 
             return true;
