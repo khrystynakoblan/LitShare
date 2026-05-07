@@ -71,6 +71,8 @@ try
     builder.Services.AddScoped<IExchangeRepository, ExchangeRepository>();
     builder.Services.AddScoped<IExchangeService, ExchangeService>();
 
+    builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+
     builder.Services.AddHttpClient<IExternalBookApiService, GoogleBooksApiService>(client =>
     {
         client.BaseAddress = new Uri("https://www.googleapis.com/books/v1/");

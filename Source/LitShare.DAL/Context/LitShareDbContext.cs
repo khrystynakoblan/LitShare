@@ -36,6 +36,8 @@
 
         public DbSet<ExchangeRequest> ExchangeRequests { get; set; }
 
+        public DbSet<Notifications> Notifications { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasPostgresEnum<DealType>("deal_type_t");
@@ -126,6 +128,16 @@
             modelBuilder.Entity<ExchangeRequest>()
                 .HasIndex(e => new { e.SenderId, e.PostId })
                 .IsUnique();
+
+            modelBuilder.Entity<Notifications>(entity =>
+            {
+                entity.HasOne(n => n.User)
+                      .WithMany() // Можна додати в Users.cs властивість Notifications, якщо треба
+                      .HasForeignKey(n => n.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.Property(n => n.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            });
         }
 
         /// <summary>

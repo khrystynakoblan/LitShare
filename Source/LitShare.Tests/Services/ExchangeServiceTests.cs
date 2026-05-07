@@ -13,6 +13,7 @@ namespace LitShare.Tests.BLL.Services
         private readonly Mock<IExchangeRepository> _exchangeRepoMock;
         private readonly Mock<IPostRepository> _postRepoMock;
         private readonly Mock<ILogger<ExchangeService>> _loggerMock;
+        private readonly Mock<INotificationRepository> _notificationRepoMock;
         private readonly ExchangeService _service;
 
         public ExchangeServiceTests()
@@ -20,8 +21,9 @@ namespace LitShare.Tests.BLL.Services
             _exchangeRepoMock = new Mock<IExchangeRepository>();
             _postRepoMock = new Mock<IPostRepository>();
             _loggerMock = new Mock<ILogger<ExchangeService>>();
+            _notificationRepoMock = new Mock<INotificationRepository>();
 
-            _service = new ExchangeService(_exchangeRepoMock.Object, _postRepoMock.Object, _loggerMock.Object);
+            _service = new ExchangeService(_exchangeRepoMock.Object, _postRepoMock.Object, _notificationRepoMock.Object, _loggerMock.Object);
         }
 
         [Fact]
