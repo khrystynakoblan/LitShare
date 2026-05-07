@@ -5,20 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - LitShare</title>
 
-    @* Бібліотеки стилів *@
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    @* Bundle — bootstrap + site.css + components.css + forms.css + profile.css *@
+    <link rel="stylesheet" href="~/css/bundle.min.css" asp-append-version="true" />
 
-    @* Кастомні стилі *@
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/components.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/forms.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
+    @* CDN — не можна включати в bundle (зовнішні файли) *@
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
 
+    @* Окремо для адміна — умовне підключення не можна класти в основний bundle *@
     @if (User.IsInRole("Admin"))
     {
-        <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/admin.min.css" asp-append-version="true" />
     }
 
     @await RenderSectionAsync("Styles", required: false)
@@ -32,7 +29,7 @@
                     <a class="navbar-brand fw-bold text-dark"
                        asp-controller="@(User.IsInRole("Admin") ? "Admin" : "Home")"
                        asp-action="Index">
-                        LitShare )
+                        LitShare
                     </a>
 
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
@@ -93,15 +90,14 @@
         </div>
     </footer>
 
-    @* Скрипти бібліотек *@
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @* Bundle — jquery + bootstrap.js + site.js *@
+    <script src="~/js/bundle.min.js" asp-append-version="true"></script>
+
+    @* CDN — не можна включати в bundle (зовнішні файли) *@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-    <script src="~/js/site.js" asp-append-version="true"></script>
-
-    @* ВИПРАВЛЕННЯ: SweetAlert сповіщення через TempData *@
+    @* SweetAlert сповіщення через TempData *@
     @if (TempData["SuccessMessage"] != null)
     {
         <script>
@@ -132,14 +128,15 @@
             });
         </script>
     }
-  
-  @await RenderSectionAsync("Scripts", required: false)
+
+    @await RenderSectionAsync("Scripts", required: false)
 
     <div aria-live="polite" aria-atomic="true" class="position-relative">
         <div id="toastContainer" class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1055;">
         </div>
     </div>
 
+    @* Умовне підключення — тільки для авторизованих *@
     @if (User.Identity?.IsAuthenticated == true)
     {
         <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>

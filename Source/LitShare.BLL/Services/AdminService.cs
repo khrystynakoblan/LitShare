@@ -50,7 +50,7 @@
                 int ownerId = complaint.Post.UserId;
                 string bookTitle = complaint.Post.Title ?? "Без назви";
 
-                var notification = new Notifications 
+                var notification = new Notifications
                 {
                     UserId = ownerId,
                     Message = $"Ваше оголошення '{bookTitle}' було видалено модератором через скаргу.",
