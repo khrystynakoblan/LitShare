@@ -1,178 +1,88 @@
 ﻿@model LitShare.Web.Models.CreatePostModel
-
 @{
     ViewData["Title"] = "Нове оголошення";
 }
 
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-<style>
-    .select2-container--default .select2-selection--multiple {
-        border: 1px solid #dee2e6;
-        min-height: 38px;
-        border-radius: 0.375rem;
-    }
-
-    .select2-container--default.select2-container--focus .select2-selection--multiple {
-        border-color: #86b7fe;
-        outline: 0;
-        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-    }
-</style>
-
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-normal">Нове оголошення</h2>
-        <a asp-controller="Profile" asp-action="Index" class="text-decoration-none text-dark">Мій профіль</a>
+        <h2 class="fw-bold">@ViewData["Title"]</h2>
+        <a asp-controller="Profile" asp-action="Index" class="btn btn-outline-dark">Мій профіль</a>
     </div>
 
-    <form asp-action="CreatePost" method="post" enctype="multipart/form-data">
+    <form asp-action="CreatePost" method="post" enctype="multipart/form-data" class="shadow-sm p-4 bg-white rounded-4 border-0">
         <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-        <div class="row">
+        <div class="row g-4">
             <div class="col-md-4 text-center">
-                <div id="imagePreviewContainer" class="border rounded bg-light d-flex align-items-center justify-content-center mb-3"
-                     style="height: 350px; border-style: dashed !important; overflow: hidden;">
-                    <div id="placeholderContent" class="text-muted">
-                        <i class="bi bi-image" style="font-size: 4rem;"></i>
-                        <p>Виберіть фото</p>
+                <div id="imagePreviewContainer" class="card shadow-inner d-flex align-items-center justify-content-center mb-3 overflow-hidden"
+                     style="height: 380px; border: 2px dashed #ddd !important;">
+                    <div id="placeholderContent" class="text-muted p-4">
+                        <i class="bi bi-cloud-arrow-up display-3"></i>
+                        <p class="fw-bold mt-2">Перетягніть або виберіть фото</p>
                     </div>
-                    <img id="imagePreview" src="#" alt="Прев'ю" style="display: none; width: 100%; height: 100%; object-fit: cover;" />
+                    <img id="imagePreview" src="#" alt="Прев'ю" class="w-100 h-100 object-fit-cover d-none" />
                 </div>
-                <input type="file" asp-for="ImageFile" id="imageInput" class="d-none" accept="image/*" />
+                <input type="file" asp-for="ImageFile" id="imageInput" class="d-none" accept="image/*" required />
                 <button type="button" class="btn btn-dark w-100 py-2" onclick="document.getElementById('imageInput').click();">
-                    Додати фото
+                    <i class="bi bi-camera me-2"></i>Додати фото
                 </button>
-                <span asp-validation-for="ImageFile" class="text-danger"></span>
+                <span asp-validation-for="ImageFile" class="text-danger small"></span>
             </div>
 
             <div class="col-md-8">
-                <div class="mb-3 row">
-                    <label asp-for="Title" class="col-sm-2 col-form-label text-start">Назва книги:</label>
-                    <div class="col-sm-10">
-                        <div class="input-group">
-                            <input asp-for="Title" class="form-control" id="bookTitleInput" placeholder="Введіть назву" />
-                            <button class="btn btn-outline-primary" type="button" id="autoFillBtn">
-                                <i class="bi bi-magic me-1"></i> Автозаповнити
-                            </button>
-                        </div>
-                        <span asp-validation-for="Title" class="text-danger d-block"></span>
-                        <span id="apiMessage" style="display: none;"></span>
+                <div class="mb-4">
+                    <label class="form-label fw-bold small">Назва книги:</label>
+                    <div class="input-group">
+                        <input asp-for="Title" class="form-control" id="bookTitleInput" placeholder="Наприклад: Маленький принц" required />
+                        <button class="btn btn-outline-dark" type="button" id="autoFillBtn">
+                            <i class="bi bi-magic me-1"></i> Автозаповнити
+                        </button>
                     </div>
+                    <span asp-validation-for="Title" class="text-danger small"></span>
                 </div>
 
-                <div class="mb-3 row">
-                    <label asp-for="Author" class="col-sm-2 col-form-label text-start">Автор книги:</label>
-                    <div class="col-sm-10">
-                        <input asp-for="Author" class="form-control" id="Author" placeholder="Введіть автора" />
-                        <span asp-validation-for="Author" class="text-danger"></span>
-                    </div>
+                <div class="mb-4">
+                    <label class="form-label fw-bold small">Автор:</label>
+                    <input asp-for="Author" class="form-control" id="Author" placeholder="Антуан де Сент-Екзюпері" required />
+                    <span asp-validation-for="Author" class="text-danger small"></span>
                 </div>
 
-                <div class="mb-3 row">
-                    <label asp-for="SelectedGenreIds" class="col-sm-2 col-form-label text-start">Жанри:</label>
-                    <div class="col-sm-10">
-                        <select asp-for="SelectedGenreIds" asp-items="Model.Genres" class="form-select js-select2" multiple="multiple" data-placeholder="Оберіть жанри">
-                        </select>
-                        <span asp-validation-for="SelectedGenreIds" class="text-danger"></span>
-                    </div>
+                <div class="mb-4">
+                    <label class="form-label fw-bold small">Жанри:</label>
+                    <select asp-for="SelectedGenreIds" asp-items="Model.Genres" class="form-select js-select2" multiple="multiple" required>
+                    </select>
+                    <span asp-validation-for="SelectedGenreIds" class="text-danger small"></span>
                 </div>
 
-                <div class="mb-3 row">
-                    <label asp-for="DealTypeId" class="col-sm-2 col-form-label text-start">Тип угоди:</label>
-                    <div class="col-sm-10">
-                        <select asp-for="DealTypeId" asp-items="Model.DealTypes" class="form-select">
-                            <option value="0">Оберіть тип угоди</option>
-                        </select>
-                        <span asp-validation-for="DealTypeId" class="text-danger"></span>
-                    </div>
+                <div class="mb-4">
+                    <label class="form-label fw-bold small">Тип угоди:</label>
+                    <select asp-for="DealTypeId" asp-items="Model.DealTypes" class="form-select" required>
+                        <option value="">Оберіть тип...</option>
+                    </select>
+                    <span asp-validation-for="DealTypeId" class="text-danger small"></span>
                 </div>
             </div>
         </div>
 
-        <div class="row mt-4">
-            <div class="col-12 text-center">
-                <h4 class="fw-normal mb-3">Опис</h4>
-                <textarea asp-for="Description" class="form-control mb-4" id="Description" rows="8" placeholder="Додайте опис книги..."></textarea>
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
+        <div class="mt-4">
+            <h5 class="fw-bold mb-3">Опис</h5>
+            <textarea asp-for="Description" class="form-control mb-4 shadow-inner" id="Description" rows="8" placeholder="Розкажіть про стан книги, рік видання або чому ви її віддаєте..." required></textarea>
+            <span asp-validation-for="Description" class="text-danger small"></span>
         </div>
 
-        <div class="row gx-2 mb-5">
-            <div class="col-6">
-                <button type="submit" class="btn btn-dark w-100 py-2 fw-bold">Зберегти</button>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <button type="submit" class="btn btn-dark w-100 py-3 fw-bold">Створити оголошення</button>
             </div>
-            <div class="col-6">
-                <a asp-action="Index" asp-controller="Home" class="btn btn-outline-dark w-100 py-2">Відхилити</a>
+            <div class="col-md-6">
+                <a asp-action="Index" asp-controller="Home" class="btn btn-outline-dark w-100 py-3">Скасувати</a>
             </div>
         </div>
     </form>
 </div>
 
 @section Scripts {
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
-    <script>
-        $(document).ready(function() {
-            $('.js-select2').select2({
-                closeOnSelect: false,
-                width: '100%'
-            });
-        });
-
-        document.getElementById('imageInput').onchange = function (evt) {
-            const [file] = this.files;
-            if (file) {
-                const preview = document.getElementById('imagePreview');
-                const placeholder = document.getElementById('placeholderContent');
-                preview.src = URL.createObjectURL(file);
-                preview.style.display = 'block';
-                placeholder.style.display = 'none';
-            }
-        };
-
-        document.getElementById('autoFillBtn').addEventListener('click', async function () {
-            const titleInput = document.getElementById('bookTitleInput').value.trim();
-            const btn = this;
-            const msgSpan = document.getElementById('apiMessage');
-
-            const showMsg = (text, isError) => {
-                msgSpan.textContent = text;
-                msgSpan.className = isError ? 'text-danger small mt-1 d-block fw-bold' : 'text-success small mt-1 d-block fw-bold';
-                msgSpan.style.display = 'block';
-                setTimeout(() => { msgSpan.style.display = 'none'; }, 4000);
-            };
-
-            if (!titleInput) {
-                showMsg('Спочатку введіть назву книги!', true);
-                return;
-            }
-
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<span class="spinner-border spinner-border-sm" aria-hidden="true"></span>...';
-            btn.disabled = true;
-
-            try {
-                const response = await fetch(`/Post/AutoFillBookData?title=${encodeURIComponent(titleInput)}`);
-
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.author) document.getElementById('Author').value = data.author;
-                    if (data.description) document.getElementById('Description').value = data.description;
-                    showMsg('Дані успішно підтягнуто!', false);
-                } else {
-                    showMsg('Книгу не знайдено в базі Google.', true);
-                }
-            } catch (error) {
-                showMsg('Помилка з\'єднання з сервером.', true);
-            } finally {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }
-        });
-    </script>
-
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    <script src="~/js/create-post.js" asp-append-version="true"></script>
+    <script src="~/js/autofill.js" asp-append-version="true"></script>
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 }

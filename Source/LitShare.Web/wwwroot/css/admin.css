@@ -1,0 +1,12 @@
+.admin-table th {
+    background: #111;
+    color: #fff;
+    padding: 12px;
+}
+
+.badge-admin {
+    background: #dc3545;
+    border-radius: 20px;
+    padding: 5px 12px;
+}
+

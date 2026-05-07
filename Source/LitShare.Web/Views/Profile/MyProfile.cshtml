@@ -3,52 +3,76 @@
     ViewData["Title"] = "Мій профіль";
 }
 
-<div class="container-fluid mt-4">
-    <div class="border rounded p-4 mx-auto" style="max-width: 1200px;">
-        <div class="row g-4">
-            <div class="col-md-4">
-                <div class="border rounded p-4 text-center">
-                    <img src="@(string.IsNullOrEmpty(Model.PhotoUrl)
-                            ? "https://cdn-icons-png.flaticon.com/512/149/149071.png"
-                            : Model.PhotoUrl)"
+<div class="container mt-4 mb-5">
+    <div class="row g-4">
+        <div class="col-md-4 col-lg-3">
+            <div class="card p-4 text-center border-0 shadow-sm mb-4 rounded-4">
+                <div class="position-relative d-inline-block mx-auto mb-3">
+                    <img src="@(string.IsNullOrEmpty(Model.PhotoUrl) ? "https://cdn-icons-png.flaticon.com/512/149/149071.png" : Model.PhotoUrl)"
                          alt="Фото профілю"
-                         class="rounded-circle mb-3"
-                         style="width:140px; height:140px; object-fit:cover;" />
-                    <h5 class="fw-bold">@Model.Name</h5>
+                         class="rounded-circle shadow-sm object-fit-cover"
+                         style="width:140px; height:140px; border: 4px solid #fff;" />
                 </div>
-                <div class="mt-4 d-grid gap-2">
-                    <a asp-controller="Post" asp-action="CreatePost" class="btn btn-dark">Додати книгу</a>
-                    <a asp-controller="Profile" asp-action="MyBooks" class="btn btn-dark">Мої книги</a>
-                    <a asp-controller="Favorite" asp-action="Index" class="btn btn-dark">
-                        <i class="bi bi-heart-fill me-1"></i> Вподобані
+                <h5 class="fw-bold mb-0">@Model.Name</h5>
+                <p class="text-muted small">@Model.Email</p>
+            </div>
+
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="list-group list-group-flush">
+                    <a asp-controller="Post" asp-action="CreatePost" class="list-group-item list-group-item-action border-0 py-3">
+                        <i class="bi bi-plus-circle me-2 text-primary"></i> Додати книгу
                     </a>
-                    <a asp-controller="Exchange" asp-action="SentRequests" class="btn btn-dark">Мої запити</a>
-                    <a asp-controller="Exchange" asp-action="ReceivedRequests" class="btn btn-dark w-100 py-2">Отримані запити</a>
-                    <a asp-controller="Review" asp-action="Index" asp-route-userId="@Model.UserId" class="btn btn-dark">Мої відгуки</a>
-                    <a asp-controller="Profile" asp-action="EditProfile" class="btn btn-dark">Редагувати профіль</a>
-                    <a asp-controller="Profile" asp-action="DeleteAccount" class="btn btn-outline-danger">Видалити акаунт</a>
+                    <a asp-controller="Profile" asp-action="MyBooks" class="list-group-item list-group-item-action border-0 py-3">
+                        <i class="bi bi-journal-text me-2"></i> Мої книги
+                    </a>
+                    <a asp-controller="Favorite" asp-action="Index" class="list-group-item list-group-item-action border-0 py-3">
+                        <i class="bi bi-heart me-2 text-danger"></i> Вподобані
+                    </a>
+                    <div class="bg-light py-2 px-3 small fw-bold text-uppercase text-muted" style="font-size: 0.7rem;">Запити</div>
+                    <a asp-controller="Exchange" asp-action="ReceivedRequests" class="list-group-item list-group-item-action border-0 py-3">
+                        <i class="bi bi-box-arrow-in-down me-2"></i> Отримані
+                    </a>
+                    <a asp-controller="Exchange" asp-action="SentRequests" class="list-group-item list-group-item-action border-0 py-3">
+                        <i class="bi bi-send me-2"></i> Надіслані
+                    </a>
+                    <div class="bg-light py-2 px-3 small fw-bold text-uppercase text-muted" style="font-size: 0.7rem;">Налаштування</div>
+                    <a asp-controller="Profile" asp-action="EditProfile" class="list-group-item list-group-item-action border-0 py-3">
+                        <i class="bi bi-gear me-2"></i> Редагувати профіль
+                    </a>
+                    <a asp-controller="Profile" asp-action="DeleteAccount" class="list-group-item list-group-item-action border-0 py-3 text-danger">
+                        <i class="bi bi-trash me-2"></i> Видалити акаунт
+                    </a>
                 </div>
             </div>
-            <div class="col-md-8">
-                <div class="border rounded p-4 mb-4">
-                    <h5 class="text-center fw-bold mb-4">Основна інформація</h5>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <p><strong>Ім'я:</strong> @Model.Name</p>
-                            <p><strong>Контактні дані:</strong> @Model.Phone</p>
-                            <p><strong>Email:</strong> @Model.Email</p>
+        </div>
+
+        <div class="col-md-8 col-lg-9">
+            <div class="card p-4 border-0 shadow-sm mb-4 rounded-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="fw-bold mb-0">Контактні дані</h5>
+                    <a asp-action="EditProfile" class="btn btn-sm btn-outline-dark rounded-pill px-3">Змінити</a>
+                </div>
+                <div class="row g-4">
+                    <div class="col-sm-6">
+                        <div class="p-3 bg-light rounded-3">
+                            <label class="text-muted small text-uppercase fw-bold d-block mb-1">Телефон</label>
+                            <p class="fs-6 mb-0 fw-semibold">@(string.IsNullOrEmpty(Model.Phone) || Model.Phone == "Номер не вказано" ? "Не вказано" : Model.Phone)</p>
                         </div>
-                        <div class="col-md-6">
-                            <p><strong>Область:</strong> @Model.Region</p>
-                            <p><strong>Район:</strong> @Model.District</p>
-                            <p><strong>Місто:</strong> @Model.City</p>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="p-3 bg-light rounded-3 h-100">
+                            <label class="text-muted small text-uppercase fw-bold d-block mb-1">Локація</label>
+                            <p class="fs-6 mb-0">@Model.City, @Model.Region</p>
                         </div>
                     </div>
                 </div>
-                <div class="border rounded p-4">
-                    <h5 class="text-center fw-bold mb-3">Про себе</h5>
-                    <p>@Model.About</p>
-                </div>
+            </div>
+
+            <div class="card p-4 border-0 shadow-sm rounded-4 h-100">
+                <h5 class="fw-bold mb-3">Про себе</h5>
+                <p class="text-secondary" style="white-space: pre-line;">
+                    @(string.IsNullOrEmpty(Model.About) ? "Ви ще не додали опис свого профілю. Розкажіть іншим про ваші літературні смаки!" : Model.About)
+                </p>
             </div>
         </div>
     </div>

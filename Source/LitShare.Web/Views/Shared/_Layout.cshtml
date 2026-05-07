@@ -1,90 +1,82 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="uk">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - LitShare.Web</title>
+    <title>@ViewData["Title"] - LitShare</title>
+    
+    @* Бібліотеки стилів *@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    
+    @* Твої кастомні стилі *@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/components.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/forms.css" asp-append-version="true" />
+    
+    @if (User.IsInRole("Admin"))
+    {
+        <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+    }
+    <link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
+
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
     @if (ViewData["HideHeader"] as bool? != true)
     {
         <header>
-            <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3 p-3">
+            <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom shadow-sm mb-4 p-3">
                 <div class="container-fluid">
+                    @* Логотип *@
+                    <a class="navbar-brand fw-bold fs-3 text-dark" 
+                       asp-controller="@(User.IsInRole("Admin") ? "Admin" : "Home")" 
+                       asp-action="Index">
+                        LitShare @(User.IsInRole("Admin") ? "(Admin)" : "")
+                    </a>
 
-                    @if (User.IsInRole("Admin"))
-                    {
-                        <a class="navbar-brand fw-bold fs-3 text-dark" asp-area="" asp-controller="Admin" asp-action="Index">
-                            LitShare (Admin)
-                        </a>
-                    }
-                    else
-                    {
-                        <a class="navbar-brand fw-bold fs-3 text-dark" asp-area="" asp-controller="Home" asp-action="Index">
-                            LitShare
-                        </a>
-                    }
-
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                            aria-expanded="false" aria-label="Toggle navigation">
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
                         <span class="navbar-toggler-icon"></span>
                     </button>
 
-                    <div class="navbar-collapse collapse d-flex align-items-center">
-
+                    <div class="navbar-collapse collapse">
+                        @* Пошук (показуємо тільки не адмінам) *@
                         @if (ViewData["ShowSearch"] as bool? == true && !User.IsInRole("Admin"))
                         {
-                            <form class="d-flex mx-auto w-50 my-2 my-sm-0" asp-controller="Home" asp-action="Index" method="get" id="headerSearchForm">
-                                <input class="form-control rounded-1" type="search" name="searchTerm"
-                                       placeholder="Пошук..." aria-label="Search"
+                            <form class="d-flex mx-auto w-50 my-2 my-sm-0" asp-controller="Home" asp-action="Index" method="get">
+                                <input class="form-control rounded-pill px-3" type="search" name="searchTerm"
+                                       placeholder="Знайти книгу або автора..." 
                                        value="@Context.Request.Query["searchTerm"]" />
-
-                                @if (!string.IsNullOrEmpty(Context.Request.Query["location"]))
-                                {
-                                    <input type="hidden" name="location" value="@Context.Request.Query["location"]" />
-                                }
-                                @if (!string.IsNullOrEmpty(Context.Request.Query["dealType"]))
-                                {
-                                    <input type="hidden" name="dealType" value="@Context.Request.Query["dealType"]" />
-                                }
-                                @foreach (var genreId in Context.Request.Query["genres"])
-                                {
-                                    <input type="hidden" name="genres" value="@genreId" />
-                                }
-
-                                <button class="btn btn-dark ms-2" type="submit">
+                                <button class="btn btn-dark rounded-pill ms-2 px-3" type="submit">
                                     <i class="bi bi-search"></i>
                                 </button>
                             </form>
                         }
 
-                        <ul class="navbar-nav align-items-center flex-row ms-auto">
+                        @* Іконки профілю та виходу *@
+                        <ul class="navbar-nav ms-auto align-items-center flex-row">
                             @if (User.Identity?.IsAuthenticated == true)
                             {
                                 <li class="nav-item me-3">
+                                    <a class="nav-link text-dark p-0" 
+                                       asp-controller="@(User.IsInRole("Admin") ? "Admin" : "Profile")" 
+                                       asp-action="MyProfile" title="Мій профіль">
+                                        <i class="bi bi-person-circle fs-3"></i>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
                                     <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
-                                        <button type="submit" class="btn btn-link text-dark p-0 border-0" title="Вийти">
+                                        <button type="submit" class="btn btn-link text-danger p-0 border-0" title="Вийти">
                                             <i class="bi bi-box-arrow-right fs-3"></i>
                                         </button>
                                     </form>
                                 </li>
-
+                            }
+                            else
+                            {
                                 <li class="nav-item">
-                                    @if (User.IsInRole("Admin"))
-                                    {
-                                        <a class="nav-link text-dark p-0" asp-controller="Admin" asp-action="MyProfile" title="Профіль адміністратора">
-                                            <i class="bi bi-person-circle fs-3"></i>
-                                        </a>
-                                    }
-                                    else
-                                    {
-                                        <a class="nav-link text-dark p-0" asp-controller="Profile" asp-action="MyProfile" title="Мій профіль">
-                                            <i class="bi bi-person-circle fs-3"></i>
-                                        </a>
-                                    }
+                                    <a class="btn btn-outline-dark btn-sm px-3 rounded-pill" asp-controller="Account" asp-action="Login">Увійти</a>
                                 </li>
                             }
                         </ul>
@@ -94,28 +86,36 @@
         </header>
     }
 
+    @* Сповіщення про помилки *@
     @if (TempData["ErrorMessage"] != null)
     {
-        <div class="alert alert-danger text-center mb-0">
-            @TempData["ErrorMessage"]
+        <div class="container">
+            <div class="alert alert-danger alert-dismissible fade show text-center shadow-sm" role="alert">
+                <i class="bi bi-exclamation-triangle me-2"></i> @TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
         </div>
     }
 
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
+    <main role="main" class="container pb-5">
+        @RenderBody()
+    </main>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - LitShare.Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <footer class="border-top footer text-muted mt-auto py-3 bg-white">
+        <div class="container text-center">
+            <small>&copy; 2026 — <strong>LitShare</strong>. Платформа для обміну книгами</small>
         </div>
     </footer>
+
+    @* Скрипти бібліотек *@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    
+    @* Твій головний JS *@
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
