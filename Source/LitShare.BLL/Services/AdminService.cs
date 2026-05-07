@@ -45,45 +45,33 @@
                 return Result<bool>.Failure("Скаргу не знайдено.");
             }
 
-            try
+            if (complaint.Post != null)
             {
-                if (complaint.Post != null)
+                int ownerId = complaint.Post.UserId;
+                string bookTitle = complaint.Post.Title ?? "Без назви";
+
+                var notification = new Notifications 
                 {
-                    int ownerId = complaint.Post.UserId;
-                    string bookTitle = complaint.Post.Title ?? "Без назви";
+                    UserId = ownerId,
+                    Message = $"Ваше оголошення '{bookTitle}' було видалено модератором через скаргу.",
+                    IsSent = false
+                };
 
-                    var notification = new Notifications
-                    {
-                        UserId = ownerId,
-                        Message = $"Ваше оголошення '{bookTitle}' було видалено модератором через скаргу.",
-                        IsSent = false
-                    };
+                await this.notificationRepository.AddAsync(notification);
+                await this.notificationRepository.SaveChangesAsync();
 
-                    await this.notificationRepository.AddAsync(notification);
-                    await this.notificationRepository.SaveChangesAsync();
-
-                    await this.postRepository.DeletePostAsync(complaint.Post);
-                    await this.postRepository.SaveChangesAsync();
-                }
-
-                var checkComplaint = await this.complaintRepository.GetByIdAsync(id);
-                if (checkComplaint != null)
-                {
-                    await this.complaintRepository.DeleteAsync(checkComplaint);
-                    await this.complaintRepository.SaveChangesAsync();
-                }
-
-                return true;
+                await this.postRepository.DeletePostAsync(complaint.Post);
+                await this.postRepository.SaveChangesAsync();
             }
-            catch (DbUpdateConcurrencyException)
+
+            var checkComplaint = await this.complaintRepository.GetByIdAsync(id);
+            if (checkComplaint != null)
             {
-                return true;
+                await this.complaintRepository.DeleteAsync(checkComplaint);
+                await this.complaintRepository.SaveChangesAsync();
             }
-            catch (Exception ex)
-            {
-                this.logger.LogError(ex, "Помилка при підтвердженні скарги");
-                return Result<bool>.Failure("Виникла помилка при видаленні даних.");
-            }
+
+            return true;
         }
 
         public async Task<Result<List<ComplaintDto>>> GetAllComplaintsAsync()
@@ -151,82 +139,66 @@
         {
             this.logger.LogInformation("Fetching admin statistics");
 
-            try
-            {
-                var users = await this.userRepository.GetAllAsync();
-                var posts = await this.postRepository.GetAllAsync();
-                var complaints = await this.complaintRepository.GetAllAsync();
+            var users = await this.userRepository.GetAllAsync();
+            var posts = await this.postRepository.GetAllAsync();
+            var complaints = await this.complaintRepository.GetAllAsync();
 
-                var cityStats = posts
-                    .Where(p => p.User?.City != null)
-                    .GroupBy(p => p.User!.City!)
-                    .Select(g => new CityStatDto { City = g.Key, Count = g.Count() })
-                    .OrderByDescending(x => x.Count)
-                    .Take(this.settings.AdminStatsTopCitiesCount)
-                    .ToList();
+            var cityStats = posts
+                .Where(p => p.User?.City != null)
+                .GroupBy(p => p.User!.City!)
+                .Select(g => new CityStatDto { City = g.Key, Count = g.Count() })
+                .OrderByDescending(x => x.Count)
+                .Take(this.settings.AdminStatsTopCitiesCount)
+                .ToList();
 
-                var genreStats = posts
-                    .Where(p => p.BookGenres != null && p.BookGenres.Any())
-                    .SelectMany(p => p.BookGenres!)
-                    .Where(bg => bg.Genre?.Name != null)
-                    .GroupBy(bg => bg.Genre!.Name!)
-                    .Select(g => new GenreStatDto
-                    {
-                        GenreName = g.Key ?? "Без жанру",
-                        Count = g.Count()
-                    })
-                    .OrderByDescending(x => x.Count)
-                    .Take(this.settings.AdminStatsTopGenresCount)
-                    .ToList();
-
-                var stats = new AdminStatsDto
+            var genreStats = posts
+                .Where(p => p.BookGenres != null && p.BookGenres.Any())
+                .SelectMany(p => p.BookGenres!)
+                .Where(bg => bg.Genre?.Name != null)
+                .GroupBy(bg => bg.Genre!.Name!)
+                .Select(g => new GenreStatDto
                 {
-                    TotalUsers = users.Count(),
-                    TotalPosts = posts.Count(),
-                    ActivePosts = posts.Count(p => p.IsActive),
-                    TotalComplaints = complaints.Count(),
-                    PendingComplaints = complaints.Count(),
-                    TopCities = cityStats,
-                    TopGenres = genreStats
-                };
+                    GenreName = g.Key ?? "Без жанру",
+                    Count = g.Count()
+                })
+                .OrderByDescending(x => x.Count)
+                .Take(this.settings.AdminStatsTopGenresCount)
+                .ToList();
 
-                return stats;
-            }
-            catch (Exception ex)
+            var stats = new AdminStatsDto
             {
-                this.logger.LogError(ex, "Error fetching admin statistics");
-                return Result<AdminStatsDto>.Failure("Не вдалося завантажити статистику");
-            }
+                TotalUsers = users.Count(),
+                TotalPosts = posts.Count(),
+                ActivePosts = posts.Count(p => p.IsActive),
+                TotalComplaints = complaints.Count(),
+                PendingComplaints = complaints.Count(),
+                TopCities = cityStats,
+                TopGenres = genreStats
+            };
+
+            return stats;
         }
 
         public async Task<Result<IEnumerable<AdminUserListDto>>> GetAllUsersAsync()
         {
             this.logger.LogInformation("Fetching all users for admin panel.");
 
-            try
-            {
-                var users = await this.userRepository.GetAllAsync();
+            var users = await this.userRepository.GetAllAsync();
 
-                var dtos = users
-                            .OrderBy(u => u.Id)
-                            .Select(u => new AdminUserListDto
-                            {
-                                Id = u.Id,
-                                Name = u.Name ?? "Без імені",
-                                Email = u.Email ?? "Не вказано",
-                                Phone = u.Phone ?? "-",
-                                Location = $"{u.City}, {u.Region}",
-                                Role = u.Role.ToString(),
-                                IsBlocked = u.IsBlocked
-                            });
+            var dtos = users
+                        .OrderBy(u => u.Id)
+                        .Select(u => new AdminUserListDto
+                        {
+                            Id = u.Id,
+                            Name = u.Name ?? "Без імені",
+                            Email = u.Email ?? "Не вказано",
+                            Phone = u.Phone ?? "-",
+                            Location = $"{u.City}, {u.Region}",
+                            Role = u.Role.ToString(),
+                            IsBlocked = u.IsBlocked
+                        });
 
-                return Result<IEnumerable<AdminUserListDto>>.Success(dtos);
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(ex, "Error occurred while fetching users list.");
-                return Result<IEnumerable<AdminUserListDto>>.Failure("Не вдалося завантажити список користувачів.");
-            }
+            return Result<IEnumerable<AdminUserListDto>>.Success(dtos);
         }
 
         public async Task<Result<bool>> ToggleUserBlockAsync(int userId)

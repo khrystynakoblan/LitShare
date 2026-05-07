@@ -1,0 +1,109 @@
+
+.navbar {
+    padding: 12px 20px;
+}
+
+.navbar-brand {
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+.footer {
+    background: #fff;
+    border-top: 1px solid #e9ecef;
+    padding: 16px 0;
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+.alert {
+    border-radius: 10px;
+    font-size: 0.9rem;
+    border: none;
+}
+
+/* BOOK / POST CARD */
+.book-cover {
+    aspect-ratio: 3/4;
+    overflow: hidden;
+    border-radius: 8px;
+    background: #f0f0f0;
+}
+
+    .book-cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+/* SIDEBAR FILTER*/
+.filter-sidebar {
+    position: sticky;
+    top: 20px;
+}
+
+/* EXCHANGE / REQUEST CARDS*/
+.request-card {
+    border-radius: 12px;
+    border: none;
+    background: #fff;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+    padding: 20px;
+    margin-bottom: 16px;
+    transition: box-shadow 0.2s ease;
+}
+
+    .request-card:hover {
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .request-card .btn + .btn {
+        margin-left: 8px;
+    }
+
+/* EMPTY STATE */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #6c757d;
+}
+
+    .empty-state i {
+        font-size: 3.5rem;
+        margin-bottom: 16px;
+        display: block;
+        opacity: 0.5;
+    }
+
+    .empty-state h4 {
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #495057;
+    }
+
+/* LIST GROUP  */
+.list-group-item {
+    font-size: 0.9rem;
+    transition: background 0.15s ease, padding-left 0.15s ease;
+}
+
+    .list-group-item:hover {
+        background-color: #f8f9fa;
+        padding-left: 20px;
+    }
+
+    .list-group-item.active {
+        background-color: #111;
+        color: #fff;
+        border-color: #111;
+    }
+
+.complaint-radio {
+    cursor: pointer;
+}
+
+.table td,
+.table th {
+    color: #1f1f1f; 
+}
