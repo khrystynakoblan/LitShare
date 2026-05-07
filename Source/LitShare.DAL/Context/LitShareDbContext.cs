@@ -132,7 +132,7 @@
             modelBuilder.Entity<Notifications>(entity =>
             {
                 entity.HasOne(n => n.User)
-                      .WithMany() // Можна додати в Users.cs властивість Notifications, якщо треба
+                      .WithMany()
                       .HasForeignKey(n => n.UserId)
                       .OnDelete(DeleteBehavior.Cascade);
 

@@ -42,7 +42,7 @@ namespace LitShare.BLL.Services
                     this.logger.LogError(ex, "Помилка при обробці сповіщень.");
                 }
 
-                await Task.Delay(TimeSpan.FromSeconds(15), stoppingToken);
+                await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
             }
         }
 
