@@ -11,12 +11,14 @@ namespace LitShare.BLL.Services
     {
         private readonly IExchangeRepository exchangeRepository;
         private readonly IPostRepository postRepository;
+        private readonly INotificationRepository notificationRepository;
         private readonly ILogger<ExchangeService> logger;
 
-        public ExchangeService(IExchangeRepository exchangeRepository, IPostRepository postRepository, ILogger<ExchangeService> logger)
+        public ExchangeService(IExchangeRepository exchangeRepository, IPostRepository postRepository, INotificationRepository notificationRepository, ILogger<ExchangeService> logger)
         {
             this.exchangeRepository = exchangeRepository;
             this.postRepository = postRepository;
+            this.notificationRepository = notificationRepository;
             this.logger = logger;
         }
 
@@ -53,6 +55,15 @@ namespace LitShare.BLL.Services
             };
 
             await this.exchangeRepository.AddAsync(request);
+
+            var notification = new Notifications
+            {
+                UserId = post.UserId, // Той, кому належить книга
+                Message = $"Ви отримали новий запит на обмін книги '{post.Title}'.",
+                IsSent = false
+            };
+            await this.notificationRepository.AddAsync(notification);
+
             await this.exchangeRepository.SaveChangesAsync();
 
             this.logger.LogInformation("Exchange request created successfully. RequestId: {RequestId}, PostId: {PostId}", request.Id, postId);
@@ -119,6 +130,16 @@ namespace LitShare.BLL.Services
             }
 
             request.Status = newStatus;
+
+            string statusText = newStatus == RequestStatus.Accepted ? "прийнято" : "відхилено";
+            var notification = new Notifications
+            {
+                UserId = request.SenderId,
+                Message = $"Ваш запит на обмін книги '{request.Post.Title}' було {statusText}.",
+                IsSent = false
+            };
+            await this.notificationRepository.AddAsync(notification);
+
             await this.exchangeRepository.SaveChangesAsync();
 
             this.logger.LogInformation("Request {RequestId} successfully updated to {Status}", requestId, newStatus);
@@ -164,6 +185,15 @@ namespace LitShare.BLL.Services
             }
 
             post.IsActive = false;
+
+            var notification = new Notifications
+            {
+                UserId = request.SenderId,
+                Message = $"Угоду по книзі '{request.Post.Title}' завершено!",
+                IsSent = false,
+            };
+            await this.notificationRepository.AddAsync(notification);
+
             await this.exchangeRepository.SaveChangesAsync();
 
             return true;

@@ -16,6 +16,7 @@
         private readonly Mock<IPostRepository> postRepositoryMock;
         private readonly Mock<IUserRepository> userRepositoryMock;
         private readonly Mock<ILogger<AdminService>> loggerMock;
+        private readonly Mock<INotificationRepository> notificationRepositoryMock;
         private readonly IOptions<AppSettings> options;
         private readonly AdminService adminService;
 
@@ -25,6 +26,7 @@
             this.postRepositoryMock = new Mock<IPostRepository>();
             this.userRepositoryMock = new Mock<IUserRepository>();
             this.loggerMock = new Mock<ILogger<AdminService>>();
+            this.notificationRepositoryMock = new Mock<INotificationRepository>();
 
             var appSettings = new AppSettings
             {
@@ -38,6 +40,7 @@
                 this.postRepositoryMock.Object,
                 this.userRepositoryMock.Object,
                 this.loggerMock.Object,
+                this.notificationRepositoryMock.Object,
                 this.options);
         }
 

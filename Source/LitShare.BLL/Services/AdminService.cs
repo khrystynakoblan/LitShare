@@ -15,6 +15,7 @@
         private readonly IPostRepository postRepository;
         private readonly IUserRepository userRepository;
         private readonly ILogger<AdminService> logger;
+        private readonly INotificationRepository notificationRepository;
         private readonly AppSettings settings;
 
         public AdminService(
@@ -22,12 +23,14 @@
             IPostRepository postRepository,
             IUserRepository userRepository,
             ILogger<AdminService> logger,
+            INotificationRepository notificationRepository,
             IOptions<AppSettings> options)
         {
             this.complaintRepository = complaintRepository;
             this.postRepository = postRepository;
             this.userRepository = userRepository;
             this.logger = logger;
+            this.notificationRepository = notificationRepository;
             this.settings = options.Value;
         }
 
@@ -44,6 +47,19 @@
 
             if (complaint.Post != null)
             {
+                int ownerId = complaint.Post.UserId;
+                string bookTitle = complaint.Post.Title ?? "Без назви";
+
+                var notification = new Notifications 
+                {
+                    UserId = ownerId,
+                    Message = $"Ваше оголошення '{bookTitle}' було видалено модератором через скаргу.",
+                    IsSent = false
+                };
+
+                await this.notificationRepository.AddAsync(notification);
+                await this.notificationRepository.SaveChangesAsync();
+
                 await this.postRepository.DeletePostAsync(complaint.Post);
                 await this.postRepository.SaveChangesAsync();
             }
