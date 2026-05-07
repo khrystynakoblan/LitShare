@@ -5,7 +5,9 @@ using LitShare.DAL.Context;
 using LitShare.DAL.Models;
 using LitShare.DAL.Repositories;
 using LitShare.DAL.Repositories.Interfaces;
+using LitShare.Web.Hubs;
 using LitShare.Web.Middleware;
+using LitShare.Web.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -73,6 +75,10 @@ try
 
     builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 
+    builder.Services.AddSignalR();
+    builder.Services.AddSingleton<IHubNotificationService, SignalRNotificationService>();
+    builder.Services.AddHostedService<NotificationBackgroundService>();
+
     builder.Services.AddHttpClient<IExternalBookApiService, GoogleBooksApiService>(client =>
     {
         client.BaseAddress = new Uri("https://www.googleapis.com/books/v1/");
@@ -111,6 +117,8 @@ try
     app.UseAuthentication();
     app.UseMiddleware<BlockCheckMiddleware>();
     app.UseAuthorization();
+
+    app.MapHub<NotificationHub>("/notificationHub");
 
     app.UseMiddleware<RequestLoggingMiddleware>();
 

@@ -24,7 +24,6 @@ namespace LitShare.DAL.Models
         [Column("is_read")]
         public bool IsRead { get; set; } = false;
 
-        // Навігаційна властивість (якщо потрібно)
         public virtual Users? User { get; set; }
     }
 }

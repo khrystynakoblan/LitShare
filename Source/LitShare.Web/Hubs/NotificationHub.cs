@@ -1,6 +1,8 @@
-﻿namespace LitShare.Web.Hubs
+﻿using Microsoft.AspNetCore.SignalR;
+
+namespace LitShare.Web.Hubs
 {
-    public class NotificationHub
+    public class NotificationHub : Hub
     {
     }
 }
