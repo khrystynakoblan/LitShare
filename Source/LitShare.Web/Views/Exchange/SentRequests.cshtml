@@ -1,24 +1,27 @@
 ﻿@model IEnumerable<LitShare.BLL.DTOs.SentRequestDto>
-
 @{
-    ViewData["Title"] = "Мої запити";
+    ViewData["Title"] = "Надіслані запити";
 }
 
-<div class="container mt-4">
-    <h2 class="fw-bold mb-4">Надіслані запити на обмін</h2>
+<div class="container mt-4 mb-5">
+    <h2 class="fw-bold mb-4">Надіслані запити</h2>
 
     @if (!Model.Any())
     {
-        <div class="card shadow-sm border-0 text-center p-5">
-            <p class="text-muted mb-0 fs-5">Ви ще не надсилали жодного запиту.</p>
-            <div class="mt-3">
-                <a href="/" class="btn btn-dark">Шукати книги</a>
+        <div class="card border-0 shadow-sm text-center py-5">
+            <div class="card-body">
+                <i class="bi bi-send display-1 text-muted mb-3 d-block opacity-50"></i>
+                <h4 class="fw-bold">Запитів ще немає</h4>
+                <p class="text-muted">Ви ще не надсилали жодного запиту на обмін</p>
+                <a asp-controller="Home" asp-action="Index" class="btn btn-dark mt-2 px-4">
+                    Шукати книги
+                </a>
             </div>
         </div>
     }
     else
     {
-        <div class="card shadow-sm border-0 p-0 overflow-hidden">
+        <div class="card border-0 shadow-sm p-0 overflow-hidden">
             <div class="table-responsive">
                 <table class="table admin-table table-hover mb-0 align-middle">
                     <thead>
@@ -33,35 +36,51 @@
                     <tbody>
                         @foreach (var request in Model)
                         {
+                            string statusUkr;
+                            if (request.Status == "Pending") { statusUkr = "Очікує"; }
+                            else if (request.Status == "Accepted") { statusUkr = "Прийнято"; }
+                            else if (request.Status == "Rejected") { statusUkr = "Відхилено"; }
+                            else if (request.Status == "Completed") { statusUkr = "Завершено"; }
+                            else { statusUkr = request.Status; }
+
+                            string bgColor;
+                            string textColor;
+                            string statusIcon;
+
+                            if (statusUkr == "Очікує")
+                            {
+                                bgColor = "#fff3cd"; textColor = "#856404"; statusIcon = "bi-hourglass-split";
+                            }
+                            else if (statusUkr == "Прийнято")
+                            {
+                                bgColor = "#d1e7dd"; textColor = "#0a3622"; statusIcon = "bi-check-circle";
+                            }
+                            else if (statusUkr == "Відхилено")
+                            {
+                                bgColor = "#f8d7da"; textColor = "#58151c"; statusIcon = "bi-x-circle";
+                            }
+                            else if (statusUkr == "Завершено")
+                            {
+                                bgColor = "#e9ecef"; textColor = "#495057"; statusIcon = "bi-archive";
+                            }
+                            else
+                            {
+                                bgColor = "#e9ecef"; textColor = "#495057"; statusIcon = "bi-question-circle";
+                            }
+
                             <tr>
-                                <td class="ps-4">
-                                    <span class="fw-bold text-dark">@request.BookTitle</span>
-                                </td>
-                                <td>@request.BookAuthor</td>
-                                <td>@request.CreatedAt.ToString("dd.MM.yyyy")</td>
+                                <td class="ps-4 fw-bold">@request.BookTitle</td>
+                                <td class="text-muted">@request.BookAuthor</td>
+                                <td class="text-muted">@request.CreatedAt.ToString("dd.MM.yyyy")</td>
                                 <td>
-                                    @{
-                                        var badgeClass = request.Status switch
-                                        {
-                                            "Pending" or "Очікує" => "bg-warning text-dark",
-                                            "Accepted" or "Прийнято" => "badge-user",
-                                            "Rejected" or "Відхилено" => "badge-admin",
-                                            "Завершено" => "bg-secondary text-white",
-                                            _ => "bg-info text-white"
-                                        };
-                                        var statusUkr = request.Status switch
-                                        {
-                                            "Pending" => "Очікує",
-                                            "Accepted" => "Прийнято",
-                                            "Rejected" => "Відхилено",
-                                            _ => request.Status
-                                        };
-                                    }
-                                    <span class="badge @badgeClass px-3 py-2" style="border-radius: 20px;">@statusUkr</span>
+                                    <span class="d-inline-flex align-items-center gap-1 px-3 py-1 rounded-pill small fw-semibold"
+                                          style="background:@bgColor; color:@textColor;">
+                                        <i class="bi @statusIcon"></i>
+                                        @statusUkr
+                                    </span>
                                 </td>
                                 <td class="text-end pe-4">
-                                    <a asp-controller="Post"
-                                       asp-action="Details"
+                                    <a asp-controller="Post" asp-action="Details"
                                        asp-route-id="@request.PostId"
                                        class="btn btn-sm btn-outline-dark">
                                         Деталі

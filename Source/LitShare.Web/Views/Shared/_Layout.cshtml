@@ -4,22 +4,22 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - LitShare</title>
-    
+
     @* Бібліотеки стилів *@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    
-    @* Твої кастомні стилі *@
+
+    @* Кастомні стилі *@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/components.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/forms.css" asp-append-version="true" />
-    
+    <link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
+
     @if (User.IsInRole("Admin"))
     {
         <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
     }
-    <link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
 
     @await RenderSectionAsync("Styles", required: false)
 </head>
@@ -29,11 +29,10 @@
         <header>
             <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom shadow-sm mb-4 p-3">
                 <div class="container-fluid">
-                    @* Логотип *@
-                    <a class="navbar-brand fw-bold fs-3 text-dark" 
-                       asp-controller="@(User.IsInRole("Admin") ? "Admin" : "Home")" 
+                    <a class="navbar-brand fw-bold text-dark"
+                       asp-controller="@(User.IsInRole("Admin") ? "Admin" : "Home")"
                        asp-action="Index">
-                        LitShare @(User.IsInRole("Admin") ? "(Admin)" : "")
+                        LitShare )
                     </a>
 
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
@@ -41,12 +40,11 @@
                     </button>
 
                     <div class="navbar-collapse collapse">
-                        @* Пошук (показуємо тільки не адмінам) *@
                         @if (ViewData["ShowSearch"] as bool? == true && !User.IsInRole("Admin"))
                         {
                             <form class="d-flex mx-auto w-50 my-2 my-sm-0" asp-controller="Home" asp-action="Index" method="get">
                                 <input class="form-control rounded-pill px-3" type="search" name="searchTerm"
-                                       placeholder="Знайти книгу або автора..." 
+                                       placeholder="Знайти книгу або автора..."
                                        value="@Context.Request.Query["searchTerm"]" />
                                 <button class="btn btn-dark rounded-pill ms-2 px-3" type="submit">
                                     <i class="bi bi-search"></i>
@@ -54,13 +52,12 @@
                             </form>
                         }
 
-                        @* Іконки профілю та виходу *@
-                        <ul class="navbar-nav ms-auto align-items-center flex-row">
+                        <ul class="navbar-nav ms-auto align-items-center flex-row gap-2">
                             @if (User.Identity?.IsAuthenticated == true)
                             {
-                                <li class="nav-item me-3">
-                                    <a class="nav-link text-dark p-0" 
-                                       asp-controller="@(User.IsInRole("Admin") ? "Admin" : "Profile")" 
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark p-0"
+                                       asp-controller="@(User.IsInRole("Admin") ? "Admin" : "Profile")"
                                        asp-action="MyProfile" title="Мій профіль">
                                         <i class="bi bi-person-circle fs-3"></i>
                                     </a>
@@ -86,22 +83,11 @@
         </header>
     }
 
-    @* Сповіщення про помилки *@
-    @if (TempData["ErrorMessage"] != null)
-    {
-        <div class="container">
-            <div class="alert alert-danger alert-dismissible fade show text-center shadow-sm" role="alert">
-                <i class="bi bi-exclamation-triangle me-2"></i> @TempData["ErrorMessage"]
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        </div>
-    }
-
-    <main role="main" class="container pb-5">
+    <main role="main" class="container pb-4">
         @RenderBody()
     </main>
 
-    <footer class="border-top footer text-muted mt-auto py-3 bg-white">
+    <footer class="footer mt-auto">
         <div class="container text-center">
             <small>&copy; 2026 — <strong>LitShare</strong>. Платформа для обміну книгами</small>
         </div>
@@ -112,9 +98,40 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    
-    @* Твій головний JS *@
+
     <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @* ВИПРАВЛЕННЯ: SweetAlert сповіщення через TempData *@
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Успішно!',
+                    text: '@Html.Raw(TempData["SuccessMessage"]?.ToString()?.Replace("'", "\\'"))',
+                    confirmButtonColor: '#111',
+                    timer: 3500,
+                    timerProgressBar: true,
+                    showConfirmButton: false
+                });
+            });
+        </script>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Помилка',
+                    text: '@Html.Raw(TempData["ErrorMessage"]?.ToString()?.Replace("'", "\\'"))',
+                    confirmButtonColor: '#111'
+                });
+            });
+        </script>
+    }
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>

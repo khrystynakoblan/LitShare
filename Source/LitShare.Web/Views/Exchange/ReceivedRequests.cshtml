@@ -1,19 +1,19 @@
 @model List<LitShare.BLL.DTOs.ReceivedRequestDto>
-
 @{
     ViewData["Title"] = "Отримані запити";
 }
 
-<div class="container mt-4">
+<div class="container mt-4 mb-5">
     <h2 class="fw-bold mb-4">Отримані запити</h2>
 
     @if (!Model.Any())
     {
-        <div class="card shadow-sm border-0 text-center p-5 mt-5">
-            <h4 class="text-muted mt-3">У вас поки немає отриманих запитів</h4>
-            <p class="text-secondary">Коли хтось надішле вам запит — він з’явиться тут</p>
-            <div class="mt-3">
-                <a asp-controller="Home" asp-action="Index" class="btn btn-dark">
+        <div class="card border-0 shadow-sm text-center py-5">
+            <div class="card-body">
+                <i class="bi bi-inbox display-1 text-muted mb-3 d-block opacity-50"></i>
+                <h4 class="fw-bold">Запитів ще немає</h4>
+                <p class="text-muted">Коли хтось надішле вам запит — він з'явиться тут</p>
+                <a asp-controller="Home" asp-action="Index" class="btn btn-dark mt-2 px-4">
                     Перейти до оголошень
                 </a>
             </div>
@@ -21,7 +21,7 @@
     }
     else
     {
-        <div class="card shadow-sm border-0 p-0 overflow-hidden">
+        <div class="card border-0 shadow-sm p-0 overflow-hidden">
             <div class="table-responsive">
                 <table class="table admin-table table-hover mb-0 align-middle">
                     <thead>
@@ -35,47 +35,70 @@
                     <tbody>
                         @foreach (var request in Model)
                         {
+                            string bgColor;
+                            string textColor;
+                            string statusIcon;
+
+                            if (request.Status == "Очікує")
+                            {
+                                bgColor = "#fff3cd"; textColor = "#856404"; statusIcon = "bi-hourglass-split";
+                            }
+                            else if (request.Status == "Прийнято")
+                            {
+                                bgColor = "#d1e7dd"; textColor = "#0a3622"; statusIcon = "bi-check-circle";
+                            }
+                            else if (request.Status == "Відхилено")
+                            {
+                                bgColor = "#f8d7da"; textColor = "#58151c"; statusIcon = "bi-x-circle";
+                            }
+                            else if (request.Status == "Завершено")
+                            {
+                                bgColor = "#e9ecef"; textColor = "#495057"; statusIcon = "bi-archive";
+                            }
+                            else
+                            {
+                                bgColor = "#e9ecef"; textColor = "#495057"; statusIcon = "bi-question-circle";
+                            }
+
                             <tr>
-                                <td class="ps-4">
-                                    <span class="fw-bold text-dark">@request.PostTitle</span>
-                                </td>
+                                <td class="ps-4 fw-bold">@request.PostTitle</td>
                                 <td>@request.SenderName</td>
                                 <td>
-                                    @{
-                                        var badgeClass = request.Status switch
-                                        {
-                                            "Очікує" => "bg-warning text-dark",
-                                            "Прийнято" => "badge-user", // Використовуємо твій кастомний клас
-                                            "Відхилено" => "badge-admin", // Твій червоний бадж
-                                            "Завершено" => "bg-secondary text-white",
-                                            _ => "bg-light text-dark"
-                                        };
-                                    }
-                                    <span class="badge @badgeClass px-3 py-2" style="border-radius: 20px;">@request.Status</span>
+                                    <span class="d-inline-flex align-items-center gap-1 px-3 py-1 rounded-pill small fw-semibold"
+                                          style="background:@bgColor; color:@textColor;">
+                                        <i class="bi @statusIcon"></i>
+                                        @request.Status
+                                    </span>
                                 </td>
                                 <td class="text-end pe-4">
                                     <div class="d-flex justify-content-end gap-2">
-                                        <a asp-controller="Post" asp-action="Details" asp-route-id="@request.PostId" class="btn btn-sm btn-outline-dark">
+                                        <a asp-controller="Post" asp-action="Details"
+                                           asp-route-id="@request.PostId"
+                                           class="btn btn-sm btn-outline-dark">
                                             Деталі
                                         </a>
-                                        
                                         @if (request.Status == "Очікує")
                                         {
                                             <form asp-action="AcceptRequest" method="post" class="d-inline">
                                                 <input type="hidden" name="requestId" value="@request.Id" />
-                                                <button type="submit" class="btn btn-sm btn-dark">Прийняти</button>
+                                                <button type="submit" class="btn btn-sm btn-dark">
+                                                    <i class="bi bi-check-lg me-1"></i>Прийняти
+                                                </button>
                                             </form>
                                             <form asp-action="RejectRequest" method="post" class="d-inline">
                                                 <input type="hidden" name="requestId" value="@request.Id" />
-                                                <button type="submit" class="btn btn-sm btn-outline-danger">Відхилити</button>
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    <i class="bi bi-x-lg me-1"></i>Відхилити
+                                                </button>
                                             </form>
                                         }
-
                                         @if (request.Status == "Прийнято")
                                         {
                                             <form asp-action="CompleteDeal" method="post" class="d-inline">
                                                 <input type="hidden" name="requestId" value="@request.Id" />
-                                                <button type="submit" class="btn btn-sm btn-dark">Завершити</button>
+                                                <button type="submit" class="btn btn-sm btn-dark">
+                                                    <i class="bi bi-handshake me-1"></i>Завершити
+                                                </button>
                                             </form>
                                         }
                                     </div>

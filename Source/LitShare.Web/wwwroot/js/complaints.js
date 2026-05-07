@@ -1,17 +1,39 @@
 function confirmApprove() {
-    if (confirm("Ви впевнені, що хочете ПІДТВЕРДИТИ скаргу? Оголошення буде видалено з сайту.")) {
-        const form = document.getElementById('approveForm');
-        if (form) form.submit();
-    }
+    Swal.fire({
+        icon: 'warning',
+        title: 'Підтвердити скаргу?',
+        text: 'Оголошення буде видалено з сайту. Цю дію неможливо скасувати.',
+        confirmButtonText: 'Так, видалити',
+        cancelButtonText: 'Скасувати',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById('approveForm').submit();
+        }
+    });
 }
 
 function confirmReject() {
-    if (confirm("Ви впевнені, що хочете ВІДХИЛИТИ цю скаргу?")) {
-        const form = document.getElementById('rejectForm');
-        if (form) form.submit();
-    }
+    Swal.fire({
+        icon: 'question',
+        title: 'Відхилити скаргу?',
+        text: 'Скаргу буде відхилено без жодних наслідків.',
+        confirmButtonText: 'Так, відхилити',
+        cancelButtonText: 'Скасувати',
+        showCancelButton: true,
+        confirmButtonColor: '#111',
+        cancelButtonColor: '#6c757d',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById('rejectForm').submit();
+        }
+    });
 }
- 
+
 document.addEventListener("DOMContentLoaded", function () {
     const textParams = document.getElementById("AdditionalText");
     const radios = document.querySelectorAll(".complaint-radio");
@@ -30,6 +52,6 @@ document.addEventListener("DOMContentLoaded", function () {
         };
 
         radios.forEach(r => r.addEventListener("change", toggleTextArea));
-        toggleTextArea(); 
+        toggleTextArea();
     }
 });

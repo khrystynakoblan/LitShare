@@ -1,23 +1,21 @@
 ﻿document.addEventListener("DOMContentLoaded", function () {
 
-    const alerts = document.querySelectorAll('.alert:not(.alert-permanent)');
-    alerts.forEach(alert => {
+    document.querySelectorAll('.alert:not(.alert-permanent)').forEach(alert => {
         setTimeout(() => {
-            const bsAlert = new bootstrap.Alert(alert);
-            bsAlert.close();
+            try {
+                new bootstrap.Alert(alert).close();
+            } catch (_) { }
         }, 5000);
     });
 
     const currentPath = window.location.pathname;
-    const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
-    navLinks.forEach(link => {
+    document.querySelectorAll('.navbar-nav .nav-link').forEach(link => {
         if (link.getAttribute('href') === currentPath) {
             link.classList.add('active');
         }
     });
 
-    const forms = document.querySelectorAll('.needs-validation');
-    forms.forEach(form => {
+    document.querySelectorAll('.needs-validation').forEach(form => {
         form.addEventListener('submit', event => {
             if (!form.checkValidity()) {
                 event.preventDefault();
@@ -27,4 +25,39 @@
         }, false);
     });
 
+    if (typeof $.fn.select2 !== 'undefined') {
+        $('.js-select2').select2({
+            placeholder: 'Оберіть жанри...',
+            allowClear: true,
+            width: '100%'
+        });
+    }
+
+    document.querySelectorAll('[data-confirm]').forEach(el => {
+        el.addEventListener('click', function (e) {
+            e.preventDefault();
+            const message = this.dataset.confirm || 'Ви впевнені?';
+            const form = this.closest('form');
+
+            Swal.fire({
+                icon: 'warning',
+                title: 'Підтвердження',
+                text: message,
+                confirmButtonText: 'Так',
+                cancelButtonText: 'Скасувати',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                reverseButtons: true
+            }).then(result => {
+                if (result.isConfirmed) {
+                    if (form) {
+                        form.submit();
+                    } else if (this.href) {
+                        window.location.href = this.href;
+                    }
+                }
+            });
+        });
+    });
 });

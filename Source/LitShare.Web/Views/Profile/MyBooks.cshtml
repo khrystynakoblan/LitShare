@@ -1,24 +1,30 @@
 @using LitShare.BLL.DTOs
 @model LitShare.Web.Models.ProfileViewModel
-
 @{
     ViewData["Title"] = "Мої книги";
+    var activeQuery = Context.Request.Query["isActive"].ToString();
 }
 
 <div class="container mt-4 mb-5">
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-5">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
         <div>
             <h2 class="fw-bold mb-1">@ViewData["Title"]</h2>
-            <p class="text-muted small mb-0">Керуйте публікаціями та їх видимістю для інших</p>
+            <p class="text-muted small mb-0">Керуйте публікаціями та їх видимістю</p>
         </div>
-        
-        <div class="btn-group shadow-sm rounded-pill overflow-hidden mt-3 mt-md-0">
-            @{
-                var activeQuery = Context.Request.Query["isActive"];
-            }
-            <a asp-action="MyBooks" class="btn btn-dark px-3 @(activeQuery.Count == 0 ? "active" : "")">Всі</a>
-            <a asp-action="MyBooks" asp-route-isActive="true" class="btn btn-dark px-3 @(activeQuery == "true" ? "active" : "")">Активні</a>
-            <a asp-action="MyBooks" asp-route-isActive="false" class="btn btn-dark px-3 @(activeQuery == "false" ? "active" : "")">Архів</a>
+
+        <div class="d-flex gap-2">
+            <a asp-action="MyBooks"
+               class="btn btn-sm @(activeQuery == "" ? "btn-dark" : "btn-outline-dark")">
+                Всі
+            </a>
+            <a asp-action="MyBooks" asp-route-isActive="true"
+               class="btn btn-sm @(activeQuery == "true" ? "btn-dark" : "btn-outline-dark")">
+                <i class="bi bi-eye me-1"></i>Активні
+            </a>
+            <a asp-action="MyBooks" asp-route-isActive="false"
+               class="btn btn-sm @(activeQuery == "false" ? "btn-dark" : "btn-outline-dark")">
+                <i class="bi bi-archive me-1"></i>Архів
+            </a>
         </div>
     </div>
 
@@ -31,32 +37,32 @@
 
                 <div class="col">
                     <div class="card h-100 p-2 border-0 shadow-sm card-hover position-relative rounded-4">
+
                         <form asp-controller="Favorite" asp-action="Toggle" method="post"
-                              class="position-absolute top-0 end-0 m-2" style="z-index: 10;">
+                              class="position-absolute top-0 end-0 m-2" style="z-index:10;">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="postId" value="@book.Id" />
                             <input type="hidden" name="returnUrl" value="/Profile/MyBooks" />
-                            <button type="submit" class="btn btn-light btn-sm rounded-circle shadow-sm p-0 d-flex align-items-center justify-content-center" 
-                                    style="width: 32px; height: 32px;">
-                                <i class="bi @(isFavorited ? "bi-heart-fill text-danger" : "bi-heart text-muted") fs-6"></i>
+                            <button type="submit"
+                                    class="btn btn-light btn-sm rounded-circle shadow-sm p-0 d-flex align-items-center justify-content-center"
+                                    style="width:32px;height:32px;" title="@(isFavorited ? "Видалити з вподобаних" : "Додати до вподобаних")">
+                                <i class="bi @(isFavorited ? "bi-heart-fill text-danger" : "bi-heart text-muted")"></i>
                             </button>
                         </form>
 
-                        <div class="bg-light rounded-3 overflow-hidden shadow-inner d-flex align-items-center justify-content-center position-relative" 
-                             style="aspect-ratio: 3/4;">
-                            
+                        <div class="bg-light rounded-3 overflow-hidden shadow-inner d-flex align-items-center justify-content-center position-relative"
+                             style="aspect-ratio:3/4;">
                             @if (!book.IsActive)
                             {
-                                <div class="position-absolute top-50 start-50 translate-middle w-100 text-center" style="z-index: 2;">
-                                    <span class="badge bg-dark opacity-75 px-3 py-2 rounded-pill">В архіві</span>
+                                <div class="position-absolute top-50 start-50 translate-middle text-center w-100" style="z-index:2;">
+                                    <span class="badge bg-dark bg-opacity-75 px-3 py-2 rounded-pill">В архіві</span>
                                 </div>
                             }
-
                             @if (!string.IsNullOrEmpty(book.PhotoUrl))
                             {
-                                <img src="@book.PhotoUrl" 
-                                    class="w-100 h-100 object-fit-cover transition-img @(book.IsActive ? "" : "grayscale-filter")" 
-                                    alt="@book.Title" />
+                                <img src="@book.PhotoUrl"
+                                     class="w-100 h-100 object-fit-cover transition-img @(book.IsActive ? "" : "grayscale-filter")"
+                                     alt="@book.Title" />
                             }
                             else
                             {
@@ -70,14 +76,17 @@
 
                             <div class="mt-auto d-grid gap-2">
                                 <a asp-controller="Post" asp-action="Edit" asp-route-id="@book.Id"
-                                   class="btn btn-outline-dark btn-sm rounded-pill py-1 small">
-                                    <i class="bi bi-pencil-square me-1"></i> Редагувати
+                                   class="btn btn-outline-dark btn-sm">
+                                    <i class="bi bi-pencil-square me-1"></i>Редагувати
                                 </a>
 
-                                <form asp-action="TogglePostStatus" method="post" class="d-grid">
+                                    Активувати = головна позитивна дія → btn-dark
+                                    Деактивувати = нейтральна/вторинна → btn-outline-dark
+                                --}}
+                                <form asp-action="TogglePostStatus" method="post">
                                     <input type="hidden" name="postId" value="@book.Id" />
-                                    <input type="hidden" name="isActive" value="@(!book.IsActive)" />
-                                    <button type="submit" class="btn btn-sm rounded-pill py-1 small @(book.IsActive ? "btn-light text-muted" : "btn-dark")">
+                                    <button type="submit"
+                                            class="btn btn-sm w-100 @(book.IsActive ? "btn-outline-dark" : "btn-dark")">
                                         <i class="bi @(book.IsActive ? "bi-eye-slash" : "bi-eye") me-1"></i>
                                         @(book.IsActive ? "Деактивувати" : "Активувати")
                                     </button>
@@ -91,16 +100,14 @@
     }
     else
     {
-        <div class="card text-center py-5 border-0 shadow-sm rounded-4 bg-white mt-4">
+        <div class="card text-center py-5 border-0 shadow-sm rounded-4 mt-4">
             <div class="card-body">
-                <i class="bi bi-journal-x display-1 text-muted mb-4 d-block"></i>
+                <i class="bi bi-journal-x display-1 text-muted mb-4 d-block opacity-50"></i>
                 <h4 class="fw-bold">Книг не знайдено</h4>
                 <p class="text-muted">Ви ще не додали жодної книги або налаштували фільтри занадто суворо.</p>
-                <div class="mt-4">
-                    <a asp-controller="Post" asp-action="CreatePost" class="btn btn-dark px-4 py-2 rounded-pill shadow-sm">
-                        <i class="bi bi-plus-lg me-2"></i>Додати першу книгу
-                    </a>
-                </div>
+                <a asp-controller="Post" asp-action="CreatePost" class="btn btn-dark px-4 mt-2">
+                    <i class="bi bi-plus-lg me-2"></i>Додати першу книгу
+                </a>
             </div>
         </div>
     }
