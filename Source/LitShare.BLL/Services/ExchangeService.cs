@@ -139,7 +139,6 @@ namespace LitShare.BLL.Services
                 return Result<bool>.Failure("Запит не знайдено.");
             }
 
-            // 🔥 ДОДАТИ ОЦЕ
             if (request.Post == null)
             {
                 return Result<bool>.Failure("Оголошення не знайдено.");
