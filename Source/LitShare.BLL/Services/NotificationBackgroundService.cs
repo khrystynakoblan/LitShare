@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using LitShare.BLL.Services.Interfaces;
-using LitShare.DAL.Context;
+using LitShare.DAL.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -29,8 +29,7 @@ namespace LitShare.BLL.Services
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            this.logger.LogInformation("Фоновий сервіс сповіщень запущено.");
-
+            this.logger.LogInformation("Notification background service is starting.");
             while (!stoppingToken.IsCancellationRequested)
             {
                 try
@@ -39,7 +38,7 @@ namespace LitShare.BLL.Services
                 }
                 catch (Exception ex)
                 {
-                    this.logger.LogError(ex, "Помилка при обробці сповіщень.");
+                    this.logger.LogError(ex, "An error occurred while processing notifications.");
                 }
 
                 await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
@@ -49,11 +48,8 @@ namespace LitShare.BLL.Services
         private async Task ProcessNotificationsAsync(CancellationToken stoppingToken)
         {
             using var scope = this.scopeFactory.CreateScope();
-            var dbContext = scope.ServiceProvider.GetRequiredService<LitShareDbContext>();
-
-            var unsentNotifications = await dbContext.Notifications
-                .Where(n => !n.IsSent)
-                .ToListAsync(stoppingToken);
+            var notificationRepo = scope.ServiceProvider.GetRequiredService<INotificationRepository>();
+            var unsentNotifications = await notificationRepo.GetUnsentNotificationsAsync();
 
             if (!unsentNotifications.Any())
             {
@@ -65,9 +61,11 @@ namespace LitShare.BLL.Services
                 await this.notificationService.SendToUserAsync(notification.UserId, notification.Message, stoppingToken);
 
                 notification.IsSent = true;
+
+                await notificationRepo.UpdateAsync(notification);
             }
 
-            await dbContext.SaveChangesAsync(stoppingToken);
+            await notificationRepo.SaveChangesAsync();
         }
     }
 }
