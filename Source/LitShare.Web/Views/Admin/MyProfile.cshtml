@@ -1,63 +1,98 @@
-﻿@model LitShare.Web.Models.ProfileViewModel
-@{
-    ViewData["Title"] = "Профіль Адміністратора";
-}
+﻿<div class="container mt-4 mb-5">
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold">Кабінет Модератора</h2>
-        <div class="d-flex gap-2">
-            <a asp-action="Users" class="btn btn-outline-dark">Користувачі</a>
-            <a asp-action="Statistics" class="btn btn-outline-dark">Статистика</a>
-            <a asp-action="Index" class="btn btn-dark">Скарги</a>
-        </div>
-    </div>
+    <div class="row g-4 mb-4">
 
-    <div class="row g-4 align-items-stretch">
-        <div class="col-md-4">
-            <div class="profile-card text-center h-100 d-flex flex-column border-2 border-primary">
-                <div class="mb-3">
-                    <span class="badge badge-admin px-3 py-2">Адміністратор</span>
-                </div>
-
+        <div class="col-md-4 col-lg-3">
+            <div class="profile-card text-center h-100 d-flex flex-column justify-content-center">
                 <img src="@(string.IsNullOrEmpty(Model.PhotoUrl) ? "https://cdn-icons-png.flaticon.com/512/149/149071.png" : Model.PhotoUrl)"
-                     alt="Фото профілю" 
-                     class="profile-avatar mb-3 mx-auto" />
+                     alt="Фото профілю"
+                     class="profile-avatar mx-auto mb-3" />
+                <h5 class="fw-bold mb-0">@Model.Name</h5>
+                <p class="text-muted small mb-0">@Model.Email</p>
+            </div>
+        </div>
 
-                <h5 class="fw-bold mb-4">@Model.Name</h5>
-
-                <div class="mt-auto profile-actions">
-                    <a asp-controller="Profile" asp-action="EditProfile" class="btn btn-dark">Оновити контакти</a>
+        <div class="col-md-8 col-lg-9">
+            <div class="card p-4 border-0 shadow-sm rounded-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0">Контактні дані</h5>
+                    <a asp-action="EditProfile" class="btn btn-sm btn-outline-dark">
+                        <i class="bi bi-pencil me-1"></i>Змінити
+                    </a>
+                </div>
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <div class="p-3 bg-light rounded-3 h-100">
+                            <label class="text-muted small text-uppercase fw-bold d-block mb-1">Телефон</label>
+                            <p class="fs-6 mb-0 fw-semibold">
+                                @(string.IsNullOrEmpty(Model.Phone) || Model.Phone == "Номер не вказано" ? "Не вказано" : Model.Phone)
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="p-3 bg-light rounded-3 h-100">
+                            <label class="text-muted small text-uppercase fw-bold d-block mb-1">Локація</label>
+                            <p class="fs-6 mb-0 fw-semibold">
+                                @(string.IsNullOrWhiteSpace(Model.City) ? "Не вказано" : $"{Model.City}, {Model.Region}")
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-8">
-            <div class="profile-card h-100 d-flex flex-column">
-                <h5 class="fw-bold mb-4"><i class="bi bi-shield-lock me-2"></i>Системні контакти</h5>
-
-                <div class="mb-3">
-                    <p class="text-muted small mb-1">Email для зв'язку</p>
-                    <p class="fw-bold fs-6 mb-0">@Model.Email</p>
-                </div>
-
-                <div class="mb-3">
-                    <p class="text-muted small mb-1">Телефон</p>
-                    <p class="fw-bold fs-6 mb-0">@(string.IsNullOrEmpty(Model.Phone) ? "Не вказано" : Model.Phone)</p>
-                </div>
-
-                <div class="mb-3">
-                    <p class="text-muted small mb-1">ID модератора</p>
-                    <p class="fw-bold font-monospace text-primary mb-0">#@Model.UserId</p>
-                </div>
-
-                <hr class="mt-auto" />
-
-                <div class="w-100">
-                    <p class="text-muted small mb-1">Опис</p>
-                    <p class="fw-bold text-secondary mb-0">@Model.About</p>
-                </div>
-            </div>
-        </div>
     </div>
-</div>
+
+    <div class="row g-4">
+
+        <div class="col-md-4 col-lg-3">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="list-group list-group-flush">
+                    <a asp-controller="Post" asp-action="CreatePost" class="list-group-item list-group-item-action border-0 py-3 px-4 d-flex align-items-center">
+                        <i class="bi bi-plus-circle me-3 fs-5 text-primary"></i> <span>Додати книгу</span>
+                    </a>
+                    <a asp-controller="Profile" asp-action="MyBooks" class="list-group-item list-group-item-action border-0 py-3 px-4 d-flex align-items-center">
+                        <i class="bi bi-journal-text me-3 fs-5"></i> <span>Мої книги</span>
+                    </a>
+                    <a asp-controller="Favorite" asp-action="Index" class="list-group-item list-group-item-action border-0 py-3 px-4 d-flex align-items-center">
+                        <i class="bi bi-heart me-3 fs-5 text-danger"></i> <span>Вподобані</span>
+                    </a>
+
+                    <div class="list-group-item bg-light py-2 px-4 small fw-bold text-uppercase text-muted border-0 mt-2" style="font-size:0.75rem; letter-spacing: 0.5px;">
+                        Запити
+                    </div>
+                    <a asp-controller="Exchange" asp-action="ReceivedRequests" class="list-group-item list-group-item-action border-0 py-3 px-4 d-flex align-items-center">
+                        <i class="bi bi-box-arrow-in-down me-3 fs-5"></i> <span>Отримані</span>
+                    </a>
+                    <a asp-controller="Exchange" asp-action="SentRequests" class="list-group-item list-group-item-action border-0 py-3 px-4 d-flex align-items-center">
+                        <i class="bi bi-send me-3 fs-5"></i> <span>Надіслані</span>
+                    </a>
+
+                    <div class="list-group-item bg-light py-2 px-4 small fw-bold text-uppercase text-muted border-0 mt-2" style="font-size:0.75rem; letter-spacing: 0.5px;">
+                        Налаштування
+                    </div>
+                    <a asp-controller="Profile" asp-action="EditProfile" class="list-group-item list-group-item-action border-0 py-3 px-4 d-flex align-items-center">
+                        <i class="bi bi-gear me-3 fs-5"></i> <span>Редагувати профіль</span>
+                    </a>
+                    <a asp-controller="Profile" asp-action="DeleteAccount" class="list-group-item list-group-item-action border-0 py-3 px-4 text-danger d-flex align-items-center mb-1">
+                        <i class="bi bi-trash me-3 fs-5"></i> <span>Видалити акаунт</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8 col-lg-9">
+            <div class="card p-4 border-0 shadow-sm rounded-4 h-100">
+                <h5 class="fw-bold mb-3">Про себе</h5>
+                <p class="text-secondary mb-0" style="white-space: pre-line; line-height: 1.7;">
+                    @(string.IsNullOrEmpty(Model.About)
+                        ? "Ви ще не додали опис профілю. Розкажіть про ваші літературні смаки!"
+                        : Model.About)
+                </p>
+            </div>
+        </div>
+
+    </div>
+</div> ```
+
+Скопіюй цей код, заміни ним старий у `MyProfile.cshtml`, і жовті попередження у Visual Studio більше не з'являтимуться!

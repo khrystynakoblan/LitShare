@@ -58,7 +58,7 @@ namespace LitShare.BLL.Services
 
             var notification = new Notifications
             {
-                UserId = post.UserId, // Той, кому належить книга
+                UserId = post.UserId,
                 Message = $"Ви отримали новий запит на обмін книги '{post.Title}'.",
                 IsSent = false
             };
