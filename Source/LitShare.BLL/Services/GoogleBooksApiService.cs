@@ -20,21 +20,39 @@
         {
             this.logger.LogInformation("Fetching external data for book: {BookTitle}", bookTitle);
 
-            var response = await this.httpClient.GetFromJsonAsync<GoogleBooksResponseDto>(
-                $"volumes?q=intitle:{bookTitle}&maxResults=1&langRestrict=uk");
-
-            var bookInfo = response?.Items?.FirstOrDefault()?.VolumeInfo;
-
-            if (bookInfo != null)
+            try
             {
-                this.logger.LogInformation("Successfully found external data for: {BookTitle}", bookTitle);
-            }
-            else
-            {
-                this.logger.LogWarning("No external data found for: {BookTitle}", bookTitle);
-            }
+                var response = await this.httpClient.GetAsync($"volumes?q=intitle:{bookTitle}&maxResults=1&langRestrict=uk");
 
-            return bookInfo;
+                if (!response.IsSuccessStatusCode)
+                {
+                    this.logger.LogWarning(
+                        "External API returned {StatusCode} for book: {BookTitle}. User might have hit rate limits.",
+                        response.StatusCode,
+                        bookTitle);
+
+                    return null;
+                }
+
+                var data = await response.Content.ReadFromJsonAsync<GoogleBooksResponseDto>();
+                var bookInfo = data?.Items?.FirstOrDefault()?.VolumeInfo;
+
+                if (bookInfo != null)
+                {
+                    this.logger.LogInformation("Successfully found external data for: {BookTitle}", bookTitle);
+                }
+                else
+                {
+                    this.logger.LogWarning("No external data found for: {BookTitle}", bookTitle);
+                }
+
+                return bookInfo;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "An error occurred while fetching data for book: {BookTitle}", bookTitle);
+                return null;
+            }
         }
     }
 }

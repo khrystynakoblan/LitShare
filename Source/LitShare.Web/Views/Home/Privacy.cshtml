@@ -1,6 +1,32 @@
 ﻿@{
-    ViewData["Title"] = "Privacy Policy";
+    ViewData["Title"] = "Політика конфіденційності";
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+<div class="container mt-5">
+    <div class="card p-5 shadow-sm">
+        <h1 class="fw-bold mb-4">@ViewData["Title"]</h1>
+        
+        <p class="text-muted">Останнє оновлення: 07 травня 2026 року</p>
+
+        <section class="mb-4">
+            <h5 class="fw-bold">1. Збір інформації</h5>
+            <p>Ми збираємо лише ті дані, які необхідні для функціонування платформи LitShare, а саме: ім'я, адресу електронної пошти, номер телефону та місцезнаходження для забезпечення успішного обміну книгами.</p>
+        </section>
+
+        <section class="mb-4">
+            <h5 class="fw-bold">2. Використання даних</h5>
+            <p>Ваші контактні дані відображаються іншим користувачам лише після вашого підтвердження запиту на обмін або дарування книги.</p>
+        </section>
+
+        <section class="mb-4">
+            <h5 class="fw-bold">3. Захист інформації</h5>
+            <p>Ми вживаємо всіх необхідних технічних заходів для захисту ваших персональних даних від несанкціонованого доступу.</p>
+        </section>
+
+        <div class="mt-5">
+            <a asp-controller="Home" asp-action="Index" class="btn btn-dark">
+                Повернутися на головну
+            </a>
+        </div>
+    </div>
+</div>

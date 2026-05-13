@@ -1,21 +1,25 @@
 @model LitShare.BLL.DTOs.PostDetailsDto
 
-<div class="container mt-5 text-center">
-    <h3 class="mb-4">Ви впевнені, що хочете видалити цю книгу?</h3>
+@{
+    ViewData["Title"] = "Видалення оголошення";
+}
 
-    <div class="card p-4 mx-auto" style="max-width: 400px;">
-        <h5>@Model.Title</h5>
-        <p class="text-muted">@Model.Author</p>
+<div class="container mt-5 text-center">
+    <h3 class="fw-bold mb-4">Ви впевнені, що хочете видалити цю книгу?</h3>
+
+    <div class="card p-4 mx-auto col-md-6 col-lg-4">
+        <h5 class="fw-bold">@Model.Title</h5>
+        <p class="text-muted mb-4">@Model.Author</p>
 
         <form asp-action="DeleteConfirmed" method="post">
             <input type="hidden" name="id" value="@Model.Id" />
 
-            <button type="submit" class="btn btn-danger w-100 mb-2">
-                Видалити
+            <button type="submit" class="btn btn-dark w-100 mb-2">
+                Так, видалити
             </button>
         </form>
 
-        <a asp-controller="Profile" asp-action="MyBooks" class="btn btn-outline-secondary w-100">
+        <a asp-controller="Profile" asp-action="MyBooks" class="btn btn-outline-dark w-100">
             Скасувати
         </a>
     </div>

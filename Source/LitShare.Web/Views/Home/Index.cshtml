@@ -4,47 +4,49 @@
     ViewData["Title"] = "Головна";
 }
 
-<div class="container-fluid mt-3">
-    <div class="row">
-
-        <div class="col-md-2">
-            <div class="border p-3">
-                <h6 class="fw-semibold mb-3">Фільтр:</h6>
+<div class="container-fluid mt-3 mb-5">
+    <div class="row g-4">
+        @* Бічна панель фільтрів *@
+        <div class="col-md-3 col-lg-2">
+            <div class="card shadow-sm border-0 p-3 position-sticky" style="top: 20px;">
+                <h6 class="fw-bold mb-3"><i class="bi bi-filter-left me-1"></i> Фільтри</h6>
                 <form method="get" asp-action="Index" id="filterForm">
                     @if (!string.IsNullOrEmpty(Model.SearchTerm))
                     {
                         <input type="hidden" name="searchTerm" value="@Model.SearchTerm" />
                     }
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Локація:</label>
+                        <label class="form-label small fw-bold">Локація:</label>
                         <input type="text" name="location" class="form-control form-control-sm"
                                placeholder="Місто..." value="@Model.Location" />
                     </div>
+
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Тип угоди:</label>
-                        <div class="form-check">
-                            <input type="radio" name="dealType" class="form-check-input" value="Exchange"
+                        <label class="form-label small fw-bold">Тип угоди:</label>
+                        <div class="form-check small">
+                            <input type="radio" name="dealType" class="form-check-input filter-radio" value="Exchange"
                                    id="dealExchange" @(Model.DealType == DealType.Exchange ? "checked" : "") />
                             <label class="form-check-label" for="dealExchange">Обмін</label>
                         </div>
-                        <div class="form-check">
-                            <input type="radio" name="dealType" class="form-check-input" value="Donation"
+                        <div class="form-check small">
+                            <input type="radio" name="dealType" class="form-check-input filter-radio" value="Donation"
                                    id="dealDonation" @(Model.DealType == DealType.Donation ? "checked" : "") />
                             <label class="form-check-label" for="dealDonation">Дарування</label>
                         </div>
-                        <div class="form-check">
-                            <input type="radio" name="dealType" class="form-check-input" value=""
+                        <div class="form-check small">
+                            <input type="radio" name="dealType" class="form-check-input filter-radio" value=""
                                    id="dealAll" @(Model.DealType == null ? "checked" : "") />
                             <label class="form-check-label" for="dealAll">Всі</label>
                         </div>
                     </div>
+
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Жанр:</label>
-                        <div class="overflow-auto" style="max-height: 300px;">
+                        <label class="form-label small fw-bold">Жанр:</label>
+                        <div class="overflow-auto custom-scrollbar pe-2" style="max-height: 300px;">
                             @foreach (var genre in Model.AllGenres)
                             {
-                                <div class="form-check">
-                                    <input type="checkbox" name="genres" class="form-check-input"
+                                <div class="form-check small">
+                                    <input type="checkbox" name="genres" class="form-check-input filter-checkbox"
                                            value="@genre.Id" id="genre_@genre.Id"
                                     @(Model.SelectedGenres != null && Model.SelectedGenres.Contains(genre.Id) ? "checked" : "") />
                                     <label class="form-check-label" for="genre_@genre.Id">@genre.Name</label>
@@ -52,78 +54,73 @@
                             }
                         </div>
                     </div>
+                    
                     @if (Model.SearchTerm != null || Model.Location != null || Model.DealType != null || (Model.SelectedGenres != null && Model.SelectedGenres.Any()))
                     {
-                        <a asp-action="Index" class="btn btn-outline-secondary w-100 mt-2">Скинути</a>
+                        <a asp-action="Index" class="btn btn-sm btn-outline-dark w-100 mt-2">Скинути</a>
                     }
                 </form>
             </div>
         </div>
 
-        <div class="col-md-10">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <span class="text-muted">Знайдено: @Model.TotalCount книг</span>
-                <a asp-controller="Post" asp-action="CreatePost" class="btn btn-dark">+ Додати книгу</a>
+        @* Основна частина з книгами *@
+        <div class="col-md-9 col-lg-10">
+            <div class="d-flex justify-content-between align-items-center mb-4 px-2">
+                <span class="text-muted fw-semibold small">Знайдено: @Model.TotalCount книг</span>
+                <a asp-controller="Post" asp-action="CreatePost" class="btn btn-dark btn-sm px-3 shadow-sm">+ Додати книгу</a>
             </div>
 
-            @if (!ViewData.ModelState.IsValid)
-            {
-                <div class="alert alert-warning fw-bold my-3 text-center" role="alert">
-                    @foreach (var value in ViewData.ModelState.Values)
-                    {
-                        foreach (var error in value.Errors)
-                        {
-                            <p class="mb-0">@error.ErrorMessage</p>
-                        }
-                    }
-                </div>
-            }
-            
             @if (!Model.Posts.Any())
             {
-                <div class="text-center text-muted mt-5">
-                    <p>Оголошень не знайдено за вибраними фільтрами.</p>
+                <div class="card shadow-sm border-0 text-center py-5 bg-white">
+                    <div class="card-body">
+                        <i class="bi bi-search display-3 text-muted mb-3 d-block"></i>
+                        <p class="text-muted fs-5">Оголошень не знайдено за вибраними фільтрами.</p>
+                        <a asp-action="Index" class="btn btn-outline-dark btn-sm mt-2">Показати всі книги</a>
+                    </div>
                 </div>
             }
             else
             {
-                <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
+                <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4 px-2">
                     @foreach (var post in Model.Posts)
                     {
                         bool isFavorited = Model.FavoritePostIds.Contains(post.Id);
 
                         <div class="col">
-                            <div class="card h-100 border-0 shadow-sm position-relative">
-
+                            <div class="card h-100 p-2 border-0 shadow-sm card-hover position-relative">
+                                @* Сердечко *@
                                 <form asp-controller="Favorite" asp-action="Toggle" method="post"
-                                      class="position-absolute top-0 end-0 m-1" style="z-index: 1;">
+                                      class="position-absolute top-0 end-0 m-2" style="z-index: 10;">
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="postId" value="@post.Id" />
                                     <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
-                                    <button type="submit" class="btn btn-link p-1 border-0" title="@(isFavorited ? "Видалити з вподобаних" : "Додати до вподобаних")">
-                                        <i class="bi @(isFavorited ? "bi-heart-fill text-danger" : "bi-heart text-muted")"
-                                           style="font-size: 1.2rem;"></i>
+                                    <button type="submit" class="btn btn-light btn-sm rounded-circle shadow-sm p-0 d-flex align-items-center justify-content-center" 
+                                            style="width: 30px; height: 30px;" title="@(isFavorited ? "Видалити" : "Додати")">
+                                        <i class="bi @(isFavorited ? "bi-heart-fill text-danger" : "bi-heart text-muted") fs-6"></i>
                                     </button>
                                 </form>
 
                                 <a asp-controller="Post" asp-action="Details" asp-route-id="@post.Id"
-                                   class="text-decoration-none text-dark">
-                                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center"
-                                         style="height: 200px; overflow: hidden;">
+                                   class="text-decoration-none text-dark h-100 d-flex flex-column">
+                                    
+                                    <div class="bg-light rounded overflow-hidden shadow-inner d-flex align-items-center justify-content-center" style="aspect-ratio: 3/4;">
                                         @if (!string.IsNullOrEmpty(post.PhotoUrl))
                                         {
-                                            <img src="@post.PhotoUrl" alt="@post.Title"
-                                                 style="width: 100%; height: 100%; object-fit: cover;" />
+                                            <img src="@post.PhotoUrl" alt="@post.Title" class="w-100 h-100 object-fit-cover transition-img" />
                                         }
                                         else
                                         {
-                                            <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                                            <i class="bi bi-book text-muted display-6"></i>
                                         }
                                     </div>
-                                    <div class="card-body p-2 text-center">
-                                        <p class="mb-0 fw-semibold small">@post.Title</p>
-                                        <p class="mb-0 text-muted small">@post.Author</p>
-                                        <p class="mb-0 text-muted small">@(post.City ?? "—")</p>
+
+                                    <div class="card-body px-1 py-3 text-center mt-auto">
+                                        <h6 class="mb-1 fw-bold text-truncate small" title="@post.Title">@post.Title</h6>
+                                        <p class="mb-1 text-muted extra-small text-truncate">@post.Author</p>
+                                        <p class="mb-0 text-secondary extra-small">
+                                            <i class="bi bi-geo-alt me-1"></i>@(post.City ?? "—")
+                                        </p>
                                     </div>
                                 </a>
                             </div>
@@ -136,23 +133,5 @@
 </div>
 
 @section Scripts {
-    <script>
-        document.querySelectorAll('input[type="radio"]').forEach(radio => {
-            radio.addEventListener('change', function () {
-                if (this.checked) {
-                    document.getElementById('filterForm').submit();
-                }
-            });
-        });
-
-        let timeoutId;
-        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-            checkbox.addEventListener('change', function () {
-                clearTimeout(timeoutId);
-                timeoutId = setTimeout(() => {
-                    document.getElementById('filterForm').submit();
-                }, 500);
-            });
-        });
-    </script>
+    <script src="~/js/filters.js" asp-append-version="true"></script>
 }

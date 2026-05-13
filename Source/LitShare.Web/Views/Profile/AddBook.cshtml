@@ -2,18 +2,25 @@
     ViewData["Title"] = "Додати оголошення";
 }
 
-<div class="row justify-content-center mt-5">
-    <div class="col-md-6 col-lg-5 text-center">
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5 text-center">
+            <div class="card p-5">
+                <i class="bi bi-hammer text-muted display-1 mb-4"></i>
+                
+                <h2 class="fw-bold mb-3">@ViewData["Title"]</h2>
 
-        <h2 class="mb-3">@ViewData["Title"]</h2>
+                <div class="alert alert-info border-0 bg-light text-dark">
+                    <i class="bi bi-info-circle me-2"></i>
+                    Ця сторінка зараз знаходиться в розробці.
+                </div>
 
-        <div class="alert alert-info">
-            Ця сторінка ще в розробці 
+                <div class="mt-4">
+                    <a asp-controller="Profile" asp-action="Index" class="btn btn-dark w-100">
+                        Назад до профілю
+                    </a>
+                </div>
+            </div>
         </div>
-
-        <a asp-controller="Profile" asp-action="MyProfile" class="btn btn-outline-secondary mt-3">
-            Назад до профілю
-        </a>
-
     </div>
 </div>

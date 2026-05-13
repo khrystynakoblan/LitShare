@@ -1,0 +1,38 @@
+[
+  {
+    "outputFileName": "wwwroot/css/bundle.min.css",
+    "inputFiles": [
+      "wwwroot/css/site.css",
+      "wwwroot/css/components.css",
+      "wwwroot/css/forms.css",
+      "wwwroot/css/profile.css"
+    ],
+    "minify": {
+      "enabled": true
+    }
+  },
+  {
+    "outputFileName": "wwwroot/css/admin.min.css",
+    "inputFiles": [
+      "wwwroot/css/admin.css"
+    ],
+    "minify": {
+      "enabled": true
+    }
+  },
+  {
+    "outputFileName": "wwwroot/js/bundle.min.js",
+    "inputFiles": [
+      "wwwroot/js/site.js",
+      "wwwroot/js/rating.js",
+      "wwwroot/js/autofill.js",
+      "wwwroot/js/filters.js",
+      "wwwroot/js/complaints.js",
+      "wwwroot/js/create-post.js",
+      "wwwroot/js/notifications.js"
+    ],
+    "minify": {
+      "enabled": true
+    }
+  }
+]

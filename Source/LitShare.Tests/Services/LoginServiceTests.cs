@@ -38,8 +38,6 @@
             this.SetupUserFound(dto.Email, expectedUserId);
             this.SetupPasswordValid(dto.Password);
 
-            // БУЛО: bool result = ...
-            // СТАЛО:
             var result = await this.sut.LoginAsync(dto);
 
             Assert.True(result.IsSuccess);

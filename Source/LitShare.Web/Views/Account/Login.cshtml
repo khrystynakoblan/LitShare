@@ -6,55 +6,53 @@
 }
 
 <div class="row justify-content-center mt-5">
-    <div class="col-md-6 col-lg-5">
+    <div class="col-md-6 col-lg-4">
+        <div class="card p-4">
+            <h2 class="mb-4 text-center fw-bold">@ViewData["Title"]</h2>
 
-        <h2 class="mb-4 text-center">@ViewData["Title"]</h2>
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success" role="alert">
+                    @TempData["SuccessMessage"]
+                </div>
+            }
 
-        @if (TempData["SuccessMessage"] != null)
-        {
-            <div class="alert alert-success" role="alert">
-                @TempData["SuccessMessage"]
-            </div>
-        }
+            @{
+                var globalErrors = ViewData.ModelState[string.Empty]?.Errors;
+            }
+            @if (globalErrors != null && globalErrors.Count > 0)
+            {
+                <div class="alert alert-danger" role="alert">
+                    @foreach (var error in globalErrors)
+                    {
+                        <div>@error.ErrorMessage</div>
+                    }
+                </div>
+            }
 
-        @{
-            var globalErrors = ViewData.ModelState[string.Empty]?.Errors;
-        }
-        @if (globalErrors != null && globalErrors.Count > 0)
-        {
-            <div class="alert alert-danger" role="alert">
-                @foreach (var error in globalErrors)
-                {
-                    <div>@error.ErrorMessage</div>
-                }
-            </div>
-        }
+            <form asp-controller="Account" asp-action="Login" method="post" class="needs-validation" novalidate>
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label"></label>
+                    <input asp-for="Email" class="form-control" placeholder="example@email.com" autocomplete="email" required />
+                    <span asp-validation-for="Email" class="text-danger small"></span>
+                </div>
 
-        <form asp-controller="Account" asp-action="Login" method="post" novalidate>
+                <div class="mb-4">
+                    <label asp-for="Password" class="form-label"></label>
+                    <input asp-for="Password" class="form-control" placeholder="Введіть пароль" autocomplete="current-password" required />
+                    <span asp-validation-for="Password" class="text-danger small"></span>
+                </div>
 
-            <div class="mb-3">
-                <label asp-for="Email" class="form-label fw-semibold"></label>
-                <input asp-for="Email" class="form-control" placeholder="example@email.com" autocomplete="email" />
-                <span asp-validation-for="Email" class="text-danger small"></span>
-            </div>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-dark btn-lg">Увійти</button>
+                </div>
 
-            <div class="mb-4">
-                <label asp-for="Password" class="form-label fw-semibold"></label>
-                <input asp-for="Password" class="form-control" placeholder="Введіть пароль" autocomplete="current-password" />
-                <span asp-validation-for="Password" class="text-danger small"></span>
-            </div>
-
-            <div class="d-grid">
-                <button type="submit" class="btn btn-dark btn-lg">Увійти</button>
-            </div>
-
-            <div class="mt-3 text-center">
-                <span class="text-muted">Немає акаунту?</span>
-                <a asp-controller="Account" asp-action="Register" class="ms-1">Зареєструватися</a>
-            </div>
-
-        </form>
-
+                <div class="mt-4 text-center">
+                    <span class="text-muted">Немає акаунту?</span>
+                    <a asp-controller="Account" asp-action="Register" class="fw-bold text-dark ms-1">Зареєструватися</a>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
