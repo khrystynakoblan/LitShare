@@ -14,9 +14,9 @@ namespace LitShare.DAL.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterDatabase()
-                .Annotation("Npgsql:Enum:deal_type_t.deal_type", "exchange,donation")
-                .Annotation("Npgsql:Enum:request_status_t.request_status", "pending,accepted,rejected,completed")
-                .Annotation("Npgsql:Enum:role_t.role_type", "user,admin");
+                .Annotation("Npgsql:Enum:deal_type_t", "exchange,donation")
+                .Annotation("Npgsql:Enum:request_status_t", "pending,accepted,rejected,completed")
+                .Annotation("Npgsql:Enum:role_t", "user,admin");
 
             migrationBuilder.CreateTable(
                 name: "genres",

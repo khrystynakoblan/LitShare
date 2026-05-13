@@ -40,8 +40,9 @@
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasPostgresEnum<DealType>("deal_type_t");
-            modelBuilder.HasPostgresEnum<RoleType>("role_t");
+            modelBuilder.HasPostgresEnum<DealType>(null, "deal_type_t");
+            modelBuilder.HasPostgresEnum<RoleType>(null, "role_t");
+            modelBuilder.HasPostgresEnum<RequestStatus>(null, "request_status_t");
 
             modelBuilder.Entity<Users>().HasIndex(u => u.Email).IsUnique();
             modelBuilder.Entity<Users>().Property(u => u.Role).HasDefaultValue(RoleType.User);
@@ -122,8 +123,6 @@
             modelBuilder.Entity<Reviews>()
                 .HasIndex(r => new { r.ReviewerId, r.ReviewedUserId })
                 .IsUnique();
-
-            modelBuilder.HasPostgresEnum<RequestStatus>("request_status_t");
 
             modelBuilder.Entity<ExchangeRequest>()
                 .HasIndex(e => new { e.SenderId, e.PostId })
