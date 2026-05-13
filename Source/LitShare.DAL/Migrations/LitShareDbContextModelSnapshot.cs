@@ -22,7 +22,7 @@ namespace LitShare.DAL.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "deal_type_t", "deal_type", new[] { "exchange", "donation" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "request_status", new[] { "pending", "accepted", "rejected", "completed" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "request_status_t", "request_status", new[] { "pending", "accepted", "rejected", "completed" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "role_t", "role_type", new[] { "user", "admin" });
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 

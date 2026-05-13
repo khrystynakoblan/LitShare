@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LitShare.DAL.Migrations
 {
     [DbContext(typeof(LitShareDbContext))]
-    [Migration("20260318104133_InitialCreate")]
+    [Migration("20260513133429_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -25,6 +25,7 @@ namespace LitShare.DAL.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "deal_type_t", "deal_type", new[] { "exchange", "donation" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "request_status_t", "request_status", new[] { "pending", "accepted", "rejected", "completed" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "role_t", "role_type", new[] { "user", "admin" });
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
@@ -82,6 +83,58 @@ namespace LitShare.DAL.Migrations
                     b.ToTable("complaints");
                 });
 
+            modelBuilder.Entity("LitShare.DAL.Models.ExchangeRequest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<int>("PostId")
+                        .HasColumnType("integer")
+                        .HasColumnName("post_id");
+
+                    b.Property<int>("SenderId")
+                        .HasColumnType("integer")
+                        .HasColumnName("sender_id");
+
+                    b.Property<RequestStatus>("Status")
+                        .HasColumnType("request_status_t")
+                        .HasColumnName("status");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PostId");
+
+                    b.HasIndex("SenderId", "PostId")
+                        .IsUnique();
+
+                    b.ToTable("exchange_requests");
+                });
+
+            modelBuilder.Entity("LitShare.DAL.Models.Favorites", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer")
+                        .HasColumnName("user_id");
+
+                    b.Property<int>("PostId")
+                        .HasColumnType("integer")
+                        .HasColumnName("post_id");
+
+                    b.HasKey("UserId", "PostId");
+
+                    b.HasIndex("PostId");
+
+                    b.ToTable("favorites");
+                });
+
             modelBuilder.Entity("LitShare.DAL.Models.Genres", b =>
                 {
                     b.Property<int>("Id")
@@ -100,6 +153,45 @@ namespace LitShare.DAL.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("genres");
+                });
+
+            modelBuilder.Entity("LitShare.DAL.Models.Notifications", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_read");
+
+                    b.Property<bool>("IsSent")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_sent");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("message");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("notifications");
                 });
 
             modelBuilder.Entity("LitShare.DAL.Models.Posts", b =>
@@ -125,6 +217,10 @@ namespace LitShare.DAL.Migrations
                         .HasColumnType("text")
                         .HasColumnName("description");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
+
                     b.Property<string>("PhotoUrl")
                         .HasColumnType("text")
                         .HasColumnName("photo_url");
@@ -144,6 +240,47 @@ namespace LitShare.DAL.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("posts");
+                });
+
+            modelBuilder.Entity("LitShare.DAL.Models.Reviews", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Date")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("date")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("integer")
+                        .HasColumnName("rating");
+
+                    b.Property<int>("ReviewedUserId")
+                        .HasColumnType("integer")
+                        .HasColumnName("reviewed_user_id");
+
+                    b.Property<int>("ReviewerId")
+                        .HasColumnType("integer")
+                        .HasColumnName("reviewer_id");
+
+                    b.Property<string>("Text")
+                        .HasColumnType("text")
+                        .HasColumnName("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReviewedUserId");
+
+                    b.HasIndex("ReviewerId", "ReviewedUserId")
+                        .IsUnique();
+
+                    b.ToTable("reviews");
                 });
 
             modelBuilder.Entity("LitShare.DAL.Models.Users", b =>
@@ -175,16 +312,20 @@ namespace LitShare.DAL.Migrations
                         .HasColumnType("character varying(255)")
                         .HasColumnName("email");
 
-                    b.Property<string>("HashedPassword")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("hashedPassword");
+                    b.Property<bool>("IsBlocked")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_blocked");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)")
                         .HasColumnName("name");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("password_hash");
 
                     b.Property<string>("Phone")
                         .HasMaxLength(20)
@@ -252,6 +393,55 @@ namespace LitShare.DAL.Migrations
                     b.Navigation("Post");
                 });
 
+            modelBuilder.Entity("LitShare.DAL.Models.ExchangeRequest", b =>
+                {
+                    b.HasOne("LitShare.DAL.Models.Posts", "Post")
+                        .WithMany()
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LitShare.DAL.Models.Users", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Post");
+
+                    b.Navigation("Sender");
+                });
+
+            modelBuilder.Entity("LitShare.DAL.Models.Favorites", b =>
+                {
+                    b.HasOne("LitShare.DAL.Models.Posts", "Post")
+                        .WithMany("FavoritedBy")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LitShare.DAL.Models.Users", "User")
+                        .WithMany("Favorites")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Post");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("LitShare.DAL.Models.Notifications", b =>
+                {
+                    b.HasOne("LitShare.DAL.Models.Users", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("LitShare.DAL.Models.Posts", b =>
                 {
                     b.HasOne("LitShare.DAL.Models.Users", "User")
@@ -261,6 +451,25 @@ namespace LitShare.DAL.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("LitShare.DAL.Models.Reviews", b =>
+                {
+                    b.HasOne("LitShare.DAL.Models.Users", "ReviewedUser")
+                        .WithMany("ReviewsReceived")
+                        .HasForeignKey("ReviewedUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LitShare.DAL.Models.Users", "Reviewer")
+                        .WithMany("ReviewsGiven")
+                        .HasForeignKey("ReviewerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ReviewedUser");
+
+                    b.Navigation("Reviewer");
                 });
 
             modelBuilder.Entity("LitShare.DAL.Models.Genres", b =>
@@ -273,13 +482,21 @@ namespace LitShare.DAL.Migrations
                     b.Navigation("BookGenres");
 
                     b.Navigation("Complaints");
+
+                    b.Navigation("FavoritedBy");
                 });
 
             modelBuilder.Entity("LitShare.DAL.Models.Users", b =>
                 {
                     b.Navigation("Complaints");
 
+                    b.Navigation("Favorites");
+
                     b.Navigation("Posts");
+
+                    b.Navigation("ReviewsGiven");
+
+                    b.Navigation("ReviewsReceived");
                 });
 #pragma warning restore 612, 618
         }
