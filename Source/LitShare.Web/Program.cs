@@ -104,6 +104,25 @@ try
 
     var app = builder.Build();
 
+    using (var scope = app.Services.CreateScope())
+    {
+        var services = scope.ServiceProvider;
+        try
+        {
+            var context = services.GetRequiredService<LitShareDbContext>();
+            if (context.Database.GetPendingMigrations().Any())
+            {
+                Log.Information("Applying pending migrations to the database...");
+                context.Database.Migrate();
+                Log.Information("Migrations applied successfully.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "An error occurred while migrating the database.");
+        }
+    }
+
     app.UseExceptionHandler();
 
     if (!app.Environment.IsDevelopment())
