@@ -337,16 +337,13 @@
         }
 
         [Fact]
-        public async Task GetStatisticsAsync_WhenRepositoryThrowsException_ReturnsFailure()
+        public async Task GetStatisticsAsync_WhenRepositoryThrowsException_ThrowsException()
         {
             this.userRepositoryMock
                 .Setup(r => r.GetAllAsync())
                 .ThrowsAsync(new Exception("Database error"));
 
-            var result = await this.adminService.GetStatisticsAsync();
-
-            Assert.True(result.IsFailure);
-            Assert.Equal("Не вдалося завантажити статистику", result.Error);
+            await Assert.ThrowsAsync<Exception>(() => this.adminService.GetStatisticsAsync());
         }
 
         [Fact]
@@ -409,16 +406,13 @@
         }
 
         [Fact]
-        public async Task GetAllUsersAsync_WhenRepositoryThrowsException_ReturnsFailure()
+        public async Task GetAllUsersAsync_WhenRepositoryThrowsException_ThrowsException()
         {
             this.userRepositoryMock
                 .Setup(r => r.GetAllAsync())
                 .ThrowsAsync(new Exception("Database connection failed"));
 
-            var result = await this.adminService.GetAllUsersAsync();
-
-            Assert.True(result.IsFailure);
-            Assert.Equal("Не вдалося завантажити список користувачів.", result.Error);
+            await Assert.ThrowsAsync<Exception>(() => this.adminService.GetAllUsersAsync());
         }
 
         [Fact]
