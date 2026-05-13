@@ -1,3 +1,4 @@
+using Azure.Identity;
 using LitShare.BLL.Common;
 using LitShare.BLL.Services;
 using LitShare.BLL.Services.Interfaces;
@@ -24,6 +25,13 @@ try
     Log.Information("Starting LitShare application...");
 
     var builder = WebApplication.CreateBuilder(args);
+
+    var keyVaultName = builder.Configuration["KeyVaultName"];
+    if (!builder.Environment.IsDevelopment() && !string.IsNullOrEmpty(keyVaultName))
+    {
+        var kvUri = new Uri($"https://{keyVaultName}.vault.azure.net/");
+        builder.Configuration.AddAzureKeyVault(kvUri, new DefaultAzureCredential());
+    }
 
     builder.Host.UseSerilog((context, services, configuration) =>
         configuration
