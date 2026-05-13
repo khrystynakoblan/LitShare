@@ -123,7 +123,7 @@
                 .HasIndex(r => new { r.ReviewerId, r.ReviewedUserId })
                 .IsUnique();
 
-            modelBuilder.HasPostgresEnum<RequestStatus>();
+            modelBuilder.HasPostgresEnum<RequestStatus>("request_status_t");
 
             modelBuilder.Entity<ExchangeRequest>()
                 .HasIndex(e => new { e.SenderId, e.PostId })
